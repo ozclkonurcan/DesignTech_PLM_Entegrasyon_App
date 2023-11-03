@@ -13,27 +13,51 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 {
 	public class LogController : Controller
 	{
-		public IActionResult Index()
-		{
+        //public IActionResult Index()
+        //{
+        //          try
+        //          {
+        //              string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
+        //              string[] dateFolders = Directory.GetDirectories(logsPath);
+
+        //              // Tarih klasörlerini ViewBag'e aktarın
+        //              ViewBag.DateFolders = dateFolders;
+        //              return View();
+
+
+        //          }
+        //          catch (Exception)
+        //          {
+        //              return View();
+
+        //          }
+
+
+        //      }
+
+        public IActionResult Index()
+        {
             try
             {
                 string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
+                if (!Directory.Exists(logsPath))
+                {
+                    // Logs klasörü yoksa oluşturun
+                    Directory.CreateDirectory(logsPath);
+                }
+
                 string[] dateFolders = Directory.GetDirectories(logsPath);
 
                 // Tarih klasörlerini ViewBag'e aktarın
                 ViewBag.DateFolders = dateFolders;
                 return View();
-
-
             }
             catch (Exception)
             {
                 return View();
-
             }
-
-
         }
+
 
         public ActionResult ViewJsonFiles(string dateFolder)
         {
