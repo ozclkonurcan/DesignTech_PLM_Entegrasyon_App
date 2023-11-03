@@ -1,0 +1,191 @@
+﻿<div class="col-xl-12">
+
+    <!--begin::List widget 21-->
+    <div class="card card-flush h-xl-100">
+        <!--begin::Header-->
+        <div class="card-header border-0 pt-5">
+            <h3 class="card-title align-items-start flex-column">
+                <span class="card-label fw-bold text-dark">Active Lessons</span>
+
+            </h3>
+
+
+        </div>
+        <!--end::Header-->
+        <!--begin::Body-->
+        <div class="card-body pt-5 table-responsive">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @try
+                    {
+
+                        @foreach (var item in ViewBag.wtPartsProcess)
+                        {
+
+
+
+                            <tr>
+                                <td>
+                                    <div class="vis-item vis-range vis-readonly" style="transform: translateX(10px);  top: 17.5px;">
+                                        <div class="vis-item-overflow">
+                                            <div class="vis-item-content" style="transform: translateX(0px);">
+
+                                                @if (item.yuzdeOran == "Canceled")
+                                                {
+                                                    <div class="rounded-pill bg-light-danger d-flex align-items-center position-relative h-40px w-100 p-2 overflow-hidden">
+                                                        <div class="position-absolute rounded-pill d-block bg-danger start-0 top-0 h-100 z-index-1" style="width:100%;"></div>
+
+                                                        <div class="d-flex align-items-center position-relative z-index-2">
+                                                            <div class="symbol-group symbol-hover flex-nowrap me-3">
+                                                            </div>
+
+                                                            <a href="#" class="fw-bold text-white text-hover-dark">@item.name</a>
+                                                        </div>
+
+                                                        <div class="d-flex flex-center bg-body rounded-pill fs-7 fw-bolder ms-auto h-100 px-3 position-relative z-index-2">
+                                                            @item.yuzdeOran / 100
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    double yuzdeOranDouble = 0.0;
+                                                    @if (double.TryParse(item.yuzdeOran.Replace("%", ""), out yuzdeOranDouble))
+                                                    {
+                                                        string progressClass = "success"; // Varsayılan olarak success sınıfını kullan
+
+                                                        if (yuzdeOranDouble < 50)
+                                                        {
+                                                            progressClass = "warning"; // 50'nin altındaysa warning sınıfını kullan
+                                                        }
+                                                        else if (yuzdeOranDouble < 100)
+                                                        {
+                                                            progressClass = "info"; // 50 ile 100 arasındaysa info sınıfını kullan
+                                                        }
+                                                        <div class="rounded-pill bg-light-@progressClass d-flex align-items-center position-relative h-40px w-100 p-2 overflow-hidden">
+                                                            <div class="position-absolute rounded-pill d-block bg-@progressClass start-0 top-0 h-100 z-index-1" style="width:@item.yuzdeOran;"></div>
+
+                                                            <div class="d-flex align-items-center position-relative z-index-2">
+                                                                <div class="symbol-group symbol-hover flex-nowrap me-3">
+                                                                </div>
+
+                                                                <a href="#" class="fw-bold text-white text-hover-dark">@item.name</a>
+                                                            </div>
+
+                                                            <div class="d-flex flex-center bg-body rounded-pill fs-7 fw-bolder ms-auto h-100 px-3 position-relative z-index-2">
+                                                                @item.yuzdeOran / 100
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="rounded-pill bg-light-success d-flex align-items-center position-relative h-40px w-100 p-2 overflow-hidden">
+                                                            <div class="position-absolute rounded-pill d-block bg-success start-0 top-0 h-100 z-index-1" style="width:@item.yuzdeOran;"></div>
+
+                                                            <div class="d-flex align-items-center position-relative z-index-2">
+                                                                <div class="symbol-group symbol-hover flex-nowrap me-3">
+                                                                </div>
+
+                                                                <a href="#" class="fw-bold text-white text-hover-dark">@item.name</a>
+                                                            </div>
+
+                                                            <div class="d-flex flex-center bg-body rounded-pill fs-7 fw-bolder ms-auto h-100 px-3 position-relative z-index-2">
+                                                                @item.yuzdeOran% / 100
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                }
+
+                                            </div>
+                                        </div><div class="vis-item-visible-frame"></div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        <tr>
+                            <td>
+                                <div class="progress-group mt-3">
+                                    <span class="alert alert-danger mt-3 w-25">HATA!</span>
+                                    <p class="alert alert-default-danger mt-3">@ex.Message</p>
+                                </div>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="dataTables_paginate paging_simple_numbers" id="kt_ecommerce_products_table_paginate">
+                <ul class="pagination">
+                    @if (ViewBag.page > 1)
+                    {
+                        <li class="paginate_button page-item">
+                            <a href="?page=1" aria-controls="kt_ecommerce_products_table" data-dt-idx="0" tabindex="0" class="page-link">
+                                <i class="previous"></i>
+                                <i class="previous"></i>
+                            </a>
+                        </li>
+                        <li class="paginate_button page-item">
+                            <a href="?page=@(ViewBag.page - 1)" aria-controls="kt_ecommerce_products_table" data-dt-idx="1" tabindex="0" class="page-link">
+                                <i class="previous"></i>
+                            </a>
+                        </li>
+                    }
+
+                    @for (var i = 1; i <= Math.Ceiling((double)ViewBag.fileCount / ViewBag.pageSize); i++)
+                    {
+                        if (i == ViewBag.page)
+                        {
+                            <li class="paginate_button page-item active">
+                                <a href="?page=@i" aria-controls="kt_ecommerce_products_table" data-dt-idx="@i" tabindex="0" class="page-link">@i</a>
+                            </li>
+                        }
+                        else if (i == 1 || i == ViewBag.page - 1 || i == ViewBag.page || i == ViewBag.page + 1 || i == Math.Ceiling((double)ViewBag.fileCount / ViewBag.pageSize))
+                        {
+                            <li class="paginate_button page-item">
+                                <a href="?page=@i" aria-controls="kt_ecommerce_products_table" data-dt-idx="@i" tabindex="0" class="page-link">@i</a>
+                            </li>
+                        }
+                        else if (i == 2 || i == ViewBag.page - 2 || i == ViewBag.page + 2 || i == Math.Ceiling((double)ViewBag.fileCount / ViewBag.pageSize) - 1)
+                        {
+                            <li class="paginate_button page-item">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+                    }
+
+                    @if (ViewBag.page < Math.Ceiling((double)ViewBag.fileCount / ViewBag.pageSize))
+                    {
+                        <li class="paginate_button page-item">
+                            <a href="?page=@(ViewBag.page + 1)" aria-controls="kt_ecommerce_products_table" data-dt-idx="6" tabindex="0" class="page-link">
+                                <i class="next"></i>
+                            </a>
+                        </li>
+                        <li class="paginate_button page-item">
+                            <a href="?page=@(Math.Ceiling((double)ViewBag.fileCount / ViewBag.pageSize))" aria-controls="kt_ecommerce_products_table" data-dt-idx="7" tabindex="0" class="page-link">
+                                <i class="next"></i>
+                                <i class="next"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+        </div>
+        <!--end::Body-->
+    </div>
+    <!--end::List widget 21-->
+</div>
+

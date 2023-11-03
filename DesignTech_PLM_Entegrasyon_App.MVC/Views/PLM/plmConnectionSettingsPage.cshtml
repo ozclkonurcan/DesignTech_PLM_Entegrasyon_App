@@ -1,0 +1,687 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="card">
+	<!--begin::Body-->
+	<div class="card-body p-lg-20">
+		<!--begin::Layout-->
+		<div class="d-flex flex-column flex-xl-row">
+			<!--begin::Content-->
+			<div class="flex-lg-row-fluid me-xl-18 mb-10 mb-xl-0">
+				<!--begin::Invoice 2 content-->
+				@* STEPPER SETTINGS *@
+				<div class="mt-n1">
+
+
+					<div class="m-0">
+
+						<!--begin::Modal dialog-->
+						<div class="modal-dialog modal-dialog-centered mw-900px" id="kt_modal_create_app">
+							<!--begin::Modal content-->
+							<div class="modal-content">
+								<!--begin::Modal header-->
+								<div class="modal-header">
+									<!--begin::Modal title-->
+									<h2>SQL Settings Form</h2>
+									<!--end::Modal title-->
+
+								</div>
+								<!--end::Modal header-->
+								<!--begin::Modal body-->
+								<div class="modal-body py-lg-10 px-lg-10">
+									<!--begin::Stepper-->
+									<div class="stepper stepper-pills stepper-column d-flex flex-column flex-xl-row flex-row-fluid" id="kt_modal_create_app_stepper">
+										<!--begin::Aside-->
+										<div class="d-flex justify-content-center justify-content-xl-start flex-row-auto w-100 w-xl-300px">
+											<!--begin::Nav-->
+											<div class="stepper-nav ps-lg-10">
+												<!--begin::Step 1-->
+												<div class="stepper-item current" data-kt-stepper-element="nav">
+													<!--begin::Wrapper-->
+													<div class="stepper-wrapper">
+														<!--begin::Icon-->
+														<div class="stepper-icon w-40px h-40px">
+															<i class="ki-duotone ki-check stepper-check fs-2"></i>
+															<span class="stepper-number">1</span>
+														</div>
+														<!--end::Icon-->
+														<!--begin::Label-->
+														<div class="stepper-label">
+															<h3 class="stepper-title">Details</h3>
+															<div class="stepper-desc">Name your Server</div>
+														</div>
+														<!--end::Label-->
+													</div>
+													<!--end::Wrapper-->
+													<!--begin::Line-->
+													<div class="stepper-line h-40px"></div>
+													<!--end::Line-->
+												</div>
+												<!--end::Step 1-->
+												<!--begin::Step 3-->
+												<div class="stepper-item" data-kt-stepper-element="nav">
+													<!--begin::Wrapper-->
+													<div class="stepper-wrapper">
+														<!--begin::Icon-->
+														<div class="stepper-icon w-40px h-40px">
+															<i class="ki-duotone ki-check stepper-check fs-2"></i>
+															<span class="stepper-number">2</span>
+														</div>
+														<!--end::Icon-->
+														<!--begin::Label-->
+														<div class="stepper-label">
+															<h3 class="stepper-title">Database</h3>
+															<div class="stepper-desc">Select the app database type</div>
+														</div>
+														<!--end::Label-->
+													</div>
+													<!--end::Wrapper-->
+													<!--begin::Line-->
+													<div class="stepper-line h-40px"></div>
+													<!--end::Line-->
+												</div>
+												<!--end::Step 3-->
+												<!--begin::Step 5-->
+												<div class="stepper-item mark-completed" data-kt-stepper-element="nav">
+													<!--begin::Wrapper-->
+													<div class="stepper-wrapper">
+														<!--begin::Icon-->
+														<div class="stepper-icon w-40px h-40px">
+															<i class="ki-duotone ki-check stepper-check fs-2"></i>
+															<span class="stepper-number">3</span>
+														</div>
+														<!--end::Icon-->
+														<!--begin::Label-->
+														<div class="stepper-label">
+															<h3 class="stepper-title">Completed</h3>
+															<div class="stepper-desc">Review and Submit</div>
+														</div>
+														<!--end::Label-->
+													</div>
+													<!--end::Wrapper-->
+												</div>
+												<!--end::Step 5-->
+											</div>
+											<!--end::Nav-->
+										</div>
+										<!--begin::Aside-->
+										<!--begin::Content-->
+										<div class="flex-row-fluid py-lg-5 px-lg-15">
+											<!--begin::Form-->
+											<form class="form" method="post" asp-action="sqlSettings" asp-controller="PLM" novalidate="novalidate" id="kt_modal_create_app_form">
+												<!--begin::Step 1-->
+												<div class="current" data-kt-stepper-element="content">
+													<div class="w-100">
+														<!--begin::Input group-->
+														<div class="fv-row mb-10">
+															<!--begin::Label-->
+															<label class="d-flex align-items-center fs-5 fw-semibold mb-2">
+																<span class="required">Server Name</span>
+																<span class="ms-1" data-bs-toggle="tooltip" title="Specify your unique server name">
+																	<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
+																		<span class="path1"></span>
+																		<span class="path2"></span>
+																		<span class="path3"></span>
+																	</i>
+																</span>
+															</label>
+															<!--end::Label-->
+															<!--begin::Input-->
+															<input type="text" class="form-control form-control-lg form-control-solid required" name="server" placeholder="" value="" />
+															<!--end::Input-->
+														</div>
+														<!--end::Input group-->
+														<!--begin::Input group-->
+														<div class="fv-row">
+															<!--begin::Label-->
+															<label class="d-flex align-items-center fs-5 fw-semibold mb-4">
+																<span class="required">SQL Type</span>
+																<span class="ms-1" data-bs-toggle="tooltip" title="Select your server category">
+																	<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
+																		<span class="path1"></span>
+																		<span class="path2"></span>
+																		<span class="path3"></span>
+																	</i>
+																</span>
+															</label>
+															<!--end::Label-->
+															<!--begin:Options-->
+															<div class="fv-row">
+																<!--begin:Option-->
+																<label class="d-flex flex-stack mb-5 cursor-pointer">
+																	<!--begin:Label-->
+																	<span class="d-flex align-items-center me-2">
+																		<!--begin:Icon-->
+																		<span class="symbol symbol-50px me-6">
+																			<span class="symbol-label bg-light-primary">
+																				<i class="ki-duotone ki-compass fs-1 text-primary">
+																					<span class="path1"></span>
+																					<span class="path2"></span>
+																				</i>
+																			</span>
+																		</span>
+																		<!--end:Icon-->
+																		<!--begin:Info-->
+																		<span class="d-flex flex-column">
+																			<span class="fw-bold fs-6">Server</span>
+																			<span class="fs-7 text-muted">Creating a clear text structure is just one SEO</span>
+																		</span>
+																		<!--end:Info-->
+																	</span>
+																	<!--end:Label-->
+																	<!--begin:Input-->
+																	<span class="form-check form-check-custom form-check-solid">
+																		<input class="form-check-input" type="radio" name="connectionType" value="Server" />
+																	</span>
+																	<!--end:Input-->
+																</label>
+																<!--end::Option-->
+																<!--begin:Option-->
+																<label class="d-flex flex-stack cursor-pointer">
+																	<!--begin:Label-->
+																	<span class="d-flex align-items-center me-2">
+																		<!--begin:Icon-->
+																		<span class="symbol symbol-50px me-6">
+																			<span class="symbol-label bg-light-success">
+																				<i class="ki-duotone ki-timer fs-1 text-success">
+																					<span class="path1"></span>
+																					<span class="path2"></span>
+																					<span class="path3"></span>
+																				</i>
+																			</span>
+																		</span>
+																		<!--end:Icon-->
+																		<!--begin:Info-->
+																		<span class="d-flex flex-column">
+																			<span class="fw-bold fs-6">Local</span>
+																			<span class="fs-7 text-muted">Creating a clear text structure copywriting</span>
+																		</span>
+																		<!--end:Info-->
+																	</span>
+																	<!--end:Label-->
+																	<!--begin:Input-->
+																	<span class="form-check form-check-custom form-check-solid">
+																		<input class="form-check-input" type="radio" name="connectionType" value="Local" />
+																	</span>
+																	<!--end:Input-->
+																</label>
+																<!--end::Option-->
+															</div>
+															<!--end:Options-->
+														</div>
+														<!--end::Input group-->
+													</div>
+												</div>
+												<!--end::Step 1-->
+												<!--begin::Step 3-->
+												<div data-kt-stepper-element="content">
+													<div class="w-100">
+														<!--begin::Input group-->
+														<div class="fv-row mb-10">
+															<!--begin::Label-->
+															<label class="required fs-5 fw-semibold mb-2">Database Name</label>
+															<!--end::Label-->
+															<!--begin::Input-->
+															<input type="text" class="form-control form-control-lg form-control-solid" name="Catalog" placeholder="" value="" />
+															<!--end::Input-->
+														</div>
+														<!--end::Input group-->
+														<!--begin::Input group-->
+														<div class="fv-row mb-10" id="UserIdDiv">
+															<!--begin::Label-->
+															<label class=" fs-5 fw-semibold mb-2">User Name</label>
+															<!--end::Label-->
+															<!--begin::Input-->
+															<input type="text" class="form-control form-control-lg form-control-solid" id="UserId" name="UserId" placeholder="" value="" />
+															<!--end::Input-->
+														</div>
+														<!--end::Input group-->
+														<!--begin::Input group-->
+														<div class="fv-row mb-10" id="PasswordDiv">
+															<!--begin::Label-->
+															<label class=" fs-5 fw-semibold mb-2">User Password</label>
+															<!--end::Label-->
+															<!--begin::Input-->
+															<input type="password" class="form-control form-control-lg form-control-solid" id="Password" name="Password" placeholder="" value="" />
+															<!--end::Input-->
+														</div>
+														<!--end::Input group-->
+
+													</div>
+												</div>
+												<!--end::Step 3-->
+												<!--begin::Step 5-->
+												<div data-kt-stepper-element="content">
+													<div class="w-100 text-center">
+														<!--begin::Heading-->
+														<h1 class="fw-bold text-dark mb-3">Release!</h1>
+														<!--end::Heading-->
+														<!--begin::Description-->
+														<div class="text-muted fw-semibold fs-3">Submit your app to kickstart your project.</div>
+														<!--end::Description-->
+														<!--begin::Illustration-->
+														<div class="text-center px-4 py-15">
+															<img src="assets/media/illustrations/sketchy-1/9.png" alt="" class="mw-100 mh-300px" />
+														</div>
+														<!--end::Illustration-->
+													</div>
+												</div>
+												<!--end::Step 5-->
+												<!--begin::Actions-->
+												<div class="d-flex flex-stack pt-10">
+													<!--begin::Wrapper-->
+													<div class="me-2">
+														<button type="button" class="btn btn-lg btn-light-primary me-3" data-kt-stepper-action="previous">
+															<i class="ki-duotone ki-arrow-left fs-3 me-1">
+																<span class="path1"></span>
+																<span class="path2"></span>
+															</i>Back
+														</button>
+													</div>
+													<!--end::Wrapper-->
+													<!--begin::Wrapper-->
+													<div>
+														<button type="submit" class="btn btn-lg btn-primary" data-kt-stepper-action="submit">
+															<span class="indicator-label">
+																Submit
+																<i class="ki-duotone ki-arrow-right fs-3 ms-2 me-0">
+																	<span class="path1"></span>
+																	<span class="path2"></span>
+																</i>
+															</span>
+															<span class="indicator-progress">
+																Please wait...
+																<span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+															</span>
+														</button>
+														<button type="button" class="btn btn-lg btn-primary" data-kt-stepper-action="next">
+															Continue
+															<i class="ki-duotone ki-arrow-right fs-3 ms-1 me-0">
+																<span class="path1"></span>
+																<span class="path2"></span>
+															</i>
+														</button>
+													</div>
+													<!--end::Wrapper-->
+												</div>
+												<!--end::Actions-->
+											</form>
+											<!--end::Form-->
+										</div>
+										<!--end::Content-->
+									</div>
+									<!--end::Stepper-->
+								</div>
+								<!--end::Modal body-->
+							</div>
+							<!--end::Modal content-->
+						</div>
+						<!--end::Modal dialog-->
+					</div>
+					<!--end::Wrapper-->
+				</div>
+				@* STEPPER SETTINGS *@
+				<!--end::Invoice 2 content-->
+			</div>
+			<!--end::Content-->
+			<!--begin::Sidebar-->
+			<div class="m-0">
+				<!--begin::Invoice 2 sidebar-->
+				@try
+				{
+					@if (@ParseConnectionString("Server", ViewBag.PlmConnectionString) != "N/A")
+					{
+
+
+
+						@if (@ParseConnectionString("Server", ViewBag.PlmConnectionString) != "N/A")
+						{
+							<div class="d-print-none border border-dashed border-gray-300 card-rounded h-lg-100 min-w-md-300px p-9 bg-lighten">
+								<!--begin::Labels-->
+								<div class="mb-8">
+
+									@if ((bool)ViewBag.ConnectionType)
+									{
+
+										<span class="badge badge-light-success  float-end">Connected</span>
+									}
+									else
+									{
+										<span class="badge badge-light-warning  float-end">Connection Failed</span>
+									}
+								</div>
+								<!--end::Labels-->
+								<!--begin::Title-->
+								<h6 class="mb-8 fw-bolder text-gray-600 text-hover-primary">SQL BAĞLANTI</h6>
+								<!--end::Title-->
+								<!--begin::Item-->
+								<div class="mb-6">
+									<div class="fw-semibold text-gray-600 fs-7">Server:</div>
+
+									<div class="fw-bold text-gray-800 fs-6">
+										@ParseConnectionString("Server", ViewBag.PlmConnectionString)
+									</div>
+								</div>
+								<!--end::Item-->
+								<!--begin::Item-->
+								<div class="mb-6">
+									<div class="fw-semibold text-gray-600 fs-7">User ID:</div>
+
+									<div class="fw-bold text-gray-800 fs-6">
+										@ParseConnectionString("User ID", ViewBag.PlmConnectionString)
+									</div>
+								</div>
+								<!--end::Item-->
+								<!--begin::Item-->
+								@* 			<div class="mb-15">
+					<div class="fw-semibold text-gray-600 fs-7">Connection Date:</div>
+
+					<div class="fw-bold fs-6 text-gray-800 d-flex align-items-center">
+					14 days
+
+					<span class="fs-7 text-danger d-flex align-items-center">
+					<span class="bullet bullet-dot bg-danger mx-2"></span>
+
+					Due in 7 days
+					</span>
+					</div>
+					</div> *@
+								<!--end::Item-->
+								<!--begin::Title-->
+								<h6 class="mb-8 fw-bolder text-gray-600 text-hover-primary">DATABASE</h6>
+								<!--end::Title-->
+								<!--begin::Item-->
+								<div class="mb-6">
+									<div class="fw-semibold text-gray-600 fs-7">Database Name</div>
+
+									<div class="fw-bold fs-6 text-gray-800">
+										Catalog: @ParseConnectionString("Initial Catalog", ViewBag.PlmConnectionString)
+
+									</div>
+								</div>
+								<!--end::Item-->
+								@if (!(bool)ViewBag.ConnectionType)
+								{
+									<div class="mb-6">
+
+										<div class="fw-bold fs-6 text-gray-800">
+											<form method="post" asp-action="plmConnectionSettingsPage" asp-controller="PLM">
+												<button type="submit" class="btn btn-sm btn-warning float-end">Re Connect</button>
+											</form>
+
+
+										</div>
+									</div>
+								}
+
+							</div>
+
+						}
+						else
+						{
+							<div class="d-print-none border border-dashed border-gray-300 card-rounded h-lg-100 min-w-md-300px p-9 bg-lighten">
+								<!--begin::Labels-->
+								<div class="mb-8">
+
+									<span class="badge badge-light-danger  float-end">Disconnected</span>
+								</div>
+								<!--end::Labels-->
+								<!--begin::Title-->
+								<h6 class="mb-8 fw-bolder text-gray-600 text-hover-primary">SQL BAĞLANTI</h6>
+								<!--end::Title-->
+								<!--begin::Item-->
+								<div class="mb-6">
+									<div class="fw-semibold text-gray-600 fs-7">Server:</div>
+
+									<div class="fw-bold text-gray-800 fs-6">
+										@ParseConnectionString("Server", ViewBag.PlmConnectionString)
+									</div>
+								</div>
+								<!--end::Item-->
+								<!--begin::Item-->
+								<div class="mb-6">
+									<div class="fw-semibold text-gray-600 fs-7">User ID:</div>
+
+									<div class="fw-bold text-gray-800 fs-6">
+										@ParseConnectionString("User ID", ViewBag.PlmConnectionString)
+									</div>
+								</div>
+								<!--end::Item-->
+								<!--begin::Item-->
+								@* 			<div class="mb-15">
+					<div class="fw-semibold text-gray-600 fs-7">Connection Date:</div>
+
+					<div class="fw-bold fs-6 text-gray-800 d-flex align-items-center">
+					14 days
+
+					<span class="fs-7 text-danger d-flex align-items-center">
+					<span class="bullet bullet-dot bg-danger mx-2"></span>
+
+					Due in 7 days
+					</span>
+					</div>
+					</div> *@
+								<!--end::Item-->
+								<!--begin::Title-->
+								<h6 class="mb-8 fw-bolder text-gray-600 text-hover-primary">DATABASE</h6>
+								<!--end::Title-->
+								<!--begin::Item-->
+								<div class="mb-6">
+									<div class="fw-semibold text-gray-600 fs-7">Database Name</div>
+
+									<div class="fw-bold fs-6 text-gray-800">
+										Catalog: @ParseConnectionString("Initial Catalog", ViewBag.PlmConnectionString)
+
+									</div>
+								</div>
+								<!--end::Item-->
+
+
+							</div>
+						}
+
+					}
+					else
+					{
+						@if (@ParseConnectionString("Data Source", ViewBag.PlmConnectionString) != "N/A")
+						{
+							<div class="d-print-none border border-dashed border-gray-300 card-rounded h-lg-100 min-w-md-300px p-9 bg-lighten">
+								<!--begin::Labels-->
+								<div class="mb-8">
+									@if ((bool)ViewBag.ConnectionType)
+									{
+
+										<span class="badge badge-light-success  float-end">Connected</span>
+									}
+									else
+									{
+										<span class="badge badge-light-warning  float-end">Connection Failed</span>
+									}
+								</div>
+								<!--end::Labels-->
+								<!--begin::Title-->
+								<h6 class="mb-8 fw-bolder text-gray-600 text-hover-primary">SQL BAĞLANTI</h6>
+								<!--end::Title-->
+								<!--begin::Item-->
+								<div class="mb-6">
+									<div class="fw-semibold text-gray-600 fs-7">Local:</div>
+
+									<div class="fw-bold text-gray-800 fs-6">
+										@ParseConnectionString("Data Source", ViewBag.PlmConnectionString)
+									</div>
+								</div>
+								<!--end::Item-->
+								<!--begin::Item-->
+								<!--end::Item-->
+								<!--begin::Title-->
+								<h6 class="mb-8 fw-bolder text-gray-600 text-hover-primary">DATABASE</h6>
+								<!--end::Title-->
+								<!--begin::Item-->
+								<div class="mb-6">
+									<div class="fw-semibold text-gray-600 fs-7">Database Name</div>
+
+									<div class="fw-bold fs-6 text-gray-800">
+										Catalog: @ParseConnectionString("Database", ViewBag.PlmConnectionString)
+
+									</div>
+								</div>
+								<!--end::Item-->
+								@if (!(bool)ViewBag.ConnectionType)
+								{
+									<div class="mb-6">
+
+										<div class="fw-bold fs-6 text-gray-800">
+											<form method="post" asp-action="plmConnectionSettingsPage" asp-controller="PLM">
+												<button type="submit" class="btn btn-sm btn-warning float-end">Re Connect</button>
+											</form>
+
+
+										</div>
+									</div>
+								}
+
+							</div>
+
+						}
+						else
+						{
+							<div class="d-print-none border border-dashed border-gray-300 card-rounded h-lg-100 min-w-md-300px p-9 bg-lighten">
+								<!--begin::Labels-->
+								<div class="mb-8">
+
+									<span class="badge badge-light-danger  float-end">Disconnected</span>
+								</div>
+								<!--end::Labels-->
+								<!--begin::Title-->
+								<h6 class="mb-8 fw-bolder text-gray-600 text-hover-primary">SQL BAĞLANTI</h6>
+								<!--end::Title-->
+								<!--begin::Item-->
+								<div class="mb-6">
+									<div class="fw-semibold text-gray-600 fs-7">Local:</div>
+
+									<div class="fw-bold text-gray-800 fs-6">
+										@ParseConnectionString("Data Source", ViewBag.PlmConnectionString)
+									</div>
+								</div>
+								<!--end::Item-->
+								<!--begin::Item-->
+								<!--end::Item-->
+								<!--begin::Title-->
+								<h6 class="mb-8 fw-bolder text-gray-600 text-hover-primary">DATABASE</h6>
+								<!--end::Title-->
+								<!--begin::Item-->
+								<div class="mb-6">
+									<div class="fw-semibold text-gray-600 fs-7">Database Name</div>
+
+									<div class="fw-bold fs-6 text-gray-800">
+										Catalog: @ParseConnectionString("Database", ViewBag.PlmConnectionString)
+
+									</div>
+								</div>
+								<!--end::Item-->
+
+							</div>
+						}
+					}
+
+				}
+				catch (Exception)
+				{
+
+					throw;
+				}
+
+				<!--end::Invoice 2 sidebar-->
+			</div>
+			<!--end::Sidebar-->
+		</div>
+		<!--end::Layout-->
+	</div>
+	<!--end::Body-->
+</div>
+
+
+
+@functions {
+
+	public string ParseConnectionString(string key, string connectionString)
+	{
+		if (string.IsNullOrEmpty(connectionString))
+		{
+			return "N/A"; // connectionString boş ise "N/A" döndür
+		}
+
+		var parts = connectionString.Split(';')
+			.Select(part => part.Trim())
+			.Where(part => !string.IsNullOrEmpty(part))
+			.Select(part => part.Split('='))
+			.ToDictionary(split => split[0], split => split[1]);
+
+		if (parts == null)
+		{
+			return "N/A"; // parts sözlüğü null ise "N/A" döndür
+		}
+
+		return parts.ContainsKey(key) ? parts[key] : "N/A";
+	}
+}
+
+
+<script>
+	$(document).ready(function () {
+		// Sayfa yüklendiğinde çalışacak kod
+		$('input[name="connectionType"]').change(function () {
+			if (this.value === "Local") {
+				// "Local" seçildiğinde
+				$('#UserIdDiv').prop('hidden', true); // User Name alanını devre dışı bırak
+				$('#PasswordDiv').prop('hidden', true); // User Password alanını devre dışı bırak
+			} else {
+				// Diğer durumlarda
+				$('#UserIdDiv').prop('hidden', false); // User Name alanını etkinleştir
+				$('#PasswordDiv').prop('hidden', false); // User Password alanını etkinleştir
+			}
+		});
+	});
+</script>
+
+<script>
+
+	$(document).ready(function () {
+		// Form submit işlemi engellenir
+		$("#kt_modal_create_app_form").submit(function (event) {
+			event.preventDefault();
+
+			// Loader gösterilir
+			$("#loader").show();
+
+			// Form verileri alınır
+			var formData = $("#kt_modal_create_app_form").serialize();
+
+			// AJAX POST isteği yapılır
+			$.ajax({
+				type: "POST",
+				url: "/PLM/sqlSettings",
+				data: formData,
+				success: function (response) {
+					// İstek başarıyla tamamlandığında yapılacak işlemler burada olabilir
+					console.log(response);
+				},
+				complete: function () {
+					// İşlem tamamlandığında loader gizlenir
+					$("#loader").hide();
+					window.location.href = '/Home/Index';
+				},
+				error: function (xhr, status, error) {
+					// İstek başarısız olduğunda yapılacak işlemler burada olabilir
+					console.error(error);
+					// Loader gizlenir
+					$("#loader").hide();
+				}
+			});
+		});
+	});
+
+</script>

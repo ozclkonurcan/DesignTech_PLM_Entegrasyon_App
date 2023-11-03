@@ -1,0 +1,491 @@
+﻿<!-- İşlem devam ederken overlay ekranı -->
+<div id="loadingOverlay" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; text-align: center; padding-top: 20%;">
+    <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #fff;"></i>
+    <p style="color: #fff;">İşlem devam ediyor...</p>
+</div>
+
+<div class="col-xl-12 mb-5 mb-xl-10">
+    <div class="col-sm-12 m-2" id="errorList"></div>
+
+    <div class="card card-flush h-xl-100">
+        <div class="card-header pt-7 d-flex justify-content-between">
+            <div>
+                <h5>Alt başlık</h5>
+            </div>
+            <button onclick="ExcelAktar();"  id="excel_aktar_btn" class="btn btn-sm btn-success btn-sm ml-auto float-end">PLM IMPORT</button>
+        </div>
+
+        <div class="card-body pt-2">
+            <div class="table-responsive">
+                <table class="table align-middle table-row-dashed fs-6 gy-3 dataTable no-footer" id="excel_table">
+                    @using (Html.BeginForm("excelproc", "PlmExcelIntegrate", FormMethod.Post, new { id = "excelheadform" }))
+                    {
+                        <input type="hidden" value="@ViewBag.excelfile" name="excel" id="excelFileName" />
+                        <thead>
+                            <tr>
+                                @try
+                                {
+                                    @foreach (var item in ViewBag.exceldata.Columns)
+                                    {
+                                            <td>
+                                                <select name="selected_headers[]" colHeadName="@item"  id="headselect_@item" class="form-select multiple_attr m-2">
+                                                    <option value="0">None</option>
+                                                    @foreach (var AttrItem in ViewBag.AttrList)
+                                                    {
+                                    
+                                                        <option typeAttr="@AttrItem.classnameA2A2"  value="@item|@AttrItem.hierarchyID|@AttrItem.classnameA2A2|@AttrItem.idA2A2">@AttrItem.displayName</option>
+                                                    }
+                                                </select>
+                                            </td>
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    <td>
+                                        <select>
+                                            <option value="0">None</option>
+                                        </select>
+                                    </td>
+                                }
+                            </tr>
+                        </thead>
+                    }
+                    <thead>
+                        <tr>
+                            @try
+                            {
+                                @foreach (var item in ViewBag.exceldata.Columns)
+                                {
+                                    <th id="err_@item">@item</th>
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                <th class="alert alert-danger m-3 p-2">HATA!</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @try
+                        {
+                            @foreach (var item in ViewBag.exceldata.Rows)
+                            {
+                                <tr>
+                                    @foreach (var header in ViewBag.exceldata.Columns)
+                                    {
+                                        <td class="@header">
+                                            @{
+                                                if (string.IsNullOrEmpty(Convert.ToString(item[header])))
+                                                {
+                                                }
+                                                else
+                                                {
+                                                                        @item[header]
+                                                }
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            <tr>
+                                <td class="alert alert-danger">HATA!</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #excel_table_wrapper > .dt-buttons {
+        display: none;
+    }
+
+    #excel_table_filter {
+        float: left;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('#excel_table').DataTable({
+            "pageLength": 5,
+            "info": false,
+            "ordering": false,
+            "dom": 'Bfrtip',
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.11.6/i18n/Turkish.json",
+                "search": "",
+                "searchPlaceholder": "Search...",
+                "sInfo": "Toplam _TOTAL_ kayıt arasından _START_ - _END_ arasındaki kayıtlar gösteriliyor",
+                "sInfoFiltered": "(toplam _MAX_ kayıttan süzülmüş)",
+            }
+        });
+    });
+</script>
+<script>
+    // Bu değişken, hataları tutmak için bir dizi oluşturur.
+    var hataListesi = [];
+
+    function ExcelAktar() {
+        // Overlay ekranını göster
+        $('#loadingOverlay').show();
+
+        // Hataları temizle
+        hataListesi = [];
+
+        let formData = $('#excelheadform').serialize();
+        ajaxClass('/upload/excelproc', formData,
+            function (data) {
+                // İşlem tamamlandığında overlay ekranını gizle
+                $('#loadingOverlay').hide();
+
+                if (data.status == true) {
+                    toastr.success(data.message);
+                    $('.multiple_attr').val('0'); // Tüm seçim alanlarını "None" olarak ayarla
+
+                    // Hata listesini kontrol et
+                    if (hataListesi.length > 0) {
+                        // Hata listesini post et veya işlem yap
+                        postHataListesi(hataListesi);
+                    } else {
+                        // Hata yoksa verileri başka bir yere post et
+                        postVerileri(data);
+                    }
+                } else {
+                    toastr.error(data.message);
+                }
+            },
+            function (err) {
+                // İşlem tamamlandığında overlay ekranını gizle
+                $('#loadingOverlay').hide();
+
+                toastr.error('Tip Dönüşüm Hatası');
+            }, null);
+    }
+
+    function postHataListesi(hatalar) {
+        // Hataları başka bir controller'a post et veya işlem yap
+        $.ajax({
+            url: '/upload/posthatalistesi',
+            type: 'POST',
+            data: {
+                hatalar: hatalar
+            },
+            success: function (data) {
+                if (data.status == true) {
+                    toastr.success('Hatalar başka bir yere gönderildi.');
+                } else {
+                    toastr.error('Hatalar gönderilirken bir hata oluştu.');
+                }
+            },
+            error: function () {
+                toastr.error('Hatalar gönderilirken bir hata oluştu.');
+            }
+        });
+    }
+
+    function postVerileri(veriler) {
+        // Verileri başka bir controller'a post et veya işlem yap
+        $.ajax({
+            url: '/upload/postveriler',
+            type: 'POST',
+            data: {
+                veriler: veriler
+            },
+            success: function (data) {
+                if (data.status == true) {
+                    toastr.success('Veriler başka bir yere gönderildi.');
+                } else {
+                    toastr.error('Veriler gönderilirken bir hata oluştu.');
+                }
+            },
+            error: function () {
+                toastr.error('Veriler gönderilirken bir hata oluştu.');
+            }
+        });
+    }
+
+    var errorList = [];
+    var validList = [];
+
+    $('.multiple_attr').change(function () {
+        // Hata kontrolü için bir değişken
+        let allNone = true;
+        errorList = []; // Her seçim değişikliğinde errorList dizisini temizle
+        validList = []; // Her seçim değişikliğinde validList dizisini temizle
+
+        $('.multiple_attr').each(function () {
+            let colHeadName = $(this).attr("colHeadName");
+            let hasError = false;
+            let colHeadType = $(this).val().split("|")[2];
+
+            if (colHeadType === "wt.iba.definition.FloatDefinition" ||
+                colHeadType === "wt.iba.definition.DoubleDefinition" ||
+                colHeadType === "wt.iba.definition.DecimalDefinition" ||
+                colHeadType === "wt.iba.definition.IntDefinition")  {
+                $('.' + colHeadName).each(function (i, obj) {
+                    let cellValue = $(obj).text().trim();
+
+                    if (!isNumeric(cellValue) && cellValue !== "") {
+                        hasError = true;
+
+                        // Hatalı değeri ve konumunu errorList'e ekleyin
+                        let rowIndex = $(this).closest('tr').index() + 1; // Satır numarası (1 başlangıçlı)
+                        let columnIndex = $(this).index() + 1; // Sütun numarası (1 başlangıçlı)
+                        // let errorInfo = `Hata: ${cellValue}, Satır: ${rowIndex}, Sütun: ${columnIndex},Durum: ${true}`;
+                        // errorList.push(errorInfo);
+                        var fileName = $('#excelFileName').val();
+                        let errorInfo = {
+                            ExcelDosya: fileName,
+                            Hata: cellValue,
+                            Satir: rowIndex,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+
+                        let errorInfoJSON = JSON.stringify(errorInfo);
+                        errorList.push(errorInfoJSON);
+
+                        $(this).css("color", "red");
+                    } else {
+                        validList.push(cellValue); // Hatalı olmayan değeri validList'e ekleyin
+                        $(this).css("color", "black");
+                    }
+                });
+
+
+                        //     if (hasnumericerror) {
+                        //         $('#err_' + colheadname).html(colheadname + ' <span class="badge badge-danger">hata</span>');
+                        //         hatalistesi.push(colheadname + ' sütununda sayısal olmayan değerler var.');
+                        //     } else {
+                        //         $('#err_' + colheadname).html(colheadname);
+                        //     }
+                        // } else if (colheadtype === "wt.iba.definition.timestampdefinition") {
+                        //     let hastimestamperror = false;
+
+                        //     $('.' + colheadname).each(function (i, obj) {
+                        //         let cellvalue = $(obj).text().trim();
+                        //         if (cellvalue === "") {
+                        //             $(this).html("empty");
+                        //             toastr.error("datetime not empty");
+                        //             hastimestamperror = true;
+                        //             haserror = true;
+                        //         } else {
+                        //             $(this).css("color", "black");
+                        //             if ($(this).html() === "empty") {
+                        //                 $(this).css("color", "orange");
+                        //             }
+                        //         }
+                        //     });
+
+                        //     if (hastimestamperror) {
+                        //         $('#err_' + colheadname).html(colheadname + ' <span class="badge badge-danger">hata</span>');
+                        //         hatalistesi.push(colheadname + ' sütununda eksik tarih saat bilgisi var.');
+                        //     } else {
+                        //         $('#err_' + colheadname).html(colheadname);
+                        //     }
+
+            }
+
+            // Diğer hata türlerine benzer şekilde hatalı veya doğru değerleri ilgili dizilere ekleyebilirsiniz.
+
+            // Hata varsa veya hiçbir şey seçilmediyse PLM IMPORT butonunu etkinleştirin
+            if (allNone || $('.multiple_attr[hasError="true"]').length > 0) {
+                // $('#excel_aktar_btn').attr("disabled", true);
+            } else {
+                // $('#excel_aktar_btn').attr("disabled", false);
+            }
+        });
+
+        // Hata Listesini konsola yazdırma işlemi burada değil, errorList ve validList dolduktan sonra yapılmalıdır.
+        console.log("Hatalı Değerler ve Konumları:");
+        errorList.forEach(function (error) {
+            console.log(error);
+        });
+        console.log("Doğru Değerler: " + validList);
+    });
+
+    function ExcelAktar() {
+
+        // alert("kekw")
+        // errorList ve validList dizilerini JSON formatına çevirin
+        var errorListJSON = JSON.stringify(errorList);
+        var validListJSON = JSON.stringify(validList);
+        var fileName = $('#excelFileName').val();
+        let formData = $('#excelheadform').serialize();
+        // Post işlemi için bir AJAX isteği gönderin
+        $.ajax({
+            url: '/PlmExcelIntegrate/ExcelFileControl',
+            type: 'POST',
+            data: { data:formData, HataListesi: errorListJSON, Hatasizlar: validListJSON },
+            dataType: "json",
+            success: function (data) {
+                // Başarılı bir şekilde post işlemi tamamlandığında burada işlemlerinizi yapabilirsiniz
+                if (hataListesi.length > 0) {
+                    toastr.info("Post işlemi gerçekleştirildi ama excel dosyasında hatalı alanlar var log sayfasını kontrol ediniz.");
+                } else {
+                    toastr.success("Post işlemi başarılı");
+                }
+            },
+            error: function (error) {
+                // Post işlemi sırasında hata oluştuğunda burada işlemlerinizi yapabilirsiniz
+                toastr.error("Post işlemi sırasında hata oluştu: " + error);
+            }
+        });
+    }
+
+
+    //         var errorList = [];
+
+    // $('.multiple_attr').change(function () {
+    //     // Hata kontrolü için bir değişken
+    //     let allNone = true;
+    //     $('.multiple_attr').each(function () {
+    //         let colHeadName = $(this).attr("colHeadName");
+    //         let hasError = false;
+    //         let colHeadType = $(this).val().split("|")[2];
+
+    //         if (colHeadType === "wt.iba.definition.FloatDefinition") { 
+    //             $('.' + colHeadName).each(function (i, obj) {
+    //                 let cellValue = $(obj).text().trim();
+
+    //                 if (!isNumeric(cellValue) && cellValue !== "") {
+    //                     hasNumericError = true;
+    //                     hasError = true;
+    //                     errorList.push(cellValue);
+    //                     $(this).css("color", "red");
+    //                 } else {
+    //                     $(this).css("color", "black");
+    //                 }
+    //             });
+    //         }
+           
+
+    //         // if (colHeadType === "wt.iba.definition.FloatDefinition" ||
+    //         //     colHeadType === "wt.iba.definition.DoubleDefinition" ||
+    //         //     colHeadType === "wt.iba.definition.DecimalDefinition" ||
+    //         //     colHeadType === "wt.iba.definition.IntDefinition") {
+    //         //     let hasNumericError = false;
+
+    //         //     $('.' + colHeadName).each(function (i, obj) {
+    //         //         let cellValue = $(obj).text().trim();
+    //         //         if (!isNumeric(cellValue) && cellValue !== "") {
+    //         //             hasNumericError = true;
+    //         //             hasError = true;
+    //         //             $(this).css("color", "red");
+    //         //         } else {
+    //         //             $(this).css("color", "black");
+    //         //         }
+    //         //     });
+
+    //         //     if (hasNumericError) {
+    //         //         $('#err_' + colHeadName).html(colHeadName + ' <span class="badge badge-danger">HATA</span>');
+    //         //         hataListesi.push(colHeadName + ' sütununda sayısal olmayan değerler var.');
+    //         //     } else {
+    //         //         $('#err_' + colHeadName).html(colHeadName);
+    //         //     }
+    //         // } else if (colHeadType === "wt.iba.definition.TimestampDefinition") {
+    //         //     let hasTimestampError = false;
+
+    //         //     $('.' + colHeadName).each(function (i, obj) {
+    //         //         let cellValue = $(obj).text().trim();
+    //         //         if (cellValue === "") {
+    //         //             $(this).html("EMPTY");
+    //         //             toastr.error("Datetime Not Empty");
+    //         //             hasTimestampError = true;
+    //         //             hasError = true;
+    //         //         } else {
+    //         //             $(this).css("color", "black");
+    //         //             if ($(this).html() === "EMPTY") {
+    //         //                 $(this).css("color", "orange");
+    //         //             }
+    //         //         }
+    //         //     });
+
+    //         //     if (hasTimestampError) {
+    //         //         $('#err_' + colHeadName).html(colHeadName + ' <span class="badge badge-danger">HATA</span>');
+    //         //         hataListesi.push(colHeadName + ' sütununda eksik tarih saat bilgisi var.');
+    //         //     } else {
+    //         //         $('#err_' + colHeadName).html(colHeadName);
+    //         //     }
+    //         // } else if (colHeadType === "wt.iba.definition.BooleanDefinition") {
+    //         //     let hasBooleanError = false;
+
+    //         //     $('.' + colHeadName).each(function (i, obj) {
+    //         //         let cellValue = $(obj).text().trim();
+    //         //         if (cellValue !== "True" && cellValue !== "False" && cellValue !== "") {
+    //         //             hasBooleanError = true;
+    //         //             hasError = true;
+    //         //             $(this).css("color", "red");
+    //         //         } else {
+    //         //             $(this).css("color", "black");
+    //         //         }
+    //         //     });
+
+    //         //     if (hasBooleanError) {
+    //         //         $('#err_' + colHeadName).html(colHeadName + ' <span class="badge badge-danger">HATA</span>');
+    //         //         hataListesi.push(colHeadName + ' sütununda hatalı boolean değerler var.');
+    //         //     } else {
+    //         //         $('#err_' + colHeadName).html(colHeadName);
+    //         //     }
+    //         // } else if (colHeadType === "wt.iba.definition.StringDefinition" || colHeadType === "wt.iba.definition.UnitDefinition") {
+    //         //     let hasStringUnitError = false;
+
+    //         //     $('.' + colHeadName).each(function (i, obj) {
+    //         //         let cellValue = $(obj).text().trim();
+    //         //         if (cellValue === "") {
+    //         //             $(this).html("EMPTY");
+    //         //         } else {
+    //         //             $(this).css("color", "black");
+    //         //             if ($(this).html() === "EMPTY") {
+    //         //                 $(this).css("color", "orange");
+    //         //             }
+    //         //         }
+    //         //     });
+
+    //         //     if (hasStringUnitError) {
+    //         //         $('#err_' + colHeadName).html(colHeadName + ' <span class="badge badge-danger">HATA</span>');
+    //         //         hataListesi.push(colHeadName + ' sütununda hatalı string veya unit değerler var.');
+    //         //     } else {
+    //         //         $('#err_' + colHeadName).html(colHeadName);
+    //         //     }
+    //         // } else {
+    //         //     // Diğer türler için özel karşılaştırmalar ekleyebilirsiniz
+    //         // }
+
+    //         // // Hata varsa, bu sütunun hasError özniteliğini true yapın
+    //         // if (hasError) {
+    //         //     $(this).attr("hasError", "true");
+    //         // } else {
+    //         //     $(this).attr("hasError", "false");
+    //         // }
+    //     });
+
+    //     // Tüm seçim alanlarını kontrol edin
+    //     $('.multiple_attr').each(function () {
+    //         if ($(this).val() !== "0") {
+    //             allNone = false;
+    //         }
+    //     });
+
+    //     // Hata varsa veya hiçbir şey seçilmediyse PLM IMPORT butonunu etkinleştirin
+    //     if (allNone || $('.multiple_attr[hasError="true"]').length > 0) {
+    //         $('#excel_aktar_btn').attr("disabled", true);
+    //     } else {
+    //         $('#excel_aktar_btn').attr("disabled", false);
+    //     }
+    // });
+
+
+    // console.log("Hata Listesi : " + errorList);
+
+    // Sayısal bir değer olup olmadığını kontrol eden bir işlev
+    function isNumeric(value) {
+        return !isNaN(parseFloat(value)) && isFinite(value);
+    }
+</script>
