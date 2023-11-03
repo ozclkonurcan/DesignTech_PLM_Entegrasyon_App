@@ -1,0 +1,16 @@
+﻿@if (ViewBag.DateFolders != null)
+{
+    <ul>
+        @foreach (var dateFolder in ViewBag.DateFolders)
+        {
+            var folderName = System.IO.Path.GetFileName(dateFolder);
+            <li>
+                <a href='@Url.Action("ViewJsonFiles", new { dateFolder = folderName })'>@folderName</a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No log folders found.</p>
+}
