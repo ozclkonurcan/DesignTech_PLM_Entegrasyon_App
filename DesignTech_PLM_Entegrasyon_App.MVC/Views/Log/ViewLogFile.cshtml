@@ -134,7 +134,7 @@ else
                     <th>Sütun</th>
                     <th>İşlem Tarihi</th>
                     <th>Durum</th>
-                @*     <th>Detay</th> *@
+                     <th>Detay</th> 
                 </tr>
             </thead>
             <tbody>
@@ -181,9 +181,9 @@ else
                                 }
                             </form>
                         </td>
-                   @*      <td>
+                        <td>
                             <div class="btn btn-info btn-sm detail-button">Detay</div>
-                        </td> *@
+                        </td> 
                     </tr>
 
                 }
@@ -228,6 +228,9 @@ else
 
 
 @section scripts {
+
+   
+
     @*   <script>
         $(document).ready(function () {
             $('#ExcelLogTables').DataTable({
@@ -311,7 +314,14 @@ else
                                 //     hucre = `<span class="badge py-3 px-4 fs-7 badge-light-danger">${hataNo}</span>`
                                 // }
 
-                                satirHtml += `<td>${hucre}</td>`;
+                                if (
+                                    hucre === hataNo
+                                ) {
+                                    satirHtml += `<td><span class="badge py-3 px-4 fs-7 badge-light-danger">${hucre}</span></td>`;
+                                } else {
+                                    satirHtml += `<td>${hucre}</td>`;
+                                }
+
 
                             });
 

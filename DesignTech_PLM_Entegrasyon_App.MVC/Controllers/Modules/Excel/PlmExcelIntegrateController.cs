@@ -8,10 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Serilog;
 using SqlKata.Execution;
 using System.Data;
 using System.Text.RegularExpressions;
+using static DesignTech_PLM_Entegrasyon_App.MVC.Controllers.LogController;
+using static DesignTech_PLM_Entegrasyon_App.MVC.Helper.LogService;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 {
@@ -286,37 +289,77 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 
 
 
+        List<ExcelDetailResult> detailData = new List<ExcelDetailResult>();
 
-
-        public JsonResult ExcelFileControl(IFormCollection data,string[] HataListesi, string[] Hatasizlar)
+        public async Task<JsonResult> ExcelFileControl(IFormCollection data,string[] HataListesi, string[] Hatasizlar,string excelFile)
 	    {
             try
             {
                 // HataListesi ve Hatasizlar JSON dizilerini çözümle
                 var hataListesi = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(HataListesi[0]);
                 var hatasizlar = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(Hatasizlar[0]);
-
+                ExcelDetailResult2 rest = new ExcelDetailResult2();
+                string logFileDataClear = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "errorFile", "errorFile.json");
+                System.IO.File.WriteAllText(logFileDataClear, string.Empty);
                 // Hatalı verileri loglama
                 if (hataListesi != null && hataListesi.Length > 0)
                 {
+                    LogService logService = new LogService();
                     foreach (var hata in hataListesi)
                     {
-                        LogService logService = new LogService();
                         logService.AddNewLogEntry(hata);
+                        logService.ErrorFileManagement(hata);
                         //Log.Information(hata);
                     }
+                    var excelLogEntries = logService.GetConvertedDataFromJson();
+                    //List<ExcelDetailResult> dataList = new List<ExcelDetailResult>();
 
-                        //ExcelProc(data);
+                    //foreach (var excel in excelLogEntries)
+                    //{
+                    //    ExcelDetailResult result = logService.GetExcelDetails(excelFile, excel.Satir, excel.Sutun, excel.Hata);
+                    //    dataList.Add(result);
+                    //}
+
+
+                    //ViewBag.ExcelDetail = dataList.Distinct().ToList();
+                    var resp = excelLogEntries.Distinct().ToList();
+
+                    // İlk başlık ve veri listelerini oluşturun
+                    rest.basliklar = new List<string>();
+                    rest.veriler = new List<object>();
+                    rest.hataNo = new List<string>();
+
+                    foreach (var item in resp)
+                    {
+                        var result = logService.GetExcelDetails(item.ExcelDosya, item.Sutun, item.Hata);
+
+                        // Başlıkları sadece bir kez ekleyin
+                        if (rest.basliklar.Count == 0)
+                        {
+                            rest.basliklar = result.Basliklar;
+                        }
+
+                        // Verileri biriktirin
+                        rest.veriler.AddRange(result.Veriler);
+                        rest.hataNo.AddRange(new List<string> { item.Hata });
+
+                    }
+
+
+
+
+
                 }
                 else
                 {
                     //ExcelProc(data);
                 }
-            
 
-			// JSON formatında verileri döndürün
 
-			var successData = new { success = true, HataListesi = hataListesi, Hatasizlar = hatasizlar };
+                // JSON formatında verileri döndürün
+
+
+                var successData = new { success = true, HataListesi = hataListesi, Hatasizlar = hatasizlar,veriler = rest.veriler, basliklar = rest.basliklar,hataNo = rest.hataNo};
 			return Json(successData);
 		}
 		catch (Exception ex)
@@ -326,6 +369,16 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 			return Json(errorData);
 		}
 	}
+
+        public class ExcelDetailResult2
+        {
+            public List<string> basliklar { get; set; }
+            public List<object> veriler { get; set; }
+            public List<string> hataNo { get; set; }
+        }
+
+
+
 
 
         public JsonResult ExcelIntegrateIndexControl()
