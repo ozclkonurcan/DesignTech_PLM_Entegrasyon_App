@@ -308,7 +308,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     foreach (var hata in hataListesi)
                     {
                         logService.AddNewLogEntry(hata);
-                        logService.ErrorFileManagement(hata);
+                        logService.ErrorFileManagement(hata, "errorFile.json");
                         //Log.Information(hata);
                     }
                     var excelLogEntries = logService.GetConvertedDataFromJson();

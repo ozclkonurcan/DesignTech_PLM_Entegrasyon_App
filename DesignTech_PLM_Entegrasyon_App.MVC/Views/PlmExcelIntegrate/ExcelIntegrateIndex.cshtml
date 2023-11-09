@@ -5,6 +5,9 @@
     <p style="color: #fff;">İşlem devam ediyor...</p>
 </div>
 
+
+<div class="warningInfoMessage"></div>
+
 <div class="col-xl-12 mb-5 mb-xl-10" id="excelListArea">
     <div class="col-sm-12 m-2" id="errorList"></div>
 
@@ -81,7 +84,7 @@
                                                 }
                                                 else
                                                 {
-                                                                                                                            @item[header]
+                                                                                                                                    @item[header]
                                                 }
                                             }
                                         </td>
@@ -242,6 +245,7 @@
     }
 
     var errorList = [];
+    var emptyList = [];
     var validList = [];
 
 
@@ -252,23 +256,28 @@
         // Hata kontrolü için bir değişken
         let allNone = true;
         errorList = []; // Her seçim değişikliğinde errorList dizisini temizle
+        emptyList = []; // Her seçim değişikliğinde emptyList dizisini temizle
         validList = []; // Her seçim değişikliğinde validList dizisini temizle
 
         $('.multiple_attr').each(function () {
                     let colHeadName = $(this).attr("colHeadName");
                     let hasError = false;
+                    let hasEmpty = false;
                     let colHeadType = $(this).val().split("|")[2];
 
      
             console.log("COL HEAD TYPE" + colHeadType);
+
             if (colHeadType === "wt.iba.definition.FloatDefinition" ||
                 colHeadType === "wt.iba.definition.DoubleDefinition" ||
                 colHeadType === "wt.iba.definition.DecimalDefinition" ||
                 colHeadType === "wt.iba.definition.IntDefinition")  {
                 $('.' + colHeadName).each(function (i, obj) {
                     let cellValue = $(obj).text().trim();
+                    console.warn(cellValue);
 
-                    if (!isNumeric(cellValue) && cellValue !== "") {
+                    // if (!isNumeric(cellValue) && cellValue !== "") {
+                    if (!isNumeric(cellValue) || cellValue === "") {
                         hasError = true;
 
                         // Hatalı değeri ve konumunu errorList'e ekleyin
@@ -289,11 +298,29 @@
                         errorList.push(errorInfoJSON);
 
                         // $(this).css("color", "red");
-                    } else {
+                    }else {
                         validList.push(cellValue); // Hatalı olmayan değeri validList'e ekleyin
                         $(this).css("color", "black");
                     }
+                    if (cellValue == "") {
 
+                        hasEmpty = true;
+
+                        let rowIndex = $(this).closest('tr').index() + 1;
+                        let columnIndex = $(this).index() + 1;
+
+                        var fileName = $('#excelFileName').val();
+                        let emptyInfo = {
+                            ExcelDosya: fileName,
+                            Hata: cellValue,
+                            Satir: rowIndex,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+
+                        let emptyInfoJSON = JSON.stringify(emptyInfo);
+                        emptyList.push(emptyInfoJSON);
+                    }
 
 
 
@@ -332,17 +359,18 @@
             console.log(error);
         });
         console.log("Doğru Değerler: " + validList);
+        console.log("Boş Değerler: " + emptyList);
     });
 
-  
 
 
     function ExcelAktar() {
-        if (errorList.length > 0) {
+        if (emptyList.length > 0) {
+
             Swal.fire({
                 title: "Hatalı Değerler Var!",
-                html: `Excel dosyasında hatalı alanlar bulunuyor. Devam etmek istiyor musunuz?
-                       <br>Hatalı Alan Sayısı: ${errorList.length}`,
+                html: `Seçilen sütun da boş alan bulunuyor. Devam etmek istiyor musunuz?
+                           <br>Boş alan Sayısı: ${emptyList.length}`,
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Evet, Devam Et",
@@ -359,22 +387,23 @@
                 }
             });
         } else {
-            Swal.fire({
-                title: "Hata Yok",
-                text: "Excel dosyasında hatalı alanlar bulunmuyor. İşlemi devam ettirmek istiyor musunuz?",
-                icon: "info",
-                showCancelButton: true,
-                confirmButtonText: "Evet, Devam Et",
-                cancelButtonText: "Hayır, İptal Et",
-                customClass: {
-                    confirmButton: "btn btn-primary",
-                    cancelButton: "btn btn-danger"
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    continueWithPost();
-                }
-            });
+            continueWithPost();
+            // Swal.fire({
+            //     title: "Hata Yok",
+            //     text: "Excel dosyasında hatalı alanlar bulunmuyor. İşlemi devam ettirmek istiyor musunuz?",
+            //     icon: "info",
+            //     showCancelButton: true,
+            //     confirmButtonText: "Evet, Devam Et",
+            //     cancelButtonText: "Hayır, İptal Et",
+            //     customClass: {
+            //         confirmButton: "btn btn-primary",
+            //         cancelButton: "btn btn-danger"
+            //     }
+            // }).then((result) => {
+            //     if (result.isConfirmed) {
+            //         continueWithPost();
+            //     }
+            // });
         }
     }
     function continueWithPost() {
@@ -391,6 +420,7 @@
             dataType: "json",
             success: function (data) {
                 if (errorList.length > 0) {
+
                     $('#excelDetailArea').removeClass("d-none");
                     $('#excelListArea').addClass("d-none");
                     var searchParams = new URLSearchParams(window.location.search);
@@ -400,11 +430,34 @@
                     let hataNo = data.hataNo;
                     let veriler = data.veriler;
 
-                    
-                 
+                    var fileNameWithoutDate = fileName.replace(/_\d{4}-\d{2}-\d{2}-\d{2}-\d{2}/, '');
+
+                    // Eğer emptyList değişkeni 0'dan büyükse
+                    var errorMessage = emptyList.length > 0 ? `Tip uyuşmazlığı ve boş alan hatası!` : `Tip uyuşmazlığı hatası!`;
+
+                    // Kullanıcıya bildirimi göster
+
 
                     let table = `
-                    <div class="table-responsive">
+
+                        <div class="alert alert-dismissible bg-light-info border border-info border-3 border-dashed d-flex flex-column flex-sm-row w-100 p-5 mb-10">
+                        <!--begin::Icon-->
+                        <i class="ki-duotone ki-notification-bing fs-2hx text-info me-4 mb-5 mb-sm-0"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>                    <!--end::Icon-->
+
+                        <!--begin::Content-->
+                        <div class="d-flex flex-column pe-0 pe-sm-10">
+                                <h5 class="mb-1">${errorMessage}</h5>
+                                        <span>Bu <strong>${fileNameWithoutDate} </strong> excel dosyasın da ${errorMessage} var lütfen şeçimlerinizi kontrol edip dosyayı tekrar yükleyin.</span>
+                        </div>
+                        <!--end::Content-->
+
+                        <!--begin::Close-->
+                        <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto" data-bs-dismiss="alert">
+                            <i class="ki-duotone ki-cross fs-1 text-info"><span class="path1"></span><span class="path2"></span></i>                    </button>
+                        <!--end::Close-->
+                        </div>
+
+                        <div class="table-responsive">
                         <table class="table" id="excel_error_table">
                         
                     `;
@@ -459,6 +512,10 @@
 
                     table += `</tbody></table></div>`;
                     $('#excelDetailContent').html(table);
+
+          
+
+
                     $('[id^="hucreID_"]').each(function () {
                         const $trList = $(`tr[id="${this.id}"]`);
                         if ($trList.length > 1) {

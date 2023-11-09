@@ -15,9 +15,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
         string currentMonthFolder;
         string logFileName;
 
-        public void ErrorFileManagement(string message)
+        public void ErrorFileManagement(string message,string dosyaIsmi)
         {
-            logFileName = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "errorFile", "errorFile.json");
+            logFileName = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "errorFile", dosyaIsmi);
 
             // Kontrol etmek için dosya var mı?
             //if (File.Exists(logFileName))

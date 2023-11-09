@@ -987,19 +987,21 @@
 <script>
 	function confirmIntegrate(item) {
 		Swal.fire({
-			title: 'Are you sure you want to integrate this?',
-			text: "Before you proceed, please make sure you have taken a backup of your data. Integration is irreversible and can result in data loss if not done correctly.",
-			icon: 'warning',
+			title: 'Bu entegrasyonu yapmak istediğinizden emin misiniz?',
+			text: "Devam etmeden önce, verilerinizin yedeğini aldığınızdan emin olun. Entegrasyon geri alınamaz ve doğru yapılmazsa veri kaybına neden olabilir.",
+			icon: 'info',
 			showCancelButton: true,
 			confirmButtonColor: '#3085d6',
 			cancelButtonColor: '#d33',
-			confirmButtonText: 'Yes, integrate it!'
+			confirmButtonText: 'Evet, entegre et!',
+			cancelButtonText: 'Hayır, iptal et!'
 		}).then((result) => {
 			if (result.isConfirmed) {
 				$('#loadingOverlay').show();
 				window.location.href = "PlmExcelIntegrate/ExcelIntegrateIndex?file=" + item;
 			}
 		});
+
 	}
 
     // $(document).ready(function () {
