@@ -51,46 +51,94 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 		}
 
 
-		//Excel Klasör Döküman Sayfası
+        //Excel Klasör Döküman Sayfası
 
 
-		[HttpPost]
-		public async Task<IActionResult> ExcelUpload(IFormFileCollection formFile)
-		{
-			try
-			{
-				foreach (var formData in formFile)
-				{
-					if (formData.Length > 0)
-					{
-						var extent = Path.GetExtension(formData.FileName);
-						string originalFileName = Path.GetFileNameWithoutExtension(formData.FileName);
-						string timeStamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm");
 
-						string randomName = $"{originalFileName}_{timeStamp}{extent}";
+        [HttpPost]
+        public async Task<IActionResult> ExcelUpload(IFormFileCollection formFile)
+        {
+            try
+            {
+                foreach (var formData in formFile)
+                {
+                    if (formData.Length > 0)
+                    {
+                        // Dosya uzantısını al
+                        var fileExtension = Path.GetExtension(formData.FileName).ToLower();
 
-						var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\ExcelInformation", randomName);
+                        // İzin verilen dosya uzantıları
+                        string[] allowedExtensions = { ".xls", ".xlsx" }; // Sadece Excel dosyalarına izin veriyoruz
 
-						using (var stream = new FileStream(path, FileMode.Create))
-						{
-							await formData.CopyToAsync(stream);
-						}
-					}
-				}
+                        if (allowedExtensions.Contains(fileExtension))
+                        {
+                            var originalFileName = Path.GetFileNameWithoutExtension(formData.FileName);
+                            var timeStamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm");
+                            var randomName = $"{originalFileName}_{timeStamp}{fileExtension}";
+                            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\ExcelInformation", randomName);
 
-				TempData["SuccessMessage"] = "Excel dosyaları başarıyla yüklendi.";
-				Log.Error("Upload Excel File Message :  Başarılı - Kullanıcı : Onur ÖZÇELİK" + "Kullanıcı ID : 1");
-				return RedirectToAction("Index", "PlmUploadExcel");
-			}
-			catch (Exception ex)
-			{
-				TempData["SystemErrorMessage"] = ex.Message;
-				Log.Error("Upload Excel File Message : " + ex.Message + "Kullanıcı : Onur ÖZÇELİK" + "Kullanıcı ID : 1");
-				return RedirectToAction("Index", "PlmUploadExcel");
-			}
-		}
+                            using (var stream = new FileStream(path, FileMode.Create))
+                            {
+                                await formData.CopyToAsync(stream);
+                            }
+                        }
+                        else
+                        {
+                            TempData["ErrorMessage"] = "Yalnızca Excel dosyalarına izin verilmektedir.";
+                            return RedirectToAction("Index", "PlmUploadExcel");
+                        }
+                    }
+                }
 
-		[HttpPost]
+                TempData["SuccessMessage"] = "Excel dosyaları başarıyla yüklendi.";
+                Log.Error("Upload Excel File Message: Başarılı - Kullanıcı : Onur ÖZÇELİK" + " Kullanıcı ID : 1");
+                return RedirectToAction("Index", "PlmUploadExcel");
+            }
+            catch (Exception ex)
+            {
+                TempData["SystemErrorMessage"] = ex.Message;
+                Log.Error("Upload Excel File Message: " + ex.Message + " Kullanıcı : Onur ÖZÇELİK" + " Kullanıcı ID : 1");
+                return RedirectToAction("Index", "PlmUploadExcel");
+            }
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> ExcelUpload(IFormFileCollection formFile)
+        //{
+        //	try
+        //	{
+        //		foreach (var formData in formFile)
+        //		{
+        //			if (formData.Length > 0)
+        //			{
+        //				var extent = Path.GetExtension(formData.FileName);
+        //				string originalFileName = Path.GetFileNameWithoutExtension(formData.FileName);
+        //				string timeStamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm");
+
+        //				string randomName = $"{originalFileName}_{timeStamp}{extent}";
+
+        //				var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\ExcelInformation", randomName);
+
+        //				using (var stream = new FileStream(path, FileMode.Create))
+        //				{
+        //					await formData.CopyToAsync(stream);
+        //				}
+        //			}
+        //		}
+
+        //		TempData["SuccessMessage"] = "Excel dosyaları başarıyla yüklendi.";
+        //		Log.Error("Upload Excel File Message :  Başarılı - Kullanıcı : Onur ÖZÇELİK" + "Kullanıcı ID : 1");
+        //		return RedirectToAction("Index", "PlmUploadExcel");
+        //	}
+        //	catch (Exception ex)
+        //	{
+        //		TempData["SystemErrorMessage"] = ex.Message;
+        //		Log.Error("Upload Excel File Message : " + ex.Message + "Kullanıcı : Onur ÖZÇELİK" + "Kullanıcı ID : 1");
+        //		return RedirectToAction("Index", "PlmUploadExcel");
+        //	}
+        //}
+
+        [HttpPost]
 		public IActionResult DeleteFile(string fileName)
 		{
 			try
