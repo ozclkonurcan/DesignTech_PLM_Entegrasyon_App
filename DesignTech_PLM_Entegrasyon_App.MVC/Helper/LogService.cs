@@ -177,7 +177,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
                         var dataTable = dataSet.Tables[0];
 
                         List<string> basliklar = new List<string>();
-                        List<Tuple<string, int, List<string>,List<string>>> eslesenSatirlar = new List<Tuple<string,int, List<string>,List<string>>>();
+                        List<Tuple<string, int, List<string>,List<string>,int>> eslesenSatirlar = new List<Tuple<string,int, List<string>,List<string>,int>>();
 
                         // Excel dosyasının 1. satırını başlıklar olarak al
                         var row = dataTable.Rows[0];
@@ -196,7 +196,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
                                 {
                                     satir.Add(row[j].ToString());
                                 }
-                                eslesenSatirlar.Add(Tuple.Create(excelFileName,i, satir,basliklar));
+
+
+                                eslesenSatirlar.Add(Tuple.Create(excelFileName,i, satir,basliklar,sutunNo));
                             }
                         }
 
