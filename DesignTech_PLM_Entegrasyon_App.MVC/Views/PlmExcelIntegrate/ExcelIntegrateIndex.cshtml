@@ -16,11 +16,35 @@
             <div>
                 <h5>Alt başlık</h5>
             </div>
+
+            <div class="d-flex align-items-center">
+                <!--begin::Checkbox-->
+                <label class="form-check form-check-custom form-check-solid me-10">
+                    <input class="form-check-input h-20px w-20px" type="radio" name="importType" value="CAD" checked="checked">
+
+                    <span class="form-check-label fw-semibold">
+                        CAD
+                    </span>
+                </label>
+                <!--end::Checkbox-->
+                <!--begin::Checkbox-->
+                <label class="form-check form-check-custom form-check-solid me-7">
+                    <input class="form-check-input h-20px w-20px" type="radio" name="importType" value="WTPart">
+
+                    <span class="form-check-label fw-semibold">
+                        WTPart
+                    </span>
+                </label>
+                <!--end::Checkbox-->
+            
             <button onclick="ExcelAktar();" disabled  id="excel_aktar_btn" class="btn btn-sm btn-success btn-sm ml-auto float-end">PLM IMPORT</button>
+            </div>
+
+
         </div>
 
-        <div class="card-body pt-2">
-            <div class="table-responsive">
+        <div class="card-body  pt-2">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                 <table class="table align-middle table-row-dashed fs-6 gy-3 dataTable no-footer" id="excel_table">
                     @using (Html.BeginForm("excelproc", "PlmExcelIntegrate", FormMethod.Post, new { id = "excelheadform" }))
                     {
@@ -133,32 +157,39 @@
 </style>
 
 <script>
+    $('#headselect_Number').attr('disabled', true);
+    $('#headselect_ESKI_NAME').attr('disabled', true);
 
-  
+    // $('#headselect_Number').addClass("d-none");
+    // $('#headselect_ESKI_NAME').addClass("d-none");
 
 </script>
 
 
 <script>
-    $(document).ready(function () {
-        $('#excel_table').DataTable({
-            "pageLength": 5,
-            "info": false,
-            "ordering": false,
-            "dom": 'Bfrtip',
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.11.6/i18n/Turkish.json",
-                "search": "",
-                "searchPlaceholder": "Search...",
-                "sInfo": "Toplam _TOTAL_ kayıt arasından _START_ - _END_ arasındaki kayıtlar gösteriliyor",
-                "sInfoFiltered": "(toplam _MAX_ kayıttan süzülmüş)",
-            }
-        });
+
+
+
+
+    // $(document).ready(function () {
+    //     $('#excel_table').DataTable({
+    //         "pageLength": 5,
+    //         "info": false,
+    //         "ordering": false,
+    //         "dom": 'Bfrtip',
+    //         "language": {
+    //             "url": "//cdn.datatables.net/plug-ins/1.11.6/i18n/Turkish.json",
+    //             "search": "",
+    //             "searchPlaceholder": "Search...",
+    //             "sInfo": "Toplam _TOTAL_ kayıt arasından _START_ - _END_ arasındaki kayıtlar gösteriliyor",
+    //             "sInfoFiltered": "(toplam _MAX_ kayıttan süzülmüş)",
+    //         }
+    //     });
 
 
 
  
-    });
+    // });
 </script>
 <script>
     // Bu değişken, hataları tutmak için bir dizi oluşturur.
@@ -255,9 +286,15 @@
         return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
             !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
     }
-
+    function clearErrors() {
+        errorList = [];
+        emptyList = [];
+        validList = [];
+        $('td.has-error').removeClass('has-error');
+    }
 
     $('.multiple_attr').change(function () {
+        clearErrors();
         let allNone = true;
   
 
@@ -299,7 +336,6 @@
                             Durum: true
                         };
                         let errorInfoJSON = JSON.stringify(errorInfo);
-                        console.warn("asdasdas : " +errorInfoJSON);
                         errorList.push(errorInfoJSON);
                         $(this).css("color", "red");
                     } else {
@@ -319,9 +355,6 @@
                             Durum: true
                         };
                         let emptyInfoJSON = JSON.stringify(emptyInfo);
-
-                    
-
                         emptyList.push(emptyInfoJSON);
                     }
                 });
@@ -341,6 +374,7 @@
                             Durum: true
                         };
                         let errorInfoJSON = JSON.stringify(errorInfo);
+
                         errorList.push(errorInfoJSON);
                         $(this).css("color", "red");
                     } else {
@@ -618,6 +652,10 @@
         let formData = $('#excelheadform').serialize();
         var sutunList = [];
 
+                var selectedValue = $('input[name="importType"]:checked').val();
+     
+       
+
 
 
         console.warn("Error List Json Data : "+errorListJSON);
@@ -626,7 +664,7 @@
         $.ajax({
             url: '/PlmExcelIntegrate/ExcelFileControl',
             type: 'POST',
-            data: { data: formData, HataListesi: errorListJSON, Hatasizlar: validListJSON, excelFile: fileName },
+            data: { data: formData, HataListesi: errorListJSON, Hatasizlar: validListJSON, excelFile: fileName, importType: selectedValue },
             dataType: "json",
             success: function (data) {
                 if (errorList.length > 0) {

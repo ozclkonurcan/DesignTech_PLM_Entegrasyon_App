@@ -7,11 +7,22 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using System.Security.Cryptography;
 using ExcelDataReader;
 using System.Collections.Generic;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using System.Data;
+using SqlKata.Execution;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
 {
     public class LogService
     {
+        private readonly IConfiguration _configuration;
+
+        public LogService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         string currentMonthFolder;
         string logFileName;
 
@@ -161,23 +172,41 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
             }
 
 
+
         public ExcelDetailResult GetExcelDetails(string excelFileName, int sutunNo, string hataNo)
         {
             var result = new ExcelDetailResult();
             try
             {
                 var fileName = Directory.GetCurrentDirectory() + "\\wwwroot\\ExcelInformation\\" + excelFileName;
+
+                var schema = _configuration["Catalog"];
+                var connectionString = _configuration.GetConnectionString("Plm");
+                using IDbConnection connection = new SqlConnection(connectionString);
+
                 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                DataSet excelData;
+
+
 
                 using (var stream = System.IO.File.Open(fileName, FileMode.Open, FileAccess.Read))
                 {
-                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    using (IExcelDataReader reader = ExcelReaderFactory.CreateReader(stream))
                     {
                         var dataSet = reader.AsDataSet();
                         var dataTable = dataSet.Tables[0];
+                        excelData = reader.AsDataSet(new ExcelDataSetConfiguration()
+                        {
+                            ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
+                            {
+                                UseHeaderRow = true
+                            }
+                        });
+
+                        //var dataTable = excelData.Tables[0];
 
                         List<string> basliklar = new List<string>();
-                        List<Tuple<string, int, List<string>,List<string>,int>> eslesenSatirlar = new List<Tuple<string,int, List<string>,List<string>,int>>();
+                        List<Tuple<string, int, List<string>, List<string>, int>> eslesenSatirlar = new List<Tuple<string, int, List<string>, List<string>, int>>();
 
                         // Excel dosyasının 1. satırını başlıklar olarak al
                         var row = dataTable.Rows[0];
@@ -186,21 +215,64 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
                             basliklar.Add(row[i].ToString());
                         }
 
-                        for (int i = 1; i < dataTable.Rows.Count; i++)
+                        foreach (DataRow excelRow in excelData.Tables[0].Rows)
                         {
-                            row = dataTable.Rows[i];
-                            if (row[sutunNo - 1].ToString() == hataNo)
+                            var Anaparca = excelRow["Number"].ToString();
+                            var Name = excelRow["NAME"].ToString();
+                            var catalogValue = _configuration["Catalog"];
+                            if (!string.IsNullOrEmpty(Name))
+                            {
+                                using (SqlConnection conn3Sel = new SqlConnection(connectionString))
+                                {
+                                    conn3Sel.Open();
+
+                                    // Eski Name değerini sakla
+                                    var getOldName = $"SELECT Name FROM {catalogValue}.EPMDocumentMaster WHERE documentNumber = @Anaparca";
+                                    using (SqlCommand getNameCmd = new SqlCommand(getOldName, conn3Sel))
+                                    {
+                                        getNameCmd.Parameters.AddWithValue("@Anaparca", Anaparca);
+                                        var oldName = (string)getNameCmd.ExecuteScalar();
+
+                                        // Eski Name değerini Excel'e yaz
+                                        excelRow["ESKI_NAME"] = oldName;
+
+
+                                    }
+
+
+                                }
+                            }
+
+
+                            if (excelRow.Field<string>(sutunNo - 1) == hataNo)
                             {
                                 List<string> satir = new List<string>();
-                                for (int j = 0; j < dataTable.Columns.Count; j++)
+
+                                foreach (var alan in excelRow.ItemArray)
                                 {
-                                    satir.Add(row[j].ToString());
+                                    satir.Add(alan.ToString());
                                 }
 
-
-                                eslesenSatirlar.Add(Tuple.Create(excelFileName,i, satir,basliklar,sutunNo));
+                                eslesenSatirlar.Add(Tuple.Create(excelFileName, excelRow.Table.Rows.IndexOf(excelRow), satir, basliklar, sutunNo));
                             }
+
                         }
+
+
+                        //foreach (DataRow row in dataTable.Rows)
+                        //{
+                        //    if (row.Field<string>(sutunNo - 1) == hataNo)
+                        //    {
+                        //        List<string> satir = new List<string>();
+
+                        //        foreach (var alan in row.ItemArray)
+                        //        {
+                        //            satir.Add(alan.ToString());
+                        //        }
+
+                        //        eslesenSatirlar.Add(Tuple.Create(excelFileName, row.Table.Rows.IndexOf(row), satir, basliklar, sutunNo));
+                        //    }
+                        //}
 
                         if (eslesenSatirlar.Any())
                         {
@@ -229,6 +301,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
 
 
 
+    
         //public ExcelDetailResult GetExcelDetails(string excelFileName, int satirNo, int sutunNo, string hataNo)
         //{
         //    var result = new ExcelDetailResult();
