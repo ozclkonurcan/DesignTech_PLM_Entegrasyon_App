@@ -293,7 +293,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
             {
                 result.Basliklar = null;
                 result.Veriler = null;
-                result.Mesaj = "HATA!" + ex.Message;
+                result.Mesaj = "HATA! " + ex.Message;
             }
 
             return result;
