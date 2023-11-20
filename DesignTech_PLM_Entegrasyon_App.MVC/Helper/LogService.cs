@@ -244,17 +244,31 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
                             }
 
 
-                            if (excelRow.Field<string>(sutunNo - 1) == hataNo)
+                            if (Convert.ToString(excelRow[sutunNo - 1]) == hataNo)
                             {
                                 List<string> satir = new List<string>();
 
                                 foreach (var alan in excelRow.ItemArray)
                                 {
-                                    satir.Add(alan.ToString());
+                                    satir.Add(Convert.ToString(alan));
                                 }
 
                                 eslesenSatirlar.Add(Tuple.Create(excelFileName, excelRow.Table.Rows.IndexOf(excelRow), satir, basliklar, sutunNo));
                             }
+
+
+
+                            //if (excelRow.Field<string>(sutunNo - 1) == hataNo)
+                            //{
+                            //    List<string> satir = new List<string>();
+
+                            //    foreach (var alan in excelRow.ItemArray)
+                            //    {
+                            //        satir.Add(alan.ToString());
+                            //    }
+
+                            //    eslesenSatirlar.Add(Tuple.Create(excelFileName, excelRow.Table.Rows.IndexOf(excelRow), satir, basliklar, sutunNo));
+                            //}
 
                         }
 

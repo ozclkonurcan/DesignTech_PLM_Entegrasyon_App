@@ -108,7 +108,7 @@
                                                 }
                                                 else
                                                 {
-                                                                                                                                            @item[header]
+                                                                                                                                                @item[header]
                                                 }
                                             }
                                         </td>
@@ -293,6 +293,10 @@
         $('td.has-error').removeClass('has-error');
     }
 
+
+    console.warn("HATALI" + errorList);
+    console.warn("BOŞ" + emptyList);
+
     $('.multiple_attr').change(function () {
         clearErrors();
         let allNone = true;
@@ -317,70 +321,163 @@
             // Başlık isminin indeksini bul
             let columnIndex = colNames.indexOf(colHeadName) + 1;
 
-            if (colHeadType === "wt.iba.definition.FloatDefinition" ||
-                colHeadType === "wt.iba.definition.DoubleDefinition" ||
-                colHeadType === "wt.iba.definition.DecimalDefinition" ||
-                colHeadType === "wt.iba.definition.IntDefinition") {
-                $('td:nth-child(' + columnIndex + '):not(:first-child)').slice(1).each(function (i, obj) {
-                    let cellValue = $(obj).text().trim();
-                    if (!isNumeric(cellValue) || cellValue === "") {
-                        hasError = true;
-                        let rowIndex = $(this).closest('tr').index() + 1;
-                        let fileName = $('#excelFileName').val();
-                        let errorInfo = {
-                            ExcelDosya: fileName,
-                            className: colHeadName,
-                            Hata: cellValue,
-                            Satir: rowIndex,
-                            Sutun: columnIndex,
-                            Durum: true
-                        };
-                        let errorInfoJSON = JSON.stringify(errorInfo);
-                        errorList.push(errorInfoJSON);
-                        $(this).css("color", "red");
-                    } else {
-                        validList.push(cellValue);
-                        $(this).css("color", "black");
-                    }
-                    if (cellValue == "") {
-                        hasEmpty = true;
-                        let rowIndex = $(this).closest('tr').index() + 1;
-                        let fileName = $('#excelFileName').val();
-                        let emptyInfo = {
-                            ExcelDosya: fileName,
-                            className: colHeadName,
-                            Hata: cellValue,
-                            Satir: rowIndex,
-                            Sutun: columnIndex,
-                            Durum: true
-                        };
-                        let emptyInfoJSON = JSON.stringify(emptyInfo);
-                        emptyList.push(emptyInfoJSON);
-                    }
-                });
-            } else if (colHeadType === "wt.iba.definition.BooleanDefinition") {
-                $('td:nth-child(' + columnIndex + '):not(:first-child)').slice(1).each(function (i, obj) {
-                    let cellValue = $(obj).text().trim();
-                    if ((cellValue !== "True" && cellValue !== "False") || (cellValue !== "Yes" && cellValue !== "No") || cellValue === "") {
-                        hasError = true;
-                        let rowIndex = $(this).closest('tr').index() + 1;
-                        let fileName = $('#excelFileName').val();
-                        let errorInfo = {
-                            ExcelDosya: fileName,
-                            className: colHeadName,
-                            Hata: cellValue,
-                            Satir: rowIndex,
-                            Sutun: columnIndex,
-                            Durum: true
-                        };
-                        let errorInfoJSON = JSON.stringify(errorInfo);
+            // if (colHeadType === "wt.iba.definition.FloatDefinition" ||
+            //     colHeadType === "wt.iba.definition.DoubleDefinition" ||
+            //     colHeadType === "wt.iba.definition.DecimalDefinition" ||
+            //     colHeadType === "wt.iba.definition.IntDefinition") {
+            //     $('td:nth-child(' + columnIndex + '):not(:first-child)').slice(1).each(function (i, obj) {
+            //         let cellValue = $(obj).text().trim();
+            //         if (!isNumeric(cellValue) || cellValue === "") {
+            //             hasError = true;
+            //             let rowIndex = $(this).closest('tr').index() + 1;
+            //             let fileName = $('#excelFileName').val();
+            //             let errorInfo = {
+            //                 ExcelDosya: fileName,
+            //                 className: colHeadName,
+            //                 Hata: cellValue,
+            //                 Satir: rowIndex,
+            //                 Sutun: columnIndex,
+            //                 Durum: true
+            //             };
+            //             let errorInfoJSON = JSON.stringify(errorInfo);
+            //             errorList.push(errorInfoJSON);
+            //             // $(this).css("color", "red");
+            //         } else {
+            //             validList.push(cellValue);
+            //             $(this).css("color", "black");
+            //         }
+            //         if (cellValue == "") {
+            //             hasEmpty = true;
+            //             let rowIndex = $(this).closest('tr').index() + 1;
+            //             let fileName = $('#excelFileName').val();
+            //             let emptyInfo = {
+            //                 ExcelDosya: fileName,
+            //                 className: colHeadName,
+            //                 Hata: cellValue,
+            //                 Satir: rowIndex,
+            //                 Sutun: columnIndex,
+            //                 Durum: true
+            //             };
+            //             let emptyInfoJSON = JSON.stringify(emptyInfo);
+            //             emptyList.push(emptyInfoJSON);
+            //         }
+            //     });
+            // } else if (colHeadType === "wt.iba.definition.BooleanDefinition")
+            // {
+            //     $('td:nth-child(' + columnIndex + '):not(:first-child)').slice(1).each(function (i, obj) {
+            //         let cellValue = $(obj).text().trim();
+            //         if ((cellValue !== "True" && cellValue !== "False") || (cellValue !== "Yes" && cellValue !== "No") || cellValue === "") {
+            //             hasError = true;
+            //             let rowIndex = $(this).closest('tr').index() + 1;
+            //             let fileName = $('#excelFileName').val();
+            //             let errorInfo = {
+            //                 ExcelDosya: fileName,
+            //                 className: colHeadName,
+            //                 Hata: cellValue,
+            //                 Satir: rowIndex,
+            //                 Sutun: columnIndex,
+            //                 Durum: true
+            //             };
+            //             let errorInfoJSON = JSON.stringify(errorInfo);
 
+            //             errorList.push(errorInfoJSON);
+            //             $(this).css("color", "red");
+            //         } else {
+            //             validList.push(cellValue);
+            //             $(this).css("color", "black");
+            //         }
+            //         if (cellValue == "") {
+            //             hasEmpty = true;
+            //             let rowIndex = $(this).closest('tr').index() + 1;
+            //             let fileName = $('#excelFileName').val();
+            //             let emptyInfo = {
+            //                 ExcelDosya: fileName,
+            //                 className: colHeadName,
+            //                 Hata: cellValue,
+            //                 Satir: rowIndex,
+            //                 Sutun: columnIndex,
+            //                 Durum: true
+            //             };
+            //             let emptyInfoJSON = JSON.stringify(emptyInfo);
+            //             emptyList.push(emptyInfoJSON);
+            //         }
+            //     });
+            // } else 
+            
+            if (colHeadType === "wt.iba.definition.TimestampDefinition") 
+            {
+
+                // Sütunundaki tüm hücreleri döngüye al
+                $('td:nth-child(' + columnIndex + ')').slice(1).each(function (i, obj) {
+
+                    // Hücre değerini al
+                    let cellValue = $(this).text().trim();
+
+                    // Zaman damgası için regex tanımla
+                    let timestampRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+
+                    if (cellValue == "") {
+                                    hasEmpty = true;
+                                    let rowIndex = $(this).closest('tr').index() + 1;
+                                    let fileName = $('#excelFileName').val();
+                                    let emptyInfo = {
+                                        ExcelDosya: fileName,
+                                        className: colHeadName,
+                                        Hata: cellValue,
+                                        Satir: rowIndex,
+                                        Sutun: columnIndex,
+                                        Durum: true
+                                    };
+                                    let emptyInfoJSON = JSON.stringify(emptyInfo);
+                                    emptyList.push(emptyInfoJSON);
+                                }
+                    // Hücre değerini kontrol et
+                    if (!timestampRegex.test(cellValue)) {
+
+                        // Geçersiz ise hata ayarla
+                        hasError = true;
+
+                        // Hata bilgisini oluştur
+                        let errorInfo = {
+                            ExcelDosya: $('#excelFileName').val(),
+                            className: colHeadName,
+                            Hata: cellValue,
+                            Satir: $(this).closest('tr').index() + 1,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+
+                        // Hata listesine ekle
+                        let errorInfoJSON = JSON.stringify(errorInfo);
                         errorList.push(errorInfoJSON);
+
+                        // Hücre rengini kırmızı yap
                         $(this).css("color", "red");
+
                     } else {
+
+                        // Geçerliyse geçerli listesine ekle
                         validList.push(cellValue);
+
+                        // Hücre rengini siyah yap
                         $(this).css("color", "black");
+
                     }
+
+                });
+
+            } else if (colHeadType === "wt.iba.definition.FloatDefinition") 
+            {
+
+                // Sütunundaki tüm hücreleri döngüye al
+                $('td:nth-child(' + columnIndex + ')').slice(1).each(function (i, obj) {
+
+                    // Hücre değerini al
+                    let cellValue = $(this).text().trim();
+
+                    // Zaman damgası için regex tanımla
+                    // let floatRegex = /^-?\d+\.\d+$/;
+                    let floatRegex = /^-?\d+(\.\d+)?([eE]\d+)?$/;
                     if (cellValue == "") {
                         hasEmpty = true;
                         let rowIndex = $(this).closest('tr').index() + 1;
@@ -396,8 +493,286 @@
                         let emptyInfoJSON = JSON.stringify(emptyInfo);
                         emptyList.push(emptyInfoJSON);
                     }
+                    // Hücre değerini kontrol et
+                    if (!floatRegex.test(cellValue)) {
+
+                        // Geçersiz ise hata ayarla
+                        hasError = true;
+
+                        // Hata bilgisini oluştur
+                        let errorInfo = {
+                            ExcelDosya: $('#excelFileName').val(),
+                            className: colHeadName,
+                            Hata: cellValue,
+                            Satir: $(this).closest('tr').index() + 1,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+
+                        // Hata listesine ekle
+                        let errorInfoJSON = JSON.stringify(errorInfo);
+                        errorList.push(errorInfoJSON);
+
+                        // Hücre rengini kırmızı yap
+                        $(this).css("color", "red");
+
+                    } else {
+
+                        // Geçerliyse geçerli listesine ekle
+                        validList.push(cellValue);
+
+                        // Hücre rengini siyah yap
+                        $(this).css("color", "black");
+
+                    }
+
                 });
-            }
+
+            } else if (colHeadType === "wt.iba.definition.IntDefinition") {
+
+                // Sütunundaki tüm hücreleri döngüye al
+                $('td:nth-child(' + columnIndex + ')').slice(1).each(function (i, obj) {
+
+                    // Hücre değerini al
+                    let cellValue = $(this).text().trim();
+
+                    // Zaman damgası için regex tanımla
+                    let intRegex = /^-?\d+$/;
+                    if (cellValue == "") {
+                        hasEmpty = true;
+                        let rowIndex = $(this).closest('tr').index() + 1;
+                        let fileName = $('#excelFileName').val();
+                        let emptyInfo = {
+                            ExcelDosya: fileName,
+                            className: colHeadName,
+                            Hata: cellValue,
+                            Satir: rowIndex,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+                        let emptyInfoJSON = JSON.stringify(emptyInfo);
+                        emptyList.push(emptyInfoJSON);
+                    }
+                    // Hücre değerini kontrol et
+                    if (!intRegex.test(cellValue)) {
+
+                        // Geçersiz ise hata ayarla
+                        hasError = true;
+
+                        // Hata bilgisini oluştur
+                        let errorInfo = {
+                            ExcelDosya: $('#excelFileName').val(),
+                            className: colHeadName,
+                            Hata: cellValue,
+                            Satir: $(this).closest('tr').index() + 1,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+
+                        // Hata listesine ekle
+                        let errorInfoJSON = JSON.stringify(errorInfo);
+                        errorList.push(errorInfoJSON);
+
+                        // Hücre rengini kırmızı yap
+                        $(this).css("color", "red");
+
+                    } else {
+
+                        // Geçerliyse geçerli listesine ekle
+                        validList.push(cellValue);
+
+                        // Hücre rengini siyah yap
+                        $(this).css("color", "black");
+
+                    }
+
+                });
+
+            } else if (colHeadType === "wt.iba.definition.UnitDefinition")
+            {
+
+                // Sütunundaki tüm hücreleri döngüye al
+                $('td:nth-child(' + columnIndex + ')').slice(1).each(function (i, obj) {
+
+                    // Hücre değerini al
+                    let cellValue = $(this).text().trim();
+
+                    // Zaman damgası için regex tanımla
+                    let unitRegex = /^-?\d+(\.\d+)?\s*(mi|km|m|cm|mm|in|ft|yd|g|kg|mg|oz|lb|gal|l|ml)$/;
+                    if (cellValue == "") {
+                        hasEmpty = true;
+                        let rowIndex = $(this).closest('tr').index() + 1;
+                        let fileName = $('#excelFileName').val();
+                        let emptyInfo = {
+                            ExcelDosya: fileName,
+                            className: colHeadName,
+                            Hata: cellValue,
+                            Satir: rowIndex,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+                        let emptyInfoJSON = JSON.stringify(emptyInfo);
+                        emptyList.push(emptyInfoJSON);
+                    }
+                    // Hücre değerini kontrol et
+                    if (!unitRegex.test(cellValue)) {
+
+                        // Geçersiz ise hata ayarla
+                        hasError = true;
+
+                        // Hata bilgisini oluştur
+                        let errorInfo = {
+                            ExcelDosya: $('#excelFileName').val(),
+                            className: colHeadName,
+                            Hata: cellValue,
+                            Satir: $(this).closest('tr').index() + 1,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+
+                        // Hata listesine ekle
+                        let errorInfoJSON = JSON.stringify(errorInfo);
+                        errorList.push(errorInfoJSON);
+
+                        // Hücre rengini kırmızı yap
+                        $(this).css("color", "red");
+
+                    } else {
+
+                        // Geçerliyse geçerli listesine ekle
+                        validList.push(cellValue);
+
+                        // Hücre rengini siyah yap
+                        $(this).css("color", "black");
+
+                    }
+
+                });
+
+            } else if (colHeadType === "wt.iba.definition.DecimalDefinition") 
+                {
+
+                // Sütunundaki tüm hücreleri döngüye al
+                $('td:nth-child(' + columnIndex + ')').slice(1).each(function (i, obj) {
+
+                    // Hücre değerini al
+                    let cellValue = $(this).text().trim();
+
+                    // Zaman damgası için regex tanımla
+                    let decimalRegex = /^-?\d+\.\d+$/;
+                    if (cellValue == "") {
+                        hasEmpty = true;
+                        let rowIndex = $(this).closest('tr').index() + 1;
+                        let fileName = $('#excelFileName').val();
+                        let emptyInfo = {
+                            ExcelDosya: fileName,
+                            className: colHeadName,
+                            Hata: cellValue,
+                            Satir: rowIndex,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+                        let emptyInfoJSON = JSON.stringify(emptyInfo);
+                        emptyList.push(emptyInfoJSON);
+                    }
+                    // Hücre değerini kontrol et
+                    if (!decimalRegex.test(cellValue)) {
+
+                        // Geçersiz ise hata ayarla
+                        hasError = true;
+
+                        // Hata bilgisini oluştur
+                        let errorInfo = {
+                            ExcelDosya: $('#excelFileName').val(),
+                            className: colHeadName,
+                            Hata: cellValue,
+                            Satir: $(this).closest('tr').index() + 1,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+
+                        // Hata listesine ekle
+                        let errorInfoJSON = JSON.stringify(errorInfo);
+                        errorList.push(errorInfoJSON);
+
+                        // Hücre rengini kırmızı yap
+                        $(this).css("color", "red");
+
+                    } else {
+
+                        // Geçerliyse geçerli listesine ekle
+                        validList.push(cellValue);
+
+                        // Hücre rengini siyah yap
+                        $(this).css("color", "black");
+
+                    }
+
+                });
+
+            } 
+            // else if (colHeadType === "wt.iba.definition.StringDefinition") {
+
+            //     // Sütunundaki tüm hücreleri döngüye al
+            //     $('td:nth-child(' + columnIndex + ')').slice(1).each(function (i, obj) {
+
+            //         // Hücre değerini al
+            //         let cellValue = $(this).text().trim();
+
+            //         // Zaman damgası için regex tanımla
+            //         let stringRegex = /^.+$/;
+            //         if (cellValue == "") {
+            //             hasEmpty = true;
+            //             let rowIndex = $(this).closest('tr').index() + 1;
+            //             let fileName = $('#excelFileName').val();
+            //             let emptyInfo = {
+            //                 ExcelDosya: fileName,
+            //                 className: colHeadName,
+            //                 Hata: cellValue,
+            //                 Satir: rowIndex,
+            //                 Sutun: columnIndex,
+            //                 Durum: true
+            //             };
+            //             let emptyInfoJSON = JSON.stringify(emptyInfo);
+            //             emptyList.push(emptyInfoJSON);
+            //         }
+            //         // Hücre değerini kontrol et
+            //         if (!stringRegex.test(cellValue)) {
+
+            //             // Geçersiz ise hata ayarla
+            //             hasError = true;
+
+            //             // Hata bilgisini oluştur
+            //             let errorInfo = {
+            //                 ExcelDosya: $('#excelFileName').val(),
+            //                 className: colHeadName,
+            //                 Hata: cellValue,
+            //                 Satir: $(this).closest('tr').index() + 1,
+            //                 Sutun: columnIndex,
+            //                 Durum: true
+            //             };
+
+            //             // Hata listesine ekle
+            //             let errorInfoJSON = JSON.stringify(errorInfo);
+            //             errorList.push(errorInfoJSON);
+
+            //             // Hücre rengini kırmızı yap
+            //             $(this).css("color", "red");
+
+            //         } else {
+
+            //             // Geçerliyse geçerli listesine ekle
+            //             validList.push(cellValue);
+
+            //             // Hücre rengini siyah yap
+            //             $(this).css("color", "black");
+
+            //         }
+
+            //     });
+
+            // }
+
 
             // Diğer doğrulama işlemleri...
 
