@@ -85,21 +85,34 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         {
                             conn3Sel.Open();
 
-                            // Eski Name değerini sakla
+                            // Eski Name değerini al
                             var getOldName = $"SELECT Name FROM {catalogValue}.EPMDocumentMaster WHERE documentNumber = @Anaparca";
+                            var getOldNameWTPart = $"SELECT Name FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Anaparca";
+
                             using (SqlCommand getNameCmd = new SqlCommand(getOldName, conn3Sel))
                             {
                                 getNameCmd.Parameters.AddWithValue("@Anaparca", Anaparca);
                                 var oldName = (string)getNameCmd.ExecuteScalar();
 
+                                if (oldName != null)
+                                {
+                                    // Eğer EPMDocumentMaster tablosunda bulunduysa
+                                    excelRow["ESKI_NAME"] = oldName;
+                                }
+                                else
+                                {
+                                    // Eğer bulunamazsa, WTPartMaster tablosunda ara
+                                    using (SqlCommand getNameCmdWTPart = new SqlCommand(getOldNameWTPart, conn3Sel))
+                                    {
+                                        getNameCmdWTPart.Parameters.AddWithValue("@Anaparca", Anaparca);
+                                        var oldNameWTPart = (string)getNameCmdWTPart.ExecuteScalar();
+                                        excelRow["ESKI_NAME"] = oldNameWTPart;
+                                    }
+                                }
                                 // Eski Name değerini Excel'e yaz
-                                excelRow["ESKI_NAME"] = oldName;
-
-
                             }
-
-                      
                         }
+
                     }
 
                 }
@@ -318,7 +331,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 
 
 
-        public IActionResult ExcelProc(IFormCollection data,string importType)
+        public IActionResult ExcelProc([FromForm] IFormCollection data,string importType)
         {
             try
             {
@@ -391,11 +404,15 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 
                     if (CIFTYON == "2")
                     {
+
+                        if(importType == "WTPart")
+                        {
+
                         using (SqlConnection conn2Sel = new SqlConnection(connectionString))
                         {
                             string alternatifDeger2Sel = "";
                             conn2Sel.Open();
-                            var sqlQuery2Sel = $"SELECT name, idA2A2, idA3containerReference FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Anaparca OR WTPartNumber = @Alternatif";
+                            var sqlQuery2Sel = $"SELECT name, idA2A2, idA3containerReference FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Anaparca";
 
 
 
@@ -607,6 +624,12 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         }
 
 
+                        }
+
+                        if(importType == "EPM")
+                        {
+
+                        }
 
 
 
@@ -616,6 +639,10 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     }
                     else if (CIFTYON == "1")
                     {
+
+                        if(importType == "WTPart")
+                        {
+
                         using (SqlConnection conn1Sel = new SqlConnection(connectionString))
                         {
                             conn1Sel.Open();
@@ -763,10 +790,23 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         }
 
 
+                        }
+
+                        if(importType == "EPM")
+                        {
+
+                        }
 
                     }
                     if (!string.IsNullOrEmpty(Name))
                     {
+
+                        if(importType == "WTPart")
+                        {
+
+                        }
+
+                        if(importType == "EPM") { 
                         using (SqlConnection conn3Sel = new SqlConnection(connectionString))
                         {
                             conn3Sel.Open();
@@ -793,10 +833,16 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                                 updateCmd.ExecuteNonQuery();
                             }
                         }
+                        }
                     }
 
 
                 }
+
+
+
+
+
 
                 foreach (GenericObjectViewModel PlmDbPRoc in RecordList)
                 {
@@ -1129,7 +1175,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         try
                         {
 
-                       //ExcelProc(data,importType);
+                       ExcelProc(data,importType);
                         TempData["SuccessMessage"] = "CAD e gönderildi.";
 
                         }
@@ -1143,7 +1189,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         try
                         {
 
-                            //ExcelProc(data, importType);
+                            ExcelProc(data, importType);
                             TempData["SuccessMessage"] = "WTPart a gönderildi.";
 
                         }
