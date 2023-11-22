@@ -158,6 +158,8 @@
 
 <script>
     $('#headselect_Number').attr('disabled', true);
+    $('#headselect_CIFTYON').attr('disabled', true);
+    $('#headselect_ALTERNATIF').attr('disabled', true);
     $('#headselect_ESKI_NAME').attr('disabled', true);
 
     // $('#headselect_Number').addClass("d-none");
@@ -278,6 +280,7 @@
     var errorList = [];
     var emptyList = [];
     var validList = [];
+    var colHeadNameList = [];
 
 
 
@@ -310,8 +313,12 @@
             colNames.push($(this).text().trim());
         });
 
+
+
+
         $('.multiple_attr').each(function () {
             let colHeadName = $(this).attr("colHeadName");
+            colHeadNameList.push(colHeadName);
             let colHeadType = $(this).val().split("|")[2];
             let hasError = false;
             let hasEmpty = false;
@@ -452,7 +459,7 @@
                         errorList.push(errorInfoJSON);
 
                         // Hücre rengini kırmızı yap
-                        $(this).css("color", "red");
+                        // $(this).css("color", "red");
 
                     } else {
 
@@ -574,7 +581,7 @@
                         errorList.push(errorInfoJSON);
 
                         // Hücre rengini kırmızı yap
-                        $(this).css("color", "red");
+                        // $(this).css("color", "red");
 
                     } else {
 
@@ -635,7 +642,7 @@
                         errorList.push(errorInfoJSON);
 
                         // Hücre rengini kırmızı yap
-                        $(this).css("color", "red");
+                        // $(this).css("color", "red");
 
                     } else {
 
@@ -696,7 +703,7 @@
                         errorList.push(errorInfoJSON);
 
                         // Hücre rengini kırmızı yap
-                        $(this).css("color", "red");
+                        // $(this).css("color", "red");
 
                     } else {
 
@@ -802,7 +809,18 @@
         console.log("Boş Değerler: " + emptyList);
     });
 
+    // Her bir 'select' öğesini döngüye alın
+    $('select.multiple_attr').each(function () {
+        let colHeadName = $(this).attr("colHeadName");
 
+        // Eğer colHeadName, selectedHeaders dizisinde ise, seçili değeri olarak ayarla
+        // Aksi takdirde, "None" olarak ayarla
+        if (colHeadNameList.includes(colHeadName)) {
+            $(this).val(colHeadName);
+        } else {
+            $(this).val("0"); // "None" için değeri 0 olarak varsayalım
+        }
+    });
 
     // $('.multiple_attr').change(function () {
     //     // Hata kontrolü için bir değişken
@@ -1027,7 +1045,7 @@
         let formData = $('#excelheadform').serialize();
         var sutunList = [];
 
-                var selectedValue = $('input[name="importType"]:checked').val();
+       var selectedValue = $('input[name="importType"]:checked').val();
      
        
 
@@ -1039,7 +1057,7 @@
         $.ajax({
             url: '/PlmExcelIntegrate/ExcelFileControl',
             type: 'POST',
-            data: { data: formData, HataListesi: errorListJSON, Hatasizlar: validListJSON, excelFile: fileName, importType: selectedValue },
+            data: { data: formData, HataListesi: errorListJSON, Hatasizlar: validListJSON, excelFile: fileName, importType: selectedValue, colHeadNameList: colHeadNameList },
             dataType: "json",
             success: function (data) {
                 if (errorList.length > 0) {

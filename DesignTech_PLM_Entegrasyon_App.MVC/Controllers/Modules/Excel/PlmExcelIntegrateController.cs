@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Serilog;
 using SqlKata.Execution;
 using System.Data;
+using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using static DesignTech_PLM_Entegrasyon_App.MVC.Controllers.LogController;
 using static DesignTech_PLM_Entegrasyon_App.MVC.Helper.LogService;
@@ -335,11 +336,31 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
         {
             try
             {
+
+
                 string excelFileData = data["data"].ToString(); // data verisini çek
 
                 string[] keyValuePairs = excelFileData.Split('&'); // & işaretine göre bölelim
 
                 string excelFileName = null;
+
+                var selectedHeaders = new List<string>();
+               
+                selectedHeaders.Add("Number");
+                selectedHeaders.Add("CIFTYON");
+                selectedHeaders.Add("ALTERNATIF");
+                selectedHeaders.Add("ESKI_NAME");
+                foreach (var pair in keyValuePairs)
+                {
+                    if (pair.StartsWith("selected_headers%5B%5D=") && !pair.StartsWith("selected_headers%5B%5D=0"))
+                    {
+                        var headerParts = pair.Split('=');
+                        var firstPart = headerParts[1].Split('%')[0];
+
+                        selectedHeaders.Add(firstPart);
+                    
+                    }
+                }
 
                 foreach (var pair in keyValuePairs)
                 {
@@ -367,33 +388,76 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         });
                     }
                 }
-                List<GenericObjectViewModel> RecordList = new List<GenericObjectViewModel>();
 
-                foreach (DataRow excelRow in excelData.Tables[0].Rows)
+                DataTable originalDataTable = excelData.Tables["EPM Document"]; // Burada 0, Excel dosyasındaki ilk sayfayı temsil eder
+                DataTable originalDataTable2 = excelData.Tables["WTPart"];
+                // Burada 0, Excel dosyasındaki ilk sayfayı temsil eder
+                DataTable filteredDataTable = new DataTable();
+                DataTable filteredDataTable2 = new DataTable();
+
+                foreach (string header in selectedHeaders)
                 {
-                    var Number = excelRow[0].ToString();
-                    var Version = excelRow[1].ToString();
-                    foreach (var item in data["selected_headers[]"])
+                    if (originalDataTable.Columns.Contains(header))
                     {
-                        if (item != "0")
-                        {
-                            var epmCollection = item.Split("|");
-                            var excelColumnName = epmCollection[0];
-                            var plmIdeHierId = epmCollection[1];
-                            var definitionType = epmCollection[2];
-                            var idA2A2 = epmCollection[3];
+                        filteredDataTable.Columns.Add(header);
+                    }
+                    if (originalDataTable2.Columns.Contains(header))
+                    {
+                        filteredDataTable2.Columns.Add(header);
+                    }
+                }
 
-                            GenericObjectViewModel GenericRowObject = new GenericObjectViewModel();
-                            GenericRowObject.Number = Number;
-                            GenericRowObject.Version = Version;
-                            GenericRowObject.HierId = plmIdeHierId;
-                            GenericRowObject.DefinitionType = definitionType;
-                            GenericRowObject.idA2A2 = idA2A2;
-                            GenericRowObject.AttrValue = excelRow[excelColumnName.ToString()].ToString();
-                            RecordList.Add(GenericRowObject);
+
+                foreach (DataRow row in originalDataTable2.Rows)
+                {
+                    DataRow newRow = filteredDataTable2.NewRow();
+
+                    foreach (string header in selectedHeaders)
+                    {
+                        if (originalDataTable2.Columns.Contains(header))
+                        {
+                            newRow[header] = row[header];
                         }
                     }
 
+                    filteredDataTable2.Rows.Add(newRow);
+                }
+
+
+                foreach (DataRow row in originalDataTable.Rows)
+                {
+                    DataRow newRow = filteredDataTable.NewRow();
+
+                    foreach (string header in selectedHeaders)
+                    {
+                        if (originalDataTable.Columns.Contains(header))
+                        {
+                            newRow[header] = row[header];
+                        }
+                    }
+
+                    filteredDataTable.Rows.Add(newRow);
+                }
+
+                // Filtrelenmiş verileri kullanarak işlemleri gerçekleştir
+                // Örneğin, ViewBag kullanarak view'e veriyi aktarabilirsiniz
+                ViewBag.FilteredData = filteredDataTable;
+                ViewBag.FilteredData = filteredDataTable2;
+
+
+                // Excel'den okunan tüm başlıklar
+
+                List<GenericObjectViewModel> RecordList = new List<GenericObjectViewModel>();
+
+
+
+
+                foreach (DataRow excelRow in filteredDataTable.Rows)
+                {
+
+
+
+                    var Number = excelRow["Number"].ToString();
                     // Şartları burada ekleyin
                     var Anaparca = excelRow["Number"].ToString();
                     var Alternatif = excelRow["ALTERNATIF"].ToString();
@@ -607,7 +671,6 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                                                         TempData["ErrorMessage"] = "HATA!" + ex.Message;
 
                                                     }
-
 
                                                 }
 
@@ -840,254 +903,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                 }
 
 
-
-
-
-
-                foreach (GenericObjectViewModel PlmDbPRoc in RecordList)
-                {
-                    var catalogValue = _configuration["Catalog"];
-                    if (PlmDbPRoc.DefinitionType.Contains("String"))
-                    {
-                        var RowControl = _plm2.Query(catalogValue + ".EPMDocNumberList").Where(new
-                        {
-                            //WT PARTI , EP Dökümanı yok o yüzden 0 gidiyor karşılığı yok.
-                            documentNumber = PlmDbPRoc.Number
-                        }).Get().ToList();
-
-                        var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
-                        if (RowControl.Count() > 0)
-                        {
-                            var ID = RowControl[0].EPMDocNumber;
-                            StringValue NewRecord = new StringValue();
-                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                            NewRecord.classnameA2A2 = "wt.iba.value.StringValue";
-                            NewRecord.idA3A5 = 0;
-                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                            NewRecord.markForDeleteA2 = 0;
-                            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                            NewRecord.updateCountA2 = 1;
-                            NewRecord.updateStampA2 = DateTime.Now.Date;
-                            NewRecord.createStampA2 = DateTime.Now.Date;
-                            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                            NewRecord.value = PlmDbPRoc.AttrValue.ToUpper();
-                            NewRecord.value2 = PlmDbPRoc.AttrValue;
-                            if (PlmDbPRoc.AttrValue != "")
-                            {
-                                var insert = _plm2.Query(catalogValue + ".StringValue").Insert(NewRecord);
-
-                                if (insert == 1)
-                                {
-                                    _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
-                                }
-                            }
-                        }
-                    }
-
-                    if (PlmDbPRoc.DefinitionType.Contains("Integer"))
-                    {
-                        var RowControl = _plm2.Query(catalogValue + ".EPMDocNumberList").Where(new
-                        {
-                            documentNumber = PlmDbPRoc.Number
-                        }).Get().ToList();
-
-                        var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
-                        if (RowControl.Count() > 0)
-                        {
-                            var ID = RowControl[0].EPMDocNumber;
-                            IntegerValue NewRecord = new IntegerValue();
-                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                            NewRecord.classnameA2A2 = "wt.iba.value.IntegerValue";
-                            NewRecord.idA3A5 = 0;
-                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                            NewRecord.markForDeleteA2 = 0;
-                            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                            NewRecord.updateCountA2 = 1;
-                            NewRecord.updateStampA2 = DateTime.Now.Date;
-                            NewRecord.createStampA2 = DateTime.Now.Date;
-                            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                            NewRecord.value = Convert.ToInt64(PlmDbPRoc.AttrValue.ToUpper());
-                            var insert = _plm2.Query(catalogValue + ".IntegerValue").Insert(NewRecord);
-                            if (PlmDbPRoc.AttrValue != "")
-                            {
-                                if (insert == 1)
-                                {
-                                    _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
-                                }
-                            }
-                        }
-                    }
-                    if (PlmDbPRoc.DefinitionType.Contains("Float"))
-                    {
-                        var RowControl = _plm2.Query(catalogValue + ".EPMDocNumberList").Where(new
-                        {
-                            documentNumber = PlmDbPRoc.Number
-                        }).Get().ToList();
-
-                        var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
-
-                        if (RowControl.Count() > 0)
-                        {
-                            var ID = RowControl[0].EPMDocNumber;
-                            FloatValue NewRecord = new FloatValue();
-                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                            NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
-                            NewRecord.idA3A5 = 0;
-                            NewRecord.wtprecision = -1;
-                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                            NewRecord.markForDeleteA2 = 0;
-                            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                            NewRecord.updateCountA2 = 1;
-                            NewRecord.updateStampA2 = DateTime.Now.Date;
-                            NewRecord.createStampA2 = DateTime.Now.Date;
-                            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                            NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
-                            var insert = _plm2.Query(catalogValue + ".FloatValue").Insert(NewRecord);
-                            if (PlmDbPRoc.AttrValue != "")
-                            {
-                                if (insert == 1)
-                                {
-                                    _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
-                                }
-                            }
-                        }
-                    }
-                    if (PlmDbPRoc.DefinitionType.Contains("Unit"))
-                    {
-                        var RowControl = _plm2.Query(catalogValue + ".EPMDocNumberList").Where(new
-                        {
-                            documentNumber = PlmDbPRoc.Number
-                        }).Get().ToList();
-
-                        var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
-                        if (RowControl.Count() > 0)
-                        {
-                            var ID = RowControl[0].EPMDocNumber;
-                            UnitValue NewRecord = new UnitValue();
-                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                            NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
-                            NewRecord.idA3A5 = 0;
-                            NewRecord.wtprecision = -1;
-                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                            NewRecord.markForDeleteA2 = 0;
-                            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                            NewRecord.updateCountA2 = 1;
-                            NewRecord.updateStampA2 = DateTime.Now.Date;
-                            NewRecord.createStampA2 = DateTime.Now.Date;
-                            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                            NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
-                            if (PlmDbPRoc.AttrValue != "")
-                            {
-                                var insert = _plm2.Query(catalogValue + ".UnitValue").Insert(NewRecord);
-                                if (insert == 1)
-                                {
-                                    _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
-                                }
-                            }
-                        }
-                    }
-                    if (PlmDbPRoc.DefinitionType.Contains("Boolean"))
-                    {
-                        var RowControl = _plm2.Query(catalogValue + ".EPMDocNumberList").Where(new
-                        {
-                            documentNumber = PlmDbPRoc.Number
-                        }).Get().ToList();
-
-                        var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
-                        if (RowControl.Count() > 0)
-                        {
-                            var ID = RowControl[0].EPMDocNumber;
-                            bool BoolValue = false;
-                            if (PlmDbPRoc.AttrValue.ToLower() == "yes")
-                            {
-                                BoolValue = true;
-                            }
-                            else
-                            {
-                                BoolValue = false;
-                            }
-                            BooleanValue NewRecord = new BooleanValue();
-                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                            NewRecord.classnameA2A2 = "wt.iba.value.BooleanValue";
-                            NewRecord.idA3A5 = 0;
-                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                            NewRecord.markForDeleteA2 = 0;
-                            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                            NewRecord.updateCountA2 = 1;
-                            NewRecord.updateStampA2 = DateTime.Now.Date;
-                            NewRecord.createStampA2 = DateTime.Now.Date;
-                            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                            NewRecord.value = Convert.ToByte(BoolValue);
-                            if (PlmDbPRoc.AttrValue != "")
-                            {
-                                var insert = _plm2.Query(catalogValue + ".BooleanValue").Insert(NewRecord);
-                                if (insert == 1)
-                                {
-                                    _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
-                                }
-                            }
-                        }
-                    }
-                    if (PlmDbPRoc.DefinitionType.Contains("Timestamp"))
-                    {
-                        var RowControl = _plm2.Query(catalogValue + ".EPMDocNumberList").Where(new
-                        {
-                            documentNumber = PlmDbPRoc.Number
-                        }).Get().ToList();
-
-                        var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
-                        if (RowControl.Count() > 0)
-                        {
-                            var ID = RowControl[0].EPMDocNumber;
-
-                            TimestampValue NewRecord = new TimestampValue();
-                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                            NewRecord.classnameA2A2 = "wt.iba.value.TimestampValue";
-                            NewRecord.idA3A5 = 0;
-                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                            NewRecord.markForDeleteA2 = 0;
-                            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                            NewRecord.updateCountA2 = 1;
-                            NewRecord.updateStampA2 = DateTime.Now.Date;
-                            NewRecord.createStampA2 = DateTime.Now.Date;
-                            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                            NewRecord.value = Convert.ToDateTime(PlmDbPRoc.AttrValue).Date;
-                            if (PlmDbPRoc.AttrValue != "")
-                            {
-                                var insert = _plm2.Query(catalogValue + ".TimestampValue").Insert(NewRecord);
-                                if (insert == 1)
-                                {
-                                    _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
-                                }
-                            }
-                        }
-                    }
-
-                }
-
-                /* foreach (DataColumn excelHeader in excelData.Tables[0].Columns)
-                    {
-                        //smartData += excelRow[excelHeader.ColumnName.ToString()].ToString();
-                    }
-                */
+           
                 return Ok(new { status = true , message = "Data Sync Success" });
 
             }
