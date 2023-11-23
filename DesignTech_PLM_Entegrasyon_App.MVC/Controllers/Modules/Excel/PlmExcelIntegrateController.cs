@@ -492,438 +492,438 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     }
 
 
-                    if (CIFTYON == "2")
-                    {
-
-                        if(importType == "WTPart")
-                        {
-
-                        using (SqlConnection conn2Sel = new SqlConnection(connectionString))
-                        {
-                            string alternatifDeger2Sel = "";
-                            conn2Sel.Open();
-                            var sqlQuery2Sel = $"SELECT name, idA2A2, idA3containerReference FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Anaparca";
-
-
-
-                            var sqlQuery2SelAlternatif = $"SELECT idA2A2 FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Alternatif";
-
-                            using (SqlCommand cmd2SelAlt = new SqlCommand(sqlQuery2SelAlternatif, conn2Sel))
-                            {
-                                cmd2SelAlt.Parameters.AddWithValue("@Anaparca", Anaparca);
-                                cmd2SelAlt.Parameters.AddWithValue("@Alternatif", Alternatif);
-
-                                using (SqlDataReader reader2SelAlt = cmd2SelAlt.ExecuteReader())
-                                {
-                                    while (reader2SelAlt.Read())
-                                    {
-                                        alternatifDeger2Sel = reader2SelAlt["idA2A2"].ToString();
-
-
-                                    }
-                                }
-                            }
-
-                            using (SqlCommand cmd2Sel = new SqlCommand(sqlQuery2Sel, conn2Sel))
-                            {
-                                cmd2Sel.Parameters.AddWithValue("@Anaparca", Anaparca);
-                                cmd2Sel.Parameters.AddWithValue("@Alternatif", Alternatif);
-
-                                using (SqlDataReader reader2Sel = cmd2Sel.ExecuteReader())
-                                {
-                                    while (reader2Sel.Read())
-                                    {
-                                        var name = reader2Sel["name"].ToString();
-                                        var idA2A2 = reader2Sel["idA2A2"].ToString();
-                                        var idA3containerReference = reader2Sel["idA3containerReference"].ToString();
-                                        var idA3domainRef = "";
-
-                                        using (SqlConnection conn1GetDomainRef = new SqlConnection(connectionString))
-                                        {
-                                            conn1GetDomainRef.Open();
-                                            var domainRefQuery = $"SELECT idA3D2containerInfo FROM {catalogValue}.PDMLinkProduct WHERE idA2A2 = {idA3containerReference}";
-                                            using (SqlCommand domainRefCmd = new SqlCommand(domainRefQuery, conn1GetDomainRef))
-                                            {
-                                                domainRefCmd.Parameters.AddWithValue("@idA2A2", idA2A2);
-
-                                                using (SqlDataReader domainRefReader = domainRefCmd.ExecuteReader())
-                                                {
-                                                    if (domainRefReader.Read())
-                                                    {
-                                                        idA3domainRef = domainRefReader["idA3D2containerInfo"].ToString();
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        // CIFTYON 2 - Insert
-                                        using (SqlConnection conn2Ins = new SqlConnection(connectionString))
-                                        {
-                                            conn2Ins.Open();
-                                            var insertQuery2Ins = $"INSERT INTO {catalogValue}.WTPartAlternateLink (idA3A5, idA3B5, classnameA2A2, classnamekeydomainRef,idA3domainRef, inheritedDomain, replacementType, classnamekeyroleBObjectRef, classnamekeyroleAObjectRef, updateCountA2, markForDeleteA2, idA2A2, createStampA2, modifyStampA2, updateStampA2) VALUES (@idA3A5, @idA3B5, @classnameA2A2, @classnamekeydomainRef, @idA3domainRef, @inheritedDomain, @replacementType, @classnamekeyroleBObjectRef, @classnamekeyroleAObjectRef, @updateCountA2, @markForDeleteA2, @idA2A2, @createStampA2, @modifyStampA2, @updateStampA2)";
-                                            // İlk ekleme işlemi
-                                            using (SqlCommand insertCmd2Ins = new SqlCommand(insertQuery2Ins, conn2Ins))
-                                            {
-                                                var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
-                                                var ID = Convert.ToInt64(Convert.ToInt64(IdSeq.value) + 100);
-
-                                                insertCmd2Ins.Parameters.AddWithValue("@idA3A5", idA2A2);
-                                                insertCmd2Ins.Parameters.AddWithValue("@idA3B5", alternatifDeger2Sel);
-                                                insertCmd2Ins.Parameters.AddWithValue("@classnamekeydomainRef", "wt.admin.AdministrativeDomain");
-                                                insertCmd2Ins.Parameters.AddWithValue("@idA3domainRef", idA3domainRef);
-                                                insertCmd2Ins.Parameters.AddWithValue("@inheritedDomain", 0);
-                                                insertCmd2Ins.Parameters.AddWithValue("@replacementType", "a");
-                                                insertCmd2Ins.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
-                                                insertCmd2Ins.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
-                                                insertCmd2Ins.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateLink");
-                                                insertCmd2Ins.Parameters.AddWithValue("@updateCountA2", 1);
-                                                insertCmd2Ins.Parameters.AddWithValue("@markForDeleteA2", 0);
-                                                insertCmd2Ins.Parameters.AddWithValue("@idA2A2", ID);
-                                                insertCmd2Ins.Parameters.AddWithValue("@createStampA2", DateTime.Now);
-                                                insertCmd2Ins.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
-                                                insertCmd2Ins.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
-                                                try
-                                                {
-                                                    insertCmd2Ins.ExecuteNonQuery();
-                                                    _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
-                                                }
-                                                catch (SqlException ex)
-                                                {
-                                                    TempData["ErrorMessage"] = "HATA!" + ex.Message;
-
-                                                }
-
+                    //if (CIFTYON == "2")
+                    //{
+
+                    //    if(importType == "WTPart")
+                    //    {
+
+                    //    using (SqlConnection conn2Sel = new SqlConnection(connectionString))
+                    //    {
+                    //        string alternatifDeger2Sel = "";
+                    //        conn2Sel.Open();
+                    //        var sqlQuery2Sel = $"SELECT name, idA2A2, idA3containerReference FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Anaparca";
+
+
+
+                    //        var sqlQuery2SelAlternatif = $"SELECT idA2A2 FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Alternatif";
+
+                    //        using (SqlCommand cmd2SelAlt = new SqlCommand(sqlQuery2SelAlternatif, conn2Sel))
+                    //        {
+                    //            cmd2SelAlt.Parameters.AddWithValue("@Anaparca", Anaparca);
+                    //            cmd2SelAlt.Parameters.AddWithValue("@Alternatif", Alternatif);
+
+                    //            using (SqlDataReader reader2SelAlt = cmd2SelAlt.ExecuteReader())
+                    //            {
+                    //                while (reader2SelAlt.Read())
+                    //                {
+                    //                    alternatifDeger2Sel = reader2SelAlt["idA2A2"].ToString();
+
+
+                    //                }
+                    //            }
+                    //        }
+
+                    //        using (SqlCommand cmd2Sel = new SqlCommand(sqlQuery2Sel, conn2Sel))
+                    //        {
+                    //            cmd2Sel.Parameters.AddWithValue("@Anaparca", Anaparca);
+                    //            cmd2Sel.Parameters.AddWithValue("@Alternatif", Alternatif);
+
+                    //            using (SqlDataReader reader2Sel = cmd2Sel.ExecuteReader())
+                    //            {
+                    //                while (reader2Sel.Read())
+                    //                {
+                    //                    var name = reader2Sel["name"].ToString();
+                    //                    var idA2A2 = reader2Sel["idA2A2"].ToString();
+                    //                    var idA3containerReference = reader2Sel["idA3containerReference"].ToString();
+                    //                    var idA3domainRef = "";
+
+                    //                    using (SqlConnection conn1GetDomainRef = new SqlConnection(connectionString))
+                    //                    {
+                    //                        conn1GetDomainRef.Open();
+                    //                        var domainRefQuery = $"SELECT idA3D2containerInfo FROM {catalogValue}.PDMLinkProduct WHERE idA2A2 = {idA3containerReference}";
+                    //                        using (SqlCommand domainRefCmd = new SqlCommand(domainRefQuery, conn1GetDomainRef))
+                    //                        {
+                    //                            domainRefCmd.Parameters.AddWithValue("@idA2A2", idA2A2);
+
+                    //                            using (SqlDataReader domainRefReader = domainRefCmd.ExecuteReader())
+                    //                            {
+                    //                                if (domainRefReader.Read())
+                    //                                {
+                    //                                    idA3domainRef = domainRefReader["idA3D2containerInfo"].ToString();
+                    //                                }
+                    //                            }
+                    //                        }
+                    //                    }
+
+                    //                    // CIFTYON 2 - Insert
+                    //                    using (SqlConnection conn2Ins = new SqlConnection(connectionString))
+                    //                    {
+                    //                        conn2Ins.Open();
+                    //                        var insertQuery2Ins = $"INSERT INTO {catalogValue}.WTPartAlternateLink (idA3A5, idA3B5, classnameA2A2, classnamekeydomainRef,idA3domainRef, inheritedDomain, replacementType, classnamekeyroleBObjectRef, classnamekeyroleAObjectRef, updateCountA2, markForDeleteA2, idA2A2, createStampA2, modifyStampA2, updateStampA2) VALUES (@idA3A5, @idA3B5, @classnameA2A2, @classnamekeydomainRef, @idA3domainRef, @inheritedDomain, @replacementType, @classnamekeyroleBObjectRef, @classnamekeyroleAObjectRef, @updateCountA2, @markForDeleteA2, @idA2A2, @createStampA2, @modifyStampA2, @updateStampA2)";
+                    //                        // İlk ekleme işlemi
+                    //                        using (SqlCommand insertCmd2Ins = new SqlCommand(insertQuery2Ins, conn2Ins))
+                    //                        {
+                    //                            var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
+                    //                            var ID = Convert.ToInt64(Convert.ToInt64(IdSeq.value) + 100);
+
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@idA3A5", idA2A2);
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@idA3B5", alternatifDeger2Sel);
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@classnamekeydomainRef", "wt.admin.AdministrativeDomain");
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@idA3domainRef", idA3domainRef);
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@inheritedDomain", 0);
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@replacementType", "a");
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateLink");
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@updateCountA2", 1);
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@markForDeleteA2", 0);
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@idA2A2", ID);
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@createStampA2", DateTime.Now);
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
+                    //                            insertCmd2Ins.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
+                    //                            try
+                    //                            {
+                    //                                insertCmd2Ins.ExecuteNonQuery();
+                    //                                _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
+                    //                            }
+                    //                            catch (SqlException ex)
+                    //                            {
+                    //                                TempData["ErrorMessage"] = "HATA!" + ex.Message;
+
+                    //                            }
+
 
-                                                var insertQuery3Ins = $"INSERT INTO {catalogValue}.WTPartAlternateHistory (eventType,principal,replacementTypeAfter,replacementTypeBefore,classnamekeyroleAObjectRef,idA3A5,classnamekeyroleBObjectRef,idA3B5,createStampA2,markForDeleteA2,modifyStampA2,classnameA2A2,idA2A2,updateCountA2,updateStampA2) VALUES (@eventType,@principal,@replacementTypeAfter,@replacementTypeBefore,@classnamekeyroleAObjectRef,@idA3A5,@classnamekeyroleBObjectRef,@idA3B5,@createStampA2,@markForDeleteA2,@modifyStampA2,@classnameA2A2,@idA2A2,@updateCountA2,@updateStampA2)";
-
-
-                                                using (SqlCommand insertCmd3Ins = new SqlCommand(insertQuery3Ins, conn2Ins))
-                                                {
-
-                                                    insertCmd3Ins.Parameters.AddWithValue("@eventType", "Add");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@principal", 12);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@replacementTypeAfter", "a");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@replacementTypeBefore", "");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@idA3A5", idA2A2);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@idA3B5", alternatifDeger2Sel);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@createStampA2", DateTime.Now);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@markForDeleteA2", 0);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateHistory");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@idA2A2", ID);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@updateCountA2", 1);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
-
-                                                    try
-                                                    {
-                                                        insertCmd3Ins.ExecuteNonQuery();
-                                                    }
-                                                    catch (SqlException ex)
-                                                    {
-                                                        TempData["ErrorMessage"] = "HATA!" + ex.Message;
+                    //                            var insertQuery3Ins = $"INSERT INTO {catalogValue}.WTPartAlternateHistory (eventType,principal,replacementTypeAfter,replacementTypeBefore,classnamekeyroleAObjectRef,idA3A5,classnamekeyroleBObjectRef,idA3B5,createStampA2,markForDeleteA2,modifyStampA2,classnameA2A2,idA2A2,updateCountA2,updateStampA2) VALUES (@eventType,@principal,@replacementTypeAfter,@replacementTypeBefore,@classnamekeyroleAObjectRef,@idA3A5,@classnamekeyroleBObjectRef,@idA3B5,@createStampA2,@markForDeleteA2,@modifyStampA2,@classnameA2A2,@idA2A2,@updateCountA2,@updateStampA2)";
+
+
+                    //                            using (SqlCommand insertCmd3Ins = new SqlCommand(insertQuery3Ins, conn2Ins))
+                    //                            {
+
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@eventType", "Add");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@principal", 12);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@replacementTypeAfter", "a");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@replacementTypeBefore", "");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@idA3A5", idA2A2);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@idA3B5", alternatifDeger2Sel);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@createStampA2", DateTime.Now);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@markForDeleteA2", 0);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateHistory");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@idA2A2", ID);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@updateCountA2", 1);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
+
+                    //                                try
+                    //                                {
+                    //                                    insertCmd3Ins.ExecuteNonQuery();
+                    //                                }
+                    //                                catch (SqlException ex)
+                    //                                {
+                    //                                    TempData["ErrorMessage"] = "HATA!" + ex.Message;
 
-                                                    }
+                    //                                }
 
 
-                                                }
+                    //                            }
 
 
 
-                                            }
+                    //                        }
 
-                                            // İkinci ekleme işlemi
-                                            using (SqlCommand insertCmd2Ins2 = new SqlCommand(insertQuery2Ins, conn2Ins))
-                                            {
-                                                var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
-                                                var ID = Convert.ToInt64(Convert.ToInt64(IdSeq.value) + 100);
-
-                                                insertCmd2Ins2.Parameters.AddWithValue("@idA3A5", alternatifDeger2Sel);
-                                                insertCmd2Ins2.Parameters.AddWithValue("@idA3B5", idA2A2);
-                                                insertCmd2Ins2.Parameters.AddWithValue("@classnamekeydomainRef", "wt.admin.AdministrativeDomain");
-                                                insertCmd2Ins2.Parameters.AddWithValue("@idA3domainRef", idA3domainRef);
-                                                insertCmd2Ins2.Parameters.AddWithValue("@inheritedDomain", 0);
-                                                insertCmd2Ins2.Parameters.AddWithValue("@replacementType", "a");
-                                                insertCmd2Ins2.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
-                                                insertCmd2Ins2.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
-                                                insertCmd2Ins2.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateLink");
-                                                insertCmd2Ins2.Parameters.AddWithValue("@updateCountA2", 1);
-                                                insertCmd2Ins2.Parameters.AddWithValue("@markForDeleteA2", 0);
-                                                insertCmd2Ins2.Parameters.AddWithValue("@idA2A2", ID);
-                                                insertCmd2Ins2.Parameters.AddWithValue("@createStampA2", DateTime.Now);
-                                                insertCmd2Ins2.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
-                                                insertCmd2Ins2.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
-                                                try
-                                                {
-                                                    insertCmd2Ins2.ExecuteNonQuery();
-                                                    _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
-                                                }
-                                                catch (SqlException ex)
-                                                {
-                                                    TempData["ErrorMessage"] = "HATA!" + ex.Message;
-                                                    throw;
-                                                }
-
-
-                                                var insertQuery3Ins = $"INSERT INTO {catalogValue}.WTPartAlternateHistory (eventType,principal,replacementTypeAfter,replacementTypeBefore,classnamekeyroleAObjectRef,idA3A5,classnamekeyroleBObjectRef,idA3B5,createStampA2,markForDeleteA2,modifyStampA2,classnameA2A2,idA2A2,updateCountA2,updateStampA2) VALUES (@eventType,@principal,@replacementTypeAfter,@replacementTypeBefore,@classnamekeyroleAObjectRef,@idA3A5,@classnamekeyroleBObjectRef,@idA3B5,@createStampA2,@markForDeleteA2,@modifyStampA2,@classnameA2A2,@idA2A2,@updateCountA2,@updateStampA2)";
-
-
-                                                using (SqlCommand insertCmd3Ins = new SqlCommand(insertQuery3Ins, conn2Ins))
-                                                {
-
-                                                    insertCmd3Ins.Parameters.AddWithValue("@eventType", "Add");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@principal", 12);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@replacementTypeAfter", "a");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@replacementTypeBefore", "");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@idA3A5", alternatifDeger2Sel);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@idA3B5", idA2A2);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@createStampA2", DateTime.Now);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@markForDeleteA2", 0);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateHistory");
-                                                    insertCmd3Ins.Parameters.AddWithValue("@idA2A2", ID);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@updateCountA2", 1);
-                                                    insertCmd3Ins.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
-
-                                                    try
-                                                    {
-                                                        insertCmd3Ins.ExecuteNonQuery();
-                                                    }
-                                                    catch (SqlException ex)
-                                                    {
-                                                        TempData["ErrorMessage"] = "HATA!" + ex.Message;
-
-                                                    }
-
-                                                }
-
-
-                                            }
-
-
-
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-
-                        }
-
-                        if(importType == "EPM")
-                        {
-
-                        }
-
-
-
-                        //var insert = _plm2.Query(catalogValue + ".WTPartAlternateLink").Insert(result);
-                        // CIFTYON 2 ise ve Alternatif değeri varsa ilgili işlemi yapın
-                        // Örnek olarak yeni bir tabloya post edin veya başka bir işlem yapın.
-                    }
-                    else if (CIFTYON == "1")
-                    {
-
-                        if(importType == "WTPart")
-                        {
-
-                        using (SqlConnection conn1Sel = new SqlConnection(connectionString))
-                        {
-                            conn1Sel.Open();
-                            var alternatifDeger2Sel = "";
-                            var idA3domainRef = "";
-                            var sqlQuery1Sel = $"SELECT name, idA2A2, idA3containerReference FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Anaparca";
-                            var sqlQuery1SelAlternatif = $"SELECT idA2A2 FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Alternatif";
-
-                            using (SqlCommand cmd1SelAlt = new SqlCommand(sqlQuery1SelAlternatif, conn1Sel))
-                            {
-                                cmd1SelAlt.Parameters.AddWithValue("@Anaparca", Anaparca);
-                                cmd1SelAlt.Parameters.AddWithValue("@Alternatif", Alternatif);
-
-                                using (SqlDataReader reader2SelAlt = cmd1SelAlt.ExecuteReader())
-                                {
-                                    while (reader2SelAlt.Read())
-                                    {
-                                        alternatifDeger2Sel = reader2SelAlt["idA2A2"].ToString();
-                                    }
-                                }
-                            }
-
-                            using (SqlCommand cmd1Sel = new SqlCommand(sqlQuery1Sel, conn1Sel))
-                            {
-                                cmd1Sel.Parameters.AddWithValue("@Anaparca", Anaparca);
-                                cmd1Sel.Parameters.AddWithValue("@Alternatif", Alternatif);
-
-                                using (SqlDataReader reader1Sel = cmd1Sel.ExecuteReader())
-                                {
-                                    while (reader1Sel.Read())
-                                    {
-                                        var name = reader1Sel["name"].ToString();
-                                        var idA2A2 = reader1Sel["idA2A2"].ToString();
-                                        var idA3containerReference = reader1Sel["idA3containerReference"].ToString();
-
-                                        using (SqlConnection conn1GetDomainRef = new SqlConnection(connectionString))
-                                        {
-                                            conn1GetDomainRef.Open();
-                                            var domainRefQuery = $"SELECT idA3D2containerInfo FROM {catalogValue}.PDMLinkProduct WHERE idA2A2 = {idA3containerReference}";
-                                            using (SqlCommand domainRefCmd = new SqlCommand(domainRefQuery, conn1GetDomainRef))
-                                            {
-                                                domainRefCmd.Parameters.AddWithValue("@idA2A2", idA2A2);
-
-                                                using (SqlDataReader domainRefReader = domainRefCmd.ExecuteReader())
-                                                {
-                                                    if (domainRefReader.Read())
-                                                    {
-                                                        idA3domainRef = domainRefReader["idA3D2containerInfo"].ToString();
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        using (SqlConnection conn1Ins = new SqlConnection(connectionString))
-                                        {
-                                            conn1Ins.Open();
-                                            var insertQuery1Ins = $"INSERT INTO {catalogValue}.WTPartAlternateLink (idA3A5, idA3B5, classnameA2A2, classnamekeydomainRef,idA3domainRef, inheritedDomain, replacementType, classnamekeyroleBObjectRef, classnamekeyroleAObjectRef, updateCountA2, markForDeleteA2, idA2A2, createStampA2, modifyStampA2, updateStampA2) VALUES (@idA3A5, @idA3B5, @classnameA2A2, @classnamekeydomainRef, @idA3domainRef, @inheritedDomain, @replacementType, @classnamekeyroleBObjectRef, @classnamekeyroleAObjectRef, @updateCountA2, @markForDeleteA2, @idA2A2, @createStampA2, @modifyStampA2, @updateStampA2)";
-                                            var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
-
-                                            var ID = Convert.ToInt64(Convert.ToInt64(IdSeq.value) + 100);
-                                            try
-                                            {
-
-                                                using (SqlCommand insertCmd1Ins = new SqlCommand(insertQuery1Ins, conn1Ins))
-                                                {
-
-                                                    insertCmd1Ins.Parameters.AddWithValue("@idA3A5", idA2A2);
-                                                    insertCmd1Ins.Parameters.AddWithValue("@idA3B5", alternatifDeger2Sel);
-                                                    insertCmd1Ins.Parameters.AddWithValue("@classnamekeydomainRef", "wt.admin.AdministrativeDomain");
-                                                    insertCmd1Ins.Parameters.AddWithValue("@idA3domainRef", idA3domainRef);
-                                                    insertCmd1Ins.Parameters.AddWithValue("@inheritedDomain", 0);
-                                                    insertCmd1Ins.Parameters.AddWithValue("@replacementType", "a");
-                                                    insertCmd1Ins.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
-                                                    insertCmd1Ins.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
-                                                    insertCmd1Ins.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateLink");
-                                                    insertCmd1Ins.Parameters.AddWithValue("@updateCountA2", 1);
-                                                    insertCmd1Ins.Parameters.AddWithValue("@markForDeleteA2", 0);
-                                                    insertCmd1Ins.Parameters.AddWithValue("@idA2A2", ID);
-                                                    insertCmd1Ins.Parameters.AddWithValue("@createStampA2", DateTime.Now);
-                                                    insertCmd1Ins.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
-                                                    insertCmd1Ins.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
-                                                    try
-                                                    {
-                                                        insertCmd1Ins.ExecuteNonQuery();
-                                                        _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
-                                                    }
-                                                    catch (SqlException ex)
-                                                    {
-                                                        TempData["ErrorMessage"] = "HATA!" + ex.Message;
-
-                                                    }
-
-                                                }
-
-
-
-                                                var insertQuery2Ins = $"INSERT INTO {catalogValue}.WTPartAlternateHistory (eventType,principal,replacementTypeAfter,replacementTypeBefore,classnamekeyroleAObjectRef,idA3A5,classnamekeyroleBObjectRef,idA3B5,createStampA2,markForDeleteA2,modifyStampA2,classnameA2A2,idA2A2,updateCountA2,updateStampA2) VALUES (@eventType,@principal,@replacementTypeAfter,@replacementTypeBefore,@classnamekeyroleAObjectRef,@idA3A5,@classnamekeyroleBObjectRef,@idA3B5,@createStampA2,@markForDeleteA2,@modifyStampA2,@classnameA2A2,@idA2A2,@updateCountA2,@updateStampA2)";
-
-
-                                                using (SqlCommand insertCmd2Ins = new SqlCommand(insertQuery2Ins, conn1Ins))
-                                                {
-
-                                                    insertCmd2Ins.Parameters.AddWithValue("@eventType", "Add");
-                                                    insertCmd2Ins.Parameters.AddWithValue("@principal", 12);
-                                                    insertCmd2Ins.Parameters.AddWithValue("@replacementTypeAfter", "a");
-                                                    insertCmd2Ins.Parameters.AddWithValue("@replacementTypeBefore", "");
-                                                    insertCmd2Ins.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
-                                                    insertCmd2Ins.Parameters.AddWithValue("@idA3A5", idA2A2);
-                                                    insertCmd2Ins.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
-                                                    insertCmd2Ins.Parameters.AddWithValue("@idA3B5", alternatifDeger2Sel);
-                                                    insertCmd2Ins.Parameters.AddWithValue("@createStampA2", DateTime.Now);
-                                                    insertCmd2Ins.Parameters.AddWithValue("@markForDeleteA2", 0);
-                                                    insertCmd2Ins.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
-                                                    insertCmd2Ins.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateHistory");
-                                                    insertCmd2Ins.Parameters.AddWithValue("@idA2A2", ID);
-                                                    insertCmd2Ins.Parameters.AddWithValue("@updateCountA2", 1);
-                                                    insertCmd2Ins.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
-
-                                                    try
-                                                    {
-                                                        insertCmd2Ins.ExecuteNonQuery();
-                                                    }
-                                                    catch (SqlException ex)
-                                                    {
-                                                        TempData["ErrorMessage"] = "HATA!" + ex.Message;
-
-                                                    }
-
-
-                                                }
-
-                                                _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
-
-                                            }
-                                            catch (SqlException ex)
-                                            {
-
-                                                TempData["ErrorMessage"] = "HATA!" + ex.Message;
-                                            }
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-
-                        }
-
-                        if(importType == "EPM")
-                        {
-
-                        }
-
-                    }
-                    if (!string.IsNullOrEmpty(Name))
-                    {
-
-                        if(importType == "WTPart")
-                        {
-
-                        }
-
-                        if(importType == "EPM") { 
-                        using (SqlConnection conn3Sel = new SqlConnection(connectionString))
-                        {
-                            conn3Sel.Open();
-
-                            //// Eski Name değerini sakla
-                            //var getOldName = $"SELECT Name FROM {catalogValue}.EPMDocumentMaster WHERE documentNumber = @Anaparca";
-                            //using (SqlCommand getNameCmd = new SqlCommand(getOldName, conn3Sel))
-                            //{
-                            //    getNameCmd.Parameters.AddWithValue("@Anaparca", Anaparca);
-                            //    var oldName = (string)getNameCmd.ExecuteScalar();
-
-                            //    // Eski Name değerini Excel'e yaz
-                            //    excelRow["ESKI_NAME"] = oldName;
+                    //                        // İkinci ekleme işlemi
+                    //                        using (SqlCommand insertCmd2Ins2 = new SqlCommand(insertQuery2Ins, conn2Ins))
+                    //                        {
+                    //                            var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
+                    //                            var ID = Convert.ToInt64(Convert.ToInt64(IdSeq.value) + 100);
+
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@idA3A5", alternatifDeger2Sel);
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@idA3B5", idA2A2);
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@classnamekeydomainRef", "wt.admin.AdministrativeDomain");
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@idA3domainRef", idA3domainRef);
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@inheritedDomain", 0);
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@replacementType", "a");
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateLink");
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@updateCountA2", 1);
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@markForDeleteA2", 0);
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@idA2A2", ID);
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@createStampA2", DateTime.Now);
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
+                    //                            insertCmd2Ins2.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
+                    //                            try
+                    //                            {
+                    //                                insertCmd2Ins2.ExecuteNonQuery();
+                    //                                _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
+                    //                            }
+                    //                            catch (SqlException ex)
+                    //                            {
+                    //                                TempData["ErrorMessage"] = "HATA!" + ex.Message;
+                    //                                throw;
+                    //                            }
+
+
+                    //                            var insertQuery3Ins = $"INSERT INTO {catalogValue}.WTPartAlternateHistory (eventType,principal,replacementTypeAfter,replacementTypeBefore,classnamekeyroleAObjectRef,idA3A5,classnamekeyroleBObjectRef,idA3B5,createStampA2,markForDeleteA2,modifyStampA2,classnameA2A2,idA2A2,updateCountA2,updateStampA2) VALUES (@eventType,@principal,@replacementTypeAfter,@replacementTypeBefore,@classnamekeyroleAObjectRef,@idA3A5,@classnamekeyroleBObjectRef,@idA3B5,@createStampA2,@markForDeleteA2,@modifyStampA2,@classnameA2A2,@idA2A2,@updateCountA2,@updateStampA2)";
+
+
+                    //                            using (SqlCommand insertCmd3Ins = new SqlCommand(insertQuery3Ins, conn2Ins))
+                    //                            {
+
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@eventType", "Add");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@principal", 12);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@replacementTypeAfter", "a");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@replacementTypeBefore", "");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@idA3A5", alternatifDeger2Sel);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@idA3B5", idA2A2);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@createStampA2", DateTime.Now);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@markForDeleteA2", 0);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateHistory");
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@idA2A2", ID);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@updateCountA2", 1);
+                    //                                insertCmd3Ins.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
+
+                    //                                try
+                    //                                {
+                    //                                    insertCmd3Ins.ExecuteNonQuery();
+                    //                                }
+                    //                                catch (SqlException ex)
+                    //                                {
+                    //                                    TempData["ErrorMessage"] = "HATA!" + ex.Message;
+
+                    //                                }
+
+                    //                            }
+
+
+                    //                        }
+
+
+
+                    //                    }
+                    //                    break;
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+
+
+                    //    }
+
+                    //    if(importType == "EPM")
+                    //    {
+
+                    //    }
+
+
+
+                    //    //var insert = _plm2.Query(catalogValue + ".WTPartAlternateLink").Insert(result);
+                    //    // CIFTYON 2 ise ve Alternatif değeri varsa ilgili işlemi yapın
+                    //    // Örnek olarak yeni bir tabloya post edin veya başka bir işlem yapın.
+                    //}
+                    //else if (CIFTYON == "1")
+                    //{
+
+                    //    if(importType == "WTPart")
+                    //    {
+
+                    //    using (SqlConnection conn1Sel = new SqlConnection(connectionString))
+                    //    {
+                    //        conn1Sel.Open();
+                    //        var alternatifDeger2Sel = "";
+                    //        var idA3domainRef = "";
+                    //        var sqlQuery1Sel = $"SELECT name, idA2A2, idA3containerReference FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Anaparca";
+                    //        var sqlQuery1SelAlternatif = $"SELECT idA2A2 FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Alternatif";
+
+                    //        using (SqlCommand cmd1SelAlt = new SqlCommand(sqlQuery1SelAlternatif, conn1Sel))
+                    //        {
+                    //            cmd1SelAlt.Parameters.AddWithValue("@Anaparca", Anaparca);
+                    //            cmd1SelAlt.Parameters.AddWithValue("@Alternatif", Alternatif);
+
+                    //            using (SqlDataReader reader2SelAlt = cmd1SelAlt.ExecuteReader())
+                    //            {
+                    //                while (reader2SelAlt.Read())
+                    //                {
+                    //                    alternatifDeger2Sel = reader2SelAlt["idA2A2"].ToString();
+                    //                }
+                    //            }
+                    //        }
+
+                    //        using (SqlCommand cmd1Sel = new SqlCommand(sqlQuery1Sel, conn1Sel))
+                    //        {
+                    //            cmd1Sel.Parameters.AddWithValue("@Anaparca", Anaparca);
+                    //            cmd1Sel.Parameters.AddWithValue("@Alternatif", Alternatif);
+
+                    //            using (SqlDataReader reader1Sel = cmd1Sel.ExecuteReader())
+                    //            {
+                    //                while (reader1Sel.Read())
+                    //                {
+                    //                    var name = reader1Sel["name"].ToString();
+                    //                    var idA2A2 = reader1Sel["idA2A2"].ToString();
+                    //                    var idA3containerReference = reader1Sel["idA3containerReference"].ToString();
+
+                    //                    using (SqlConnection conn1GetDomainRef = new SqlConnection(connectionString))
+                    //                    {
+                    //                        conn1GetDomainRef.Open();
+                    //                        var domainRefQuery = $"SELECT idA3D2containerInfo FROM {catalogValue}.PDMLinkProduct WHERE idA2A2 = {idA3containerReference}";
+                    //                        using (SqlCommand domainRefCmd = new SqlCommand(domainRefQuery, conn1GetDomainRef))
+                    //                        {
+                    //                            domainRefCmd.Parameters.AddWithValue("@idA2A2", idA2A2);
+
+                    //                            using (SqlDataReader domainRefReader = domainRefCmd.ExecuteReader())
+                    //                            {
+                    //                                if (domainRefReader.Read())
+                    //                                {
+                    //                                    idA3domainRef = domainRefReader["idA3D2containerInfo"].ToString();
+                    //                                }
+                    //                            }
+                    //                        }
+                    //                    }
+
+                    //                    using (SqlConnection conn1Ins = new SqlConnection(connectionString))
+                    //                    {
+                    //                        conn1Ins.Open();
+                    //                        var insertQuery1Ins = $"INSERT INTO {catalogValue}.WTPartAlternateLink (idA3A5, idA3B5, classnameA2A2, classnamekeydomainRef,idA3domainRef, inheritedDomain, replacementType, classnamekeyroleBObjectRef, classnamekeyroleAObjectRef, updateCountA2, markForDeleteA2, idA2A2, createStampA2, modifyStampA2, updateStampA2) VALUES (@idA3A5, @idA3B5, @classnameA2A2, @classnamekeydomainRef, @idA3domainRef, @inheritedDomain, @replacementType, @classnamekeyroleBObjectRef, @classnamekeyroleAObjectRef, @updateCountA2, @markForDeleteA2, @idA2A2, @createStampA2, @modifyStampA2, @updateStampA2)";
+                    //                        var IdSeq = _plm2.Query(catalogValue + ".id_sequence").OrderByDesc("value").FirstOrDefault();
+
+                    //                        var ID = Convert.ToInt64(Convert.ToInt64(IdSeq.value) + 100);
+                    //                        try
+                    //                        {
+
+                    //                            using (SqlCommand insertCmd1Ins = new SqlCommand(insertQuery1Ins, conn1Ins))
+                    //                            {
+
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@idA3A5", idA2A2);
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@idA3B5", alternatifDeger2Sel);
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@classnamekeydomainRef", "wt.admin.AdministrativeDomain");
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@idA3domainRef", idA3domainRef);
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@inheritedDomain", 0);
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@replacementType", "a");
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateLink");
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@updateCountA2", 1);
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@markForDeleteA2", 0);
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@idA2A2", ID);
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@createStampA2", DateTime.Now);
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
+                    //                                insertCmd1Ins.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
+                    //                                try
+                    //                                {
+                    //                                    insertCmd1Ins.ExecuteNonQuery();
+                    //                                    _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
+                    //                                }
+                    //                                catch (SqlException ex)
+                    //                                {
+                    //                                    TempData["ErrorMessage"] = "HATA!" + ex.Message;
+
+                    //                                }
+
+                    //                            }
+
+
+
+                    //                            var insertQuery2Ins = $"INSERT INTO {catalogValue}.WTPartAlternateHistory (eventType,principal,replacementTypeAfter,replacementTypeBefore,classnamekeyroleAObjectRef,idA3A5,classnamekeyroleBObjectRef,idA3B5,createStampA2,markForDeleteA2,modifyStampA2,classnameA2A2,idA2A2,updateCountA2,updateStampA2) VALUES (@eventType,@principal,@replacementTypeAfter,@replacementTypeBefore,@classnamekeyroleAObjectRef,@idA3A5,@classnamekeyroleBObjectRef,@idA3B5,@createStampA2,@markForDeleteA2,@modifyStampA2,@classnameA2A2,@idA2A2,@updateCountA2,@updateStampA2)";
+
+
+                    //                            using (SqlCommand insertCmd2Ins = new SqlCommand(insertQuery2Ins, conn1Ins))
+                    //                            {
+
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@eventType", "Add");
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@principal", 12);
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@replacementTypeAfter", "a");
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@replacementTypeBefore", "");
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@classnamekeyroleAObjectRef", "wt.part.WTPartMaster");
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@idA3A5", idA2A2);
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@classnamekeyroleBObjectRef", "wt.part.WTPartMaster");
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@idA3B5", alternatifDeger2Sel);
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@createStampA2", DateTime.Now);
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@markForDeleteA2", 0);
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@modifyStampA2", DateTime.Now);
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@classnameA2A2", "wt.part.WTPartAlternateHistory");
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@idA2A2", ID);
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@updateCountA2", 1);
+                    //                                insertCmd2Ins.Parameters.AddWithValue("@updateStampA2", DateTime.Now);
+
+                    //                                try
+                    //                                {
+                    //                                    insertCmd2Ins.ExecuteNonQuery();
+                    //                                }
+                    //                                catch (SqlException ex)
+                    //                                {
+                    //                                    TempData["ErrorMessage"] = "HATA!" + ex.Message;
+
+                    //                                }
+
+
+                    //                            }
+
+                    //                            _plm2.Query(catalogValue + ".id_sequence").Insert(new { dummy = "x" });
+
+                    //                        }
+                    //                        catch (SqlException ex)
+                    //                        {
+
+                    //                            TempData["ErrorMessage"] = "HATA!" + ex.Message;
+                    //                        }
+
+                    //                    }
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+
+
+                    //    }
+
+                    //    if(importType == "EPM")
+                    //    {
+
+                    //    }
+
+                    //}
+                    //if (!string.IsNullOrEmpty(Name))
+                    //{
+
+                    //    if(importType == "WTPart")
+                    //    {
+
+                    //    }
+
+                    //    if(importType == "EPM") { 
+                    //    using (SqlConnection conn3Sel = new SqlConnection(connectionString))
+                    //    {
+                    //        conn3Sel.Open();
+
+                    //        //// Eski Name değerini sakla
+                    //        //var getOldName = $"SELECT Name FROM {catalogValue}.EPMDocumentMaster WHERE documentNumber = @Anaparca";
+                    //        //using (SqlCommand getNameCmd = new SqlCommand(getOldName, conn3Sel))
+                    //        //{
+                    //        //    getNameCmd.Parameters.AddWithValue("@Anaparca", Anaparca);
+                    //        //    var oldName = (string)getNameCmd.ExecuteScalar();
+
+                    //        //    // Eski Name değerini Excel'e yaz
+                    //        //    excelRow["ESKI_NAME"] = oldName;
                                 
                                
-                            //}
+                    //        //}
 
-                            // Name alanını güncelle
-                            var updateName = $"UPDATE {catalogValue}.EPMDocumentMaster SET name = @Name WHERE documentNumber = @Anaparca";
-                            using (SqlCommand updateCmd = new SqlCommand(updateName, conn3Sel))
-                            {
-                                updateCmd.Parameters.AddWithValue("@Name", Name);
-                                updateCmd.Parameters.AddWithValue("@Anaparca", Anaparca);
-                                updateCmd.ExecuteNonQuery();
-                            }
-                        }
-                        }
-                    }
+                    //        // Name alanını güncelle
+                    //        var updateName = $"UPDATE {catalogValue}.EPMDocumentMaster SET name = @Name WHERE documentNumber = @Anaparca";
+                    //        using (SqlCommand updateCmd = new SqlCommand(updateName, conn3Sel))
+                    //        {
+                    //            updateCmd.Parameters.AddWithValue("@Name", Name);
+                    //            updateCmd.Parameters.AddWithValue("@Anaparca", Anaparca);
+                    //            updateCmd.ExecuteNonQuery();
+                    //        }
+                    //    }
+                    //    }
+                    //}
 
 
                 }
@@ -931,247 +931,289 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 
                 //Tahminimce verisyon kodu olmadığı için eklenmiyor bu kontrol edilecek
 
-                //foreach (GenericObjectViewModel PlmDbPRoc in RecordList)
-                //{
-                //    if (PlmDbPRoc.DefinitionType.Contains("String"))
-                //    {
-                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
-                //        {
-                //            documentNumber = PlmDbPRoc.Number,
-                //            versionIdA2versionInfo = PlmDbPRoc.Version
-                //        }).Get().ToList();
+                foreach (GenericObjectViewModel PlmDbPRoc in RecordList)
+                {
+                    if (PlmDbPRoc.DefinitionType.Contains("String"))
+                    {
+                        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                        {
+                            documentNumber = PlmDbPRoc.Number,
+                            //versionIdA2versionInfo = PlmDbPRoc.Version
+                        }).Get().ToList();
 
-                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
-                //        if (RowControl.Count() > 0)
-                //        {
-                //            var ID = RowControl[0].EPMDocNumber;
-                //            StringValue NewRecord = new StringValue();
-                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                //            NewRecord.classnameA2A2 = "wt.iba.value.StringValue";
-                //            NewRecord.idA3A5 = 0;
-                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                //            NewRecord.markForDeleteA2 = 0;
-                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                //            NewRecord.updateCountA2 = 1;
-                //            NewRecord.updateStampA2 = DateTime.Now.Date;
-                //            NewRecord.createStampA2 = DateTime.Now.Date;
-                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                //            NewRecord.value = PlmDbPRoc.AttrValue.ToUpper();
-                //            NewRecord.value2 = PlmDbPRoc.AttrValue;
-                //            if (PlmDbPRoc.AttrValue != "")
-                //            {
-                //                var insert = _plm2.Query("PLM2.StringValue").Insert(NewRecord);
+                        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                        if (RowControl.Count() > 0)
+                        {
+                            var ID = RowControl[0].EPMDocNumber;
+                            StringValue NewRecord = new StringValue();
+                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                            NewRecord.classnameA2A2 = "wt.iba.value.StringValue";
+                            NewRecord.idA3A5 = 0;
+                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                            NewRecord.markForDeleteA2 = 0;
+                            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                            NewRecord.updateCountA2 = 1;
+                            NewRecord.updateStampA2 = DateTime.Now.Date;
+                            NewRecord.createStampA2 = DateTime.Now.Date;
+                            if(importType == "EPM")
+                            {
+                            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                            }
+                            if(importType =="WTPart")
+                            {
+                            NewRecord.classnamekeyA4 = "wt.part.WTPart";
+                            }
+                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                            NewRecord.value = PlmDbPRoc.AttrValue.ToUpper();
+                            NewRecord.value2 = PlmDbPRoc.AttrValue;
+                            if (PlmDbPRoc.AttrValue != "")
+                            {
+                                var insert = _plm2.Query("PLM2.StringValue").Insert(NewRecord);
 
-                //                if (insert == 1)
-                //                {
-                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
-                //                }
-                //            }
-                //        }
-                //    }
+                                if (insert == 1)
+                                {
+                                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                                }
+                            }
+                        }
+                    }
 
-                //    if (PlmDbPRoc.DefinitionType.Contains("Integer"))
-                //    {
-                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
-                //        {
-                //            documentNumber = PlmDbPRoc.Number,
-                //            versionIdA2versionInfo = PlmDbPRoc.Version
-                //        }).Get().ToList();
+                    if (PlmDbPRoc.DefinitionType.Contains("Integer"))
+                    {
+                        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                        {
+                            documentNumber = PlmDbPRoc.Number,
+                            versionIdA2versionInfo = PlmDbPRoc.Version
+                        }).Get().ToList();
 
-                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
-                //        if (RowControl.Count() > 0)
-                //        {
-                //            var ID = RowControl[0].EPMDocNumber;
-                //            IntegerValue NewRecord = new IntegerValue();
-                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                //            NewRecord.classnameA2A2 = "wt.iba.value.IntegerValue";
-                //            NewRecord.idA3A5 = 0;
-                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                //            NewRecord.markForDeleteA2 = 0;
-                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                //            NewRecord.updateCountA2 = 1;
-                //            NewRecord.updateStampA2 = DateTime.Now.Date;
-                //            NewRecord.createStampA2 = DateTime.Now.Date;
-                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                //            NewRecord.value = Convert.ToInt64(PlmDbPRoc.AttrValue.ToUpper());
-                //            var insert = _plm2.Query("PLM2.IntegerValue").Insert(NewRecord);
-                //            if (PlmDbPRoc.AttrValue != "")
-                //            {
-                //                if (insert == 1)
-                //                {
-                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
-                //                }
-                //            }
-                //        }
-                //    }
-                //    if (PlmDbPRoc.DefinitionType.Contains("Float"))
-                //    {
-                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
-                //        {
-                //            documentNumber = PlmDbPRoc.Number,
-                //            versionIdA2versionInfo = PlmDbPRoc.Version
-                //        }).Get().ToList();
+                        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                        if (RowControl.Count() > 0)
+                        {
+                            var ID = RowControl[0].EPMDocNumber;
+                            IntegerValue NewRecord = new IntegerValue();
+                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                            NewRecord.classnameA2A2 = "wt.iba.value.IntegerValue";
+                            NewRecord.idA3A5 = 0;
+                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                            NewRecord.markForDeleteA2 = 0;
+                            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                            NewRecord.updateCountA2 = 1;
+                            NewRecord.updateStampA2 = DateTime.Now.Date;
+                            NewRecord.createStampA2 = DateTime.Now.Date;
+                            if (importType == "EPM")
+                            {
+                                NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                            }
+                            if (importType == "WTPart")
+                            {
+                                NewRecord.classnamekeyA4 = "wt.part.WTPart";
+                            }
+                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                            NewRecord.value = Convert.ToInt64(PlmDbPRoc.AttrValue.ToUpper());
+                            var insert = _plm2.Query("PLM2.IntegerValue").Insert(NewRecord);
+                            if (PlmDbPRoc.AttrValue != "")
+                            {
+                                if (insert == 1)
+                                {
+                                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                                }
+                            }
+                        }
+                    }
+                    if (PlmDbPRoc.DefinitionType.Contains("Float"))
+                    {
+                        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                        {
+                            documentNumber = PlmDbPRoc.Number,
+                            //versionIdA2versionInfo = PlmDbPRoc.Version
+                        }).Get().ToList();
 
-                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
-                //        if (RowControl.Count() > 0)
-                //        {
-                //            var ID = RowControl[0].EPMDocNumber;
-                //            FloatValue NewRecord = new FloatValue();
-                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                //            NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
-                //            NewRecord.idA3A5 = 0;
-                //            NewRecord.wtprecision = -1;
-                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                //            NewRecord.markForDeleteA2 = 0;
-                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                //            NewRecord.updateCountA2 = 1;
-                //            NewRecord.updateStampA2 = DateTime.Now.Date;
-                //            NewRecord.createStampA2 = DateTime.Now.Date;
-                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                //            NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
-                //            var insert = _plm2.Query("PLM2.FloatValue").Insert(NewRecord);
-                //            if (PlmDbPRoc.AttrValue != "")
-                //            {
-                //                if (insert == 1)
-                //                {
-                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
-                //                }
-                //            }
-                //        }
-                //    }
-                //    if (PlmDbPRoc.DefinitionType.Contains("Unit"))
-                //    {
-                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
-                //        {
-                //            documentNumber = PlmDbPRoc.Number,
-                //            versionIdA2versionInfo = PlmDbPRoc.Version
-                //        }).Get().ToList();
+                        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                        if (RowControl.Count() > 0)
+                        {
+                            var ID = RowControl[0].EPMDocNumber;
+                            FloatValue NewRecord = new FloatValue();
+                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                            NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
+                            NewRecord.idA3A5 = 0;
+                            NewRecord.wtprecision = -1;
+                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                            NewRecord.markForDeleteA2 = 0;
+                            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                            NewRecord.updateCountA2 = 1;
+                            NewRecord.updateStampA2 = DateTime.Now.Date;
+                            NewRecord.createStampA2 = DateTime.Now.Date;
+                            if (importType == "EPM")
+                            {
+                                NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                            }
+                            if (importType == "WTPart")
+                            {
+                                NewRecord.classnamekeyA4 = "wt.part.WTPart";
+                            }
+                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                            NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
+                            var insert = _plm2.Query("PLM2.FloatValue").Insert(NewRecord);
+                            if (PlmDbPRoc.AttrValue != "")
+                            {
+                                if (insert == 1)
+                                {
+                                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                                }
+                            }
+                        }
+                    }
+                    if (PlmDbPRoc.DefinitionType.Contains("Unit"))
+                    {
+                        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                        {
+                            documentNumber = PlmDbPRoc.Number,
+                            //versionIdA2versionInfo = PlmDbPRoc.Version
+                        }).Get().ToList();
 
-                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
-                //        if (RowControl.Count() > 0)
-                //        {
-                //            var ID = RowControl[0].EPMDocNumber;
-                //            UnitValue NewRecord = new UnitValue();
-                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                //            NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
-                //            NewRecord.idA3A5 = 0;
-                //            NewRecord.wtprecision = -1;
-                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                //            NewRecord.markForDeleteA2 = 0;
-                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                //            NewRecord.updateCountA2 = 1;
-                //            NewRecord.updateStampA2 = DateTime.Now.Date;
-                //            NewRecord.createStampA2 = DateTime.Now.Date;
-                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                //            NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
-                //            if (PlmDbPRoc.AttrValue != "")
-                //            {
-                //                var insert = _plm2.Query("PLM2.UnitValue").Insert(NewRecord);
-                //                if (insert == 1)
-                //                {
-                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
-                //                }
-                //            }
-                //        }
-                //    }
-                //    if (PlmDbPRoc.DefinitionType.Contains("Boolean"))
-                //    {
-                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
-                //        {
-                //            documentNumber = PlmDbPRoc.Number,
-                //            versionIdA2versionInfo = PlmDbPRoc.Version
-                //        }).Get().ToList();
+                        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                        if (RowControl.Count() > 0)
+                        {
+                            var ID = RowControl[0].EPMDocNumber;
+                            UnitValue NewRecord = new UnitValue();
+                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                            NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
+                            NewRecord.idA3A5 = 0;
+                            NewRecord.wtprecision = -1;
+                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                            NewRecord.markForDeleteA2 = 0;
+                            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                            NewRecord.updateCountA2 = 1;
+                            NewRecord.updateStampA2 = DateTime.Now.Date;
+                            NewRecord.createStampA2 = DateTime.Now.Date;
+                            if (importType == "EPM")
+                            {
+                                NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                            }
+                            if (importType == "WTPart")
+                            {
+                                NewRecord.classnamekeyA4 = "wt.part.WTPart";
+                            }
+                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                            NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
+                            if (PlmDbPRoc.AttrValue != "")
+                            {
+                                var insert = _plm2.Query("PLM2.UnitValue").Insert(NewRecord);
+                                if (insert == 1)
+                                {
+                                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                                }
+                            }
+                        }
+                    }
+                    if (PlmDbPRoc.DefinitionType.Contains("Boolean"))
+                    {
+                        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                        {
+                            documentNumber = PlmDbPRoc.Number,
+                            //versionIdA2versionInfo = PlmDbPRoc.Version
+                        }).Get().ToList();
 
-                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
-                //        if (RowControl.Count() > 0)
-                //        {
-                //            var ID = RowControl[0].EPMDocNumber;
-                //            bool BoolValue = false;
-                //            if (PlmDbPRoc.AttrValue.ToLower() == "yes")
-                //            {
-                //                BoolValue = true;
-                //            }
-                //            else
-                //            {
-                //                BoolValue = false;
-                //            }
-                //            BooleanValue NewRecord = new BooleanValue();
-                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                //            NewRecord.classnameA2A2 = "wt.iba.value.BooleanValue";
-                //            NewRecord.idA3A5 = 0;
-                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                //            NewRecord.markForDeleteA2 = 0;
-                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                //            NewRecord.updateCountA2 = 1;
-                //            NewRecord.updateStampA2 = DateTime.Now.Date;
-                //            NewRecord.createStampA2 = DateTime.Now.Date;
-                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                //            NewRecord.value = Convert.ToByte(BoolValue);
-                //            if (PlmDbPRoc.AttrValue != "")
-                //            {
-                //                var insert = _plm2.Query("PLM2.BooleanValue").Insert(NewRecord);
-                //                if (insert == 1)
-                //                {
-                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
-                //                }
-                //            }
-                //        }
-                //    }
-                //    if (PlmDbPRoc.DefinitionType.Contains("Timestamp"))
-                //    {
-                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
-                //        {
-                //            documentNumber = PlmDbPRoc.Number,
-                //            versionIdA2versionInfo = PlmDbPRoc.Version
-                //        }).Get().ToList();
+                        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                        if (RowControl.Count() > 0)
+                        {
+                            var ID = RowControl[0].EPMDocNumber;
+                            bool BoolValue = false;
+                            if (PlmDbPRoc.AttrValue.ToLower() == "yes")
+                            {
+                                BoolValue = true;
+                            }
+                            else
+                            {
+                                BoolValue = false;
+                            }
+                            BooleanValue NewRecord = new BooleanValue();
+                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                            NewRecord.classnameA2A2 = "wt.iba.value.BooleanValue";
+                            NewRecord.idA3A5 = 0;
+                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                            NewRecord.markForDeleteA2 = 0;
+                            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                            NewRecord.updateCountA2 = 1;
+                            NewRecord.updateStampA2 = DateTime.Now.Date;
+                            NewRecord.createStampA2 = DateTime.Now.Date;
+                            if (importType == "EPM")
+                            {
+                                NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                            }
+                            if (importType == "WTPart")
+                            {
+                                NewRecord.classnamekeyA4 = "wt.part.WTPart";
+                            }
+                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                            NewRecord.value = Convert.ToByte(BoolValue);
+                            if (PlmDbPRoc.AttrValue != "")
+                            {
+                                var insert = _plm2.Query("PLM2.BooleanValue").Insert(NewRecord);
+                                if (insert == 1)
+                                {
+                                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                                }
+                            }
+                        }
+                    }
+                    if (PlmDbPRoc.DefinitionType.Contains("Timestamp"))
+                    {
+                        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                        {
+                            documentNumber = PlmDbPRoc.Number,
+                            //versionIdA2versionInfo = PlmDbPRoc.Version
+                        }).Get().ToList();
 
-                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
-                //        if (RowControl.Count() > 0)
-                //        {
-                //            var ID = RowControl[0].EPMDocNumber;
+                        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                        if (RowControl.Count() > 0)
+                        {
+                            var ID = RowControl[0].EPMDocNumber;
 
-                //            TimestampValue NewRecord = new TimestampValue();
-                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
-                //            NewRecord.classnameA2A2 = "wt.iba.value.TimestampValue";
-                //            NewRecord.idA3A5 = 0;
-                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-                //            NewRecord.markForDeleteA2 = 0;
-                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
-                //            NewRecord.updateCountA2 = 1;
-                //            NewRecord.updateStampA2 = DateTime.Now.Date;
-                //            NewRecord.createStampA2 = DateTime.Now.Date;
-                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-                //            NewRecord.value = Convert.ToDateTime(PlmDbPRoc.AttrValue).Date;
-                //            if (PlmDbPRoc.AttrValue != "")
-                //            {
-                //                var insert = _plm2.Query("PLM2.TimestampValue").Insert(NewRecord);
-                //                if (insert == 1)
-                //                {
-                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
-                //                }
-                //            }
-                //        }
-                //    }
+                            TimestampValue NewRecord = new TimestampValue();
+                            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                            NewRecord.classnameA2A2 = "wt.iba.value.TimestampValue";
+                            NewRecord.idA3A5 = 0;
+                            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                            NewRecord.markForDeleteA2 = 0;
+                            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                            NewRecord.updateCountA2 = 1;
+                            NewRecord.updateStampA2 = DateTime.Now.Date;
+                            NewRecord.createStampA2 = DateTime.Now.Date;
+                            if (importType == "EPM")
+                            {
+                                NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                            }
+                            if (importType == "WTPart")
+                            {
+                                NewRecord.classnamekeyA4 = "wt.part.WTPart";
+                            }
+                            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                            NewRecord.value = Convert.ToDateTime(PlmDbPRoc.AttrValue).Date;
+                            if (PlmDbPRoc.AttrValue != "")
+                            {
+                                var insert = _plm2.Query("PLM2.TimestampValue").Insert(NewRecord);
+                                if (insert == 1)
+                                {
+                                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                                }
+                            }
+                        }
+                    }
 
-                //}
+                }
 
                 return Ok(new { status = true , message = "Data Sync Success" });
 
