@@ -454,17 +454,43 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 
                 foreach (DataRow excelRow in filteredDataTable.Rows)
                 {
-
-
+                   
+                   
 
                     var Number = excelRow["Number"].ToString();
                     // Şartları burada ekleyin
                     var Anaparca = excelRow["Number"].ToString();
                     var Alternatif = excelRow["ALTERNATIF"].ToString();
                     var CIFTYON = excelRow["CIFTYON"].ToString();
-                    var Name = excelRow["NAME"].ToString();
+                    var Name = "";
+                    if(excelRow["NAME"].ToString() != null)
+                    {
+                       Name = excelRow["NAME"].ToString();
+                    }
                     var connectionString = _configuration.GetConnectionString("Plm");
                     var catalogValue = _configuration["Catalog"];
+
+                    foreach (var item in data["colHeadFullDataList[]"])
+                    {
+                        if (item != "0")
+                        {
+                            var epmCollection = item.Split("|");
+                            var excelColumnName = epmCollection[0];
+                            var plmIdeHierId = epmCollection[1];
+                            var definitionType = epmCollection[2];
+                            var idA2A2 = epmCollection[3];
+
+                            GenericObjectViewModel GenericRowObject = new GenericObjectViewModel();
+                            GenericRowObject.Number = Number;
+                            //GenericRowObject.Version = Version;
+                            GenericRowObject.HierId = plmIdeHierId;
+                            GenericRowObject.DefinitionType = definitionType;
+                            GenericRowObject.idA2A2 = idA2A2;
+                            GenericRowObject.AttrValue = excelRow[excelColumnName.ToString()].ToString();
+                            RecordList.Add(GenericRowObject);
+                        }
+                    }
+
 
                     if (CIFTYON == "2")
                     {
@@ -903,7 +929,250 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                 }
 
 
-           
+                //Tahminimce verisyon kodu olmadığı için eklenmiyor bu kontrol edilecek
+
+                //foreach (GenericObjectViewModel PlmDbPRoc in RecordList)
+                //{
+                //    if (PlmDbPRoc.DefinitionType.Contains("String"))
+                //    {
+                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                //        {
+                //            documentNumber = PlmDbPRoc.Number,
+                //            versionIdA2versionInfo = PlmDbPRoc.Version
+                //        }).Get().ToList();
+
+                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                //        if (RowControl.Count() > 0)
+                //        {
+                //            var ID = RowControl[0].EPMDocNumber;
+                //            StringValue NewRecord = new StringValue();
+                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                //            NewRecord.classnameA2A2 = "wt.iba.value.StringValue";
+                //            NewRecord.idA3A5 = 0;
+                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                //            NewRecord.markForDeleteA2 = 0;
+                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                //            NewRecord.updateCountA2 = 1;
+                //            NewRecord.updateStampA2 = DateTime.Now.Date;
+                //            NewRecord.createStampA2 = DateTime.Now.Date;
+                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                //            NewRecord.value = PlmDbPRoc.AttrValue.ToUpper();
+                //            NewRecord.value2 = PlmDbPRoc.AttrValue;
+                //            if (PlmDbPRoc.AttrValue != "")
+                //            {
+                //                var insert = _plm2.Query("PLM2.StringValue").Insert(NewRecord);
+
+                //                if (insert == 1)
+                //                {
+                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                //                }
+                //            }
+                //        }
+                //    }
+
+                //    if (PlmDbPRoc.DefinitionType.Contains("Integer"))
+                //    {
+                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                //        {
+                //            documentNumber = PlmDbPRoc.Number,
+                //            versionIdA2versionInfo = PlmDbPRoc.Version
+                //        }).Get().ToList();
+
+                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                //        if (RowControl.Count() > 0)
+                //        {
+                //            var ID = RowControl[0].EPMDocNumber;
+                //            IntegerValue NewRecord = new IntegerValue();
+                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                //            NewRecord.classnameA2A2 = "wt.iba.value.IntegerValue";
+                //            NewRecord.idA3A5 = 0;
+                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                //            NewRecord.markForDeleteA2 = 0;
+                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                //            NewRecord.updateCountA2 = 1;
+                //            NewRecord.updateStampA2 = DateTime.Now.Date;
+                //            NewRecord.createStampA2 = DateTime.Now.Date;
+                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                //            NewRecord.value = Convert.ToInt64(PlmDbPRoc.AttrValue.ToUpper());
+                //            var insert = _plm2.Query("PLM2.IntegerValue").Insert(NewRecord);
+                //            if (PlmDbPRoc.AttrValue != "")
+                //            {
+                //                if (insert == 1)
+                //                {
+                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                //                }
+                //            }
+                //        }
+                //    }
+                //    if (PlmDbPRoc.DefinitionType.Contains("Float"))
+                //    {
+                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                //        {
+                //            documentNumber = PlmDbPRoc.Number,
+                //            versionIdA2versionInfo = PlmDbPRoc.Version
+                //        }).Get().ToList();
+
+                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                //        if (RowControl.Count() > 0)
+                //        {
+                //            var ID = RowControl[0].EPMDocNumber;
+                //            FloatValue NewRecord = new FloatValue();
+                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                //            NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
+                //            NewRecord.idA3A5 = 0;
+                //            NewRecord.wtprecision = -1;
+                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                //            NewRecord.markForDeleteA2 = 0;
+                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                //            NewRecord.updateCountA2 = 1;
+                //            NewRecord.updateStampA2 = DateTime.Now.Date;
+                //            NewRecord.createStampA2 = DateTime.Now.Date;
+                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                //            NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
+                //            var insert = _plm2.Query("PLM2.FloatValue").Insert(NewRecord);
+                //            if (PlmDbPRoc.AttrValue != "")
+                //            {
+                //                if (insert == 1)
+                //                {
+                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                //                }
+                //            }
+                //        }
+                //    }
+                //    if (PlmDbPRoc.DefinitionType.Contains("Unit"))
+                //    {
+                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                //        {
+                //            documentNumber = PlmDbPRoc.Number,
+                //            versionIdA2versionInfo = PlmDbPRoc.Version
+                //        }).Get().ToList();
+
+                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                //        if (RowControl.Count() > 0)
+                //        {
+                //            var ID = RowControl[0].EPMDocNumber;
+                //            UnitValue NewRecord = new UnitValue();
+                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                //            NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
+                //            NewRecord.idA3A5 = 0;
+                //            NewRecord.wtprecision = -1;
+                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                //            NewRecord.markForDeleteA2 = 0;
+                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                //            NewRecord.updateCountA2 = 1;
+                //            NewRecord.updateStampA2 = DateTime.Now.Date;
+                //            NewRecord.createStampA2 = DateTime.Now.Date;
+                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                //            NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
+                //            if (PlmDbPRoc.AttrValue != "")
+                //            {
+                //                var insert = _plm2.Query("PLM2.UnitValue").Insert(NewRecord);
+                //                if (insert == 1)
+                //                {
+                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                //                }
+                //            }
+                //        }
+                //    }
+                //    if (PlmDbPRoc.DefinitionType.Contains("Boolean"))
+                //    {
+                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                //        {
+                //            documentNumber = PlmDbPRoc.Number,
+                //            versionIdA2versionInfo = PlmDbPRoc.Version
+                //        }).Get().ToList();
+
+                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                //        if (RowControl.Count() > 0)
+                //        {
+                //            var ID = RowControl[0].EPMDocNumber;
+                //            bool BoolValue = false;
+                //            if (PlmDbPRoc.AttrValue.ToLower() == "yes")
+                //            {
+                //                BoolValue = true;
+                //            }
+                //            else
+                //            {
+                //                BoolValue = false;
+                //            }
+                //            BooleanValue NewRecord = new BooleanValue();
+                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                //            NewRecord.classnameA2A2 = "wt.iba.value.BooleanValue";
+                //            NewRecord.idA3A5 = 0;
+                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                //            NewRecord.markForDeleteA2 = 0;
+                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                //            NewRecord.updateCountA2 = 1;
+                //            NewRecord.updateStampA2 = DateTime.Now.Date;
+                //            NewRecord.createStampA2 = DateTime.Now.Date;
+                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                //            NewRecord.value = Convert.ToByte(BoolValue);
+                //            if (PlmDbPRoc.AttrValue != "")
+                //            {
+                //                var insert = _plm2.Query("PLM2.BooleanValue").Insert(NewRecord);
+                //                if (insert == 1)
+                //                {
+                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                //                }
+                //            }
+                //        }
+                //    }
+                //    if (PlmDbPRoc.DefinitionType.Contains("Timestamp"))
+                //    {
+                //        var RowControl = _plm2.Query("PLM2.dbo.EPMDocNumberList").Where(new
+                //        {
+                //            documentNumber = PlmDbPRoc.Number,
+                //            versionIdA2versionInfo = PlmDbPRoc.Version
+                //        }).Get().ToList();
+
+                //        var IdSeq = _plm2.Query("PLM2.id_sequence").OrderByDesc("value").FirstOrDefault();
+                //        if (RowControl.Count() > 0)
+                //        {
+                //            var ID = RowControl[0].EPMDocNumber;
+
+                //            TimestampValue NewRecord = new TimestampValue();
+                //            NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                //            NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                //            NewRecord.idA3A4 = Convert.ToInt64(ID);
+                //            NewRecord.classnameA2A2 = "wt.iba.value.TimestampValue";
+                //            NewRecord.idA3A5 = 0;
+                //            NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                //            NewRecord.markForDeleteA2 = 0;
+                //            NewRecord.modifyStampA2 = DateTime.Now.Date;
+                //            NewRecord.updateCountA2 = 1;
+                //            NewRecord.updateStampA2 = DateTime.Now.Date;
+                //            NewRecord.createStampA2 = DateTime.Now.Date;
+                //            NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                //            NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                //            NewRecord.value = Convert.ToDateTime(PlmDbPRoc.AttrValue).Date;
+                //            if (PlmDbPRoc.AttrValue != "")
+                //            {
+                //                var insert = _plm2.Query("PLM2.TimestampValue").Insert(NewRecord);
+                //                if (insert == 1)
+                //                {
+                //                    _plm2.Query("PLM2.id_sequence").Insert(new { dummy = "x" });
+                //                }
+                //            }
+                //        }
+                //    }
+
+                //}
+
                 return Ok(new { status = true , message = "Data Sync Success" });
 
             }
@@ -991,7 +1260,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         try
                         {
 
-                       //ExcelProc(data,importType);
+                       ExcelProc(data,importType);
                         TempData["SuccessMessage"] = "CAD e gönderildi.";
 
                         }
@@ -1005,7 +1274,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         try
                         {
 
-                            //ExcelProc(data, importType);
+                            ExcelProc(data, importType);
                             TempData["SuccessMessage"] = "WTPart a gönderildi.";
 
                         }
