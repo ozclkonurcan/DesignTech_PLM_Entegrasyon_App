@@ -991,7 +991,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         try
                         {
 
-                       ExcelProc(data,importType);
+                       //ExcelProc(data,importType);
                         TempData["SuccessMessage"] = "CAD e gönderildi.";
 
                         }
@@ -1005,7 +1005,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         try
                         {
 
-                            ExcelProc(data, importType);
+                            //ExcelProc(data, importType);
                             TempData["SuccessMessage"] = "WTPart a gönderildi.";
 
                         }
