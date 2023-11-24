@@ -660,7 +660,7 @@
                 });
 
             } else if (colHeadType === "wt.iba.definition.DecimalDefinition") 
-                {
+               {
 
                 // Sütunundaki tüm hücreleri döngüye al
                 $('td:nth-child(' + columnIndex + ')').slice(1).each(function (i, obj) {
@@ -721,6 +721,76 @@
                 });
 
             } 
+            //Eğer farklı bir excel yüklendiğinde hata alma sayfası boş sayfa olarak gözüküyorsa 
+            //sebebi burası 
+            else if (colHeadType === "wt.iba.definition.BooleanDefinition") {
+
+                // Sütunundaki tüm hücreleri döngüye al
+                $('td:nth-child(' + columnIndex + ')').slice(1).each(function (i, obj) {
+
+                    // Hücre değerini al
+                    let cellValue = $(this).text().trim();
+
+                    // Zaman damgası için regex tanımla
+                    let booleanRegex = /^(true|false|1|0|yes|no|evet|hayir|Evet|Hayir|Yes|No|True|False)$/;
+
+                    if (cellValue == "") {
+                        hasEmpty = true;
+                        let rowIndex = $(this).closest('tr').index() + 1;
+                        let fileName = $('#excelFileName').val();
+                        let emptyInfo = {
+                            ExcelDosya: fileName,
+                            className: colHeadName,
+                            Hata: cellValue,
+                            Satir: rowIndex,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+                        let emptyInfoJSON = JSON.stringify(emptyInfo);
+                        emptyList.push(emptyInfoJSON);
+                    }
+                    // Hücre değerini kontrol et
+                    if (!booleanRegex.test(cellValue)) {
+
+                        // Geçersiz ise hata ayarla
+                        hasError = true;
+
+                        // Hata bilgisini oluştur
+                        let errorInfo = {
+                            ExcelDosya: $('#excelFileName').val(),
+                            className: colHeadName,
+                            Hata: cellValue,
+                            Satir: $(this).closest('tr').index() + 1,
+                            Sutun: columnIndex,
+                            Durum: true
+                        };
+
+                        // Hata listesine ekle
+                        let errorInfoJSON = JSON.stringify(errorInfo);
+                        errorList.push(errorInfoJSON);
+
+                        // Hücre rengini kırmızı yap
+                        // $(this).css("color", "red");
+
+                    } else {
+
+                        // Geçerliyse geçerli listesine ekle
+                        validList.push(cellValue);
+
+                        // Hücre rengini siyah yap
+                        $(this).css("color", "black");
+
+                    }
+
+                });
+
+            }
+
+
+
+
+           
+
             // else if (colHeadType === "wt.iba.definition.StringDefinition") {
 
             //     // Sütunundaki tüm hücreleri döngüye al
@@ -1202,10 +1272,12 @@
                     toastr.info("Excel dosyasında hatalı alanlar bulunuyor. Excel dosyasını kontrol ediniz.");
                 } else {
                     toastr.success("Post işlemi başarılı");
+                    window.location.href = '@Url.Action("Index", "PlmUploadExcel")';
                 }
             },
             error: function (error) {
                 toastr.error("Post işlemi sırasında hata oluştu: " + error);
+                window.location.href = '@Url.Action("Index", "PlmUploadExcel")';
             }
         });
     }

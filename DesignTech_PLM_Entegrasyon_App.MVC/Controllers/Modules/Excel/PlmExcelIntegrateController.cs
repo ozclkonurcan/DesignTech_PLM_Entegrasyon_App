@@ -77,6 +77,10 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 				}
                 foreach (DataRow excelRow in excelData.Tables[0].Rows)
                 {
+                    try
+                    {
+
+                    
                     var Anaparca = excelRow["Number"].ToString();
                     var Name = excelRow["NAME"].ToString();
                     var catalogValue = _configuration["Catalog"];
@@ -94,6 +98,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                             {
                                 getNameCmd.Parameters.AddWithValue("@Anaparca", Anaparca);
                                 var oldName = (string)getNameCmd.ExecuteScalar();
+
 
                                 if (oldName != null)
                                 {
@@ -114,6 +119,11 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                             }
                         }
 
+                    }
+                    }
+                    catch (Exception)
+                    {
+                        continue;
                     }
 
                 }
@@ -460,15 +470,28 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     var Number = excelRow["Number"].ToString();
                     // Şartları burada ekleyin
                     var Anaparca = excelRow["Number"].ToString();
-                    var Alternatif = excelRow["ALTERNATIF"].ToString();
-                    var CIFTYON = excelRow["CIFTYON"].ToString();
-                    var Name = "";
-                    if(excelRow["NAME"].ToString() != null)
+                  
+             
+
+                    if (excelRow.Table.Columns.Contains("ALTERNATIF"))
                     {
-                       Name = excelRow["NAME"].ToString();
+                        var Alternatif = excelRow["ALTERNATIF"].ToString();
                     }
+
+                    if (excelRow.Table.Columns.Contains("CIFTYON"))
+                    {
+                        var CIFTYON = excelRow["CIFTYON"].ToString();
+                    }
+                    if (excelRow.Table.Columns.Contains("NAME"))
+                    { 
+                        var Name = excelRow["NAME"].ToString();
+                    }
+
+                    
                     var connectionString = _configuration.GetConnectionString("Plm");
                     var catalogValue = _configuration["Catalog"];
+
+                    var seenMaterials = new HashSet<string>();
 
                     foreach (var item in data["colHeadFullDataList[]"])
                     {
@@ -480,9 +503,18 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                             var definitionType = epmCollection[2];
                             var idA2A2 = epmCollection[3];
 
+                            // Malzeme kontrolü
+                            var materialKey = $"{excelColumnName}|{plmIdeHierId}|{definitionType}|{idA2A2}";
+                            if (seenMaterials.Contains(materialKey))
+                            {
+                                // Bu malzeme daha önce işlendi, bu durumu atla
+                                continue;
+                            }
+
+                            seenMaterials.Add(materialKey); // Malzeme kümesine ekle
+
                             GenericObjectViewModel GenericRowObject = new GenericObjectViewModel();
                             GenericRowObject.Number = Number;
-                            //GenericRowObject.Version = Version;
                             GenericRowObject.HierId = plmIdeHierId;
                             GenericRowObject.DefinitionType = definitionType;
                             GenericRowObject.idA2A2 = idA2A2;
@@ -909,8 +941,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 
                     //        //    // Eski Name değerini Excel'e yaz
                     //        //    excelRow["ESKI_NAME"] = oldName;
-                                
-                               
+
+
                     //        //}
 
                     //        // Name alanını güncelle
@@ -1297,18 +1329,18 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                 else
                 {
 
-                    if(importType == "CAD")
+                    if(importType == "EPM")
                     {
                         try
                         {
 
                        ExcelProc(data,importType);
-                        TempData["SuccessMessage"] = "CAD e gönderildi.";
+                        TempData["SuccessMessage"] = "EPM e gönderildi.";
 
                         }
                         catch (Exception)
                         {
-                            TempData["ErrorMessage"] = "CAD e gönderilemedi.";
+                            TempData["ErrorMessage"] = "EPM e gönderilemedi.";
                         }
                     }
                     if (importType == "WTPart")
