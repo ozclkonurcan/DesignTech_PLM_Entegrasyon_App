@@ -43,7 +43,8 @@
     <div id="folderList" class="row g-6 g-xl-9 mb-6 mb-xl-9 d-flex align-items-start flex-row">
         @foreach (var item in ViewBag.filelist)
         {
-            var fileInfo = item.Split('_');
+			var degerSerach = "_20";
+			var fileInfo = item.Split(degerSerach);
 
             if (fileInfo.Length >= 2)
             {

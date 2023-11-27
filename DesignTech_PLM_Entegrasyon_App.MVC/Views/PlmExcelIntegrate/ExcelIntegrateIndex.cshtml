@@ -161,6 +161,7 @@
     $('#headselect_CIFTYON').attr('disabled', true);
     $('#headselect_ALTERNATIF').attr('disabled', true);
     $('#headselect_ESKI_NAME').attr('disabled', true);
+    $('#headselect_NAME').attr('disabled', true);
 
     // $('#headselect_Number').addClass("d-none");
     // $('#headselect_ESKI_NAME').addClass("d-none");
@@ -319,6 +320,9 @@
 
         $('.multiple_attr').each(function () {
             let colHeadName = $(this).attr("colHeadName");
+
+            console.warn(colHeadName);
+
             colHeadNameList.push(colHeadName);
             colHeadFullDataList.push($(`#headselect_${colHeadName}`).val());
 
@@ -608,7 +612,8 @@
                     let cellValue = $(this).text().trim();
 
                     // Zaman damgası için regex tanımla
-                    let unitRegex = /^-?\d+(\.\d+)?\s*(mi|km|m|cm|mm|in|ft|yd|g|kg|mg|oz|lb|gal|l|ml)$/;
+                    // let unitRegex = /^-?\d+(\.\d+)?\s*(mi|km|m|cm|mm|in|ft|yd|g|kg|mg|oz|lb|gal|l|ml)$/;
+                    let unitRegex = /^-?\d*\.?\d+\s*(mi|km|m|cm|mm|in|ft|yd|g|kg|mg|oz|lb|gal|l|ml)?$/;
                     if (cellValue == "") {
                         hasEmpty = true;
                         let rowIndex = $(this).closest('tr').index() + 1;
