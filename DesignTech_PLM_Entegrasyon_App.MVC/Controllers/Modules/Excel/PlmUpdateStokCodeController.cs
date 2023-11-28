@@ -219,6 +219,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                 }
 
 
+
                 ViewBag.exceldata = excelData.Tables[0];
 				ViewBag.excelfile = file;
 				return View();

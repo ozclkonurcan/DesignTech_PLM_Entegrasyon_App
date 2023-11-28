@@ -8,6 +8,7 @@ using ExcelDataReader;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Serilog;
@@ -362,6 +363,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                 selectedHeaders.Add("CIFTYON");
                 selectedHeaders.Add("ALTERNATIF");
                 selectedHeaders.Add("ESKI_NAME");
+                selectedHeaders.Add("NAME");
                 foreach (var pair in keyValuePairs)
                 {
                     if (pair.StartsWith("selected_headers%5B%5D=") && !pair.StartsWith("selected_headers%5B%5D=0"))
@@ -494,7 +496,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     var Number = excelRow["Number"].ToString();
                     // Şartları burada ekleyin
                     var Anaparca = excelRow["Number"].ToString();
-                  
+					var Name = "";
              
 
                     if (excelRow.Table.Columns.Contains("ALTERNATIF"))
@@ -508,12 +510,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     }
                     if (excelRow.Table.Columns.Contains("NAME"))
                     { 
-                        var Name = excelRow["NAME"].ToString();
+                         Name = excelRow["NAME"].ToString();
                     }
-					if (excelRow.Table.Columns.Contains("Name"))
-					{
-						var Name = excelRow["Name"].ToString();
-					}
+			
 
 					var connectionString = _configuration.GetConnectionString("Plm");
 
@@ -541,6 +540,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 
                             GenericObjectViewModel GenericRowObject = new GenericObjectViewModel();
                             GenericRowObject.Number = Number;
+                            GenericRowObject.Name = Name;
                             GenericRowObject.HierId = plmIdeHierId;
                             GenericRowObject.DefinitionType = definitionType;
                             GenericRowObject.idA2A2 = idA2A2;
@@ -993,1101 +993,1152 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 				foreach (GenericObjectViewModel PlmDbPRoc in RecordList)
                 {
 
-                    if(importType == "EPM Document")
+                    var connectionString = _configuration.GetConnectionString("Plm");
+                    var RowControl = _plm2.Query($"{catalogValue}.dbo.WTPartNoList").Where(new
                     {
-						try
-						{
+                        WTPartNumber = PlmDbPRoc.Number.Trim(),
+                        //versionIdA2versionInfo = PlmDbPRoc.Version
+                    }).Get().ToList();
 
+                    // Son veriyi dynamic türünde bir değişkene atıyoruz
+                    dynamic lastRowControl = RowControl.LastOrDefault();
+
+                    // lastRowList adında yeni bir liste oluşturuyoruz ve dynamic türündeki veriyi ekliyoruz
+                    var lastRowList = new List<dynamic>();
+                    if (lastRowControl != null)
+                    {
+                        lastRowList.Add(lastRowControl);
+                    }
+
+
+                    ////WTPartMaster Name Güncelleme sorgusu
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        var updateQueryName = $@"
+						 UPDATE {catalogValue}.dbo.WTPartNoList
+							SET
+								name = @Queryname
+							WHERE
+								idA2A2 = @ida2a2ID";
+
+                        var updateQueryNameparameters = new
+                        {
+                            ida2a2ID = lastRowList[0].idA2A2,
+                            Queryname = PlmDbPRoc.Name,
+                        };
+
+
+                        conn.Execute(updateQueryName, updateQueryNameparameters);
+                    }
+
+                    try
+                    {
+
+                        if (PlmDbPRoc.DefinitionType.Contains("String"))
+                        {
+                            documentFunction(catalogValue, "StringValue", lastRowList, PlmDbPRoc, importType, connectionString);
+                        }
+                        if (PlmDbPRoc.DefinitionType.Contains("Integer"))
+                        {
+                            documentFunction(catalogValue, "IntegerValue", lastRowList, PlmDbPRoc, importType, connectionString);
+                        }
+                        if (PlmDbPRoc.DefinitionType.Contains("Float"))
+                        {
+                            documentFunction(catalogValue, "FloatValue", lastRowList, PlmDbPRoc, importType, connectionString);
+                        }
+                        if (PlmDbPRoc.DefinitionType.Contains("Unit"))
+                        {
+                            documentFunction(catalogValue, "UnitValue", lastRowList, PlmDbPRoc, importType, connectionString);
+                        }
+                        if (PlmDbPRoc.DefinitionType.Contains("Boolean"))
+                        {
+                            documentFunction(catalogValue, "BooleanValue", lastRowList, PlmDbPRoc, importType, connectionString);
+                        }
+                        if (PlmDbPRoc.DefinitionType.Contains("Timestamp"))
+                        {
+                            documentFunction(catalogValue, "TimestampValue", lastRowList, PlmDbPRoc, importType, connectionString);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        
+                        throw;
+                    }
+
+			
+
+     //               if (importType == "EPM Document")
+     //               {
+					//	try
+					//	{
 					
-						if (PlmDbPRoc.DefinitionType.Contains("String"))
-						{
-							var RowControl = _plm2.Query($"{catalogValue}.dbo.EPMDocNumberList").Where(new
-							{
-								documentNumber = PlmDbPRoc.Number.Trim(),
-								//versionIdA2versionInfo = PlmDbPRoc.Version
-							}).Get().ToList();
-
-							var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-							if (RowControl.Count() > 0)
-							{
-								var ID = RowControl[0].EPMDocNumber;
-								StringValue NewRecord = new StringValue();
-								NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-								NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-								NewRecord.idA3A4 = Convert.ToInt64(ID);
-								NewRecord.classnameA2A2 = "wt.iba.value.StringValue";
-								NewRecord.idA3A5 = 0;
-								NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-								NewRecord.markForDeleteA2 = 0;
-								NewRecord.modifyStampA2 = DateTime.Now;
-								NewRecord.updateCountA2 = 1;
-								NewRecord.updateStampA2 = DateTime.Now;
-								NewRecord.createStampA2 = DateTime.Now;
-								if (importType == "EPM Document")
-								{
-									NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-								}
-								if (importType == "WTPart")
-								{
-									NewRecord.classnamekeyA4 = "wt.part.WTPart";
-								}
-								NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-								NewRecord.value = PlmDbPRoc.AttrValue.ToUpper();
-								NewRecord.value2 = PlmDbPRoc.AttrValue;
-								if (PlmDbPRoc.AttrValue != "")
-								{
-										var existingRecord = _plm2.Query($"{catalogValue}.StringValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<IntegerValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.StringValue
-        SET
-            value = @AttrValueUpper,
-            value2 = @AttrValue,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-
-
-									var insert = _plm2.Query($"{catalogValue}.StringValue").Insert(NewRecord);
-
-									if (insert == 1)
-									{
-										_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-									}
-										}
-								}
-							}
-						}
-						if (PlmDbPRoc.DefinitionType.Contains("Integer"))
-						{
-							var RowControl = _plm2.Query($"{catalogValue}.dbo.EPMDocNumberList").Where(new
-							{
-								documentNumber = PlmDbPRoc.Number.Trim(),
-								//versionIdA2versionInfo = PlmDbPRoc.Version
-							}).Get().ToList();
-
-							var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-								if (RowControl.Count() > 0)
-								{
-									var ID = RowControl[0].EPMDocNumber;
-									IntegerValue NewRecord = new IntegerValue();
-									NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-									NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-									NewRecord.idA3A4 = Convert.ToInt64(ID);
-									NewRecord.classnameA2A2 = "wt.iba.value.IntegerValue";
-									NewRecord.idA3A5 = 0;
-									NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-									NewRecord.markForDeleteA2 = 0;
-									NewRecord.modifyStampA2 = DateTime.Now;
-									NewRecord.updateCountA2 = 1;
-									NewRecord.updateStampA2 = DateTime.Now;
-									NewRecord.createStampA2 = DateTime.Now;
-									if (importType == "EPM Document")
-									{
-										NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-									}
-									if (importType == "WTPart")
-									{
-										NewRecord.classnamekeyA4 = "wt.part.WTPart";
-									}
-									NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-									NewRecord.value = Convert.ToInt64(PlmDbPRoc.AttrValue.ToUpper());
-									if (PlmDbPRoc.AttrValue != "")
-									{
-										var existingRecord = _plm2.Query($"{catalogValue}.IntegerValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<IntegerValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.IntegerValue
-        SET
-            value = @AttrValueUpper,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-
-											var insert = _plm2.Query($"{catalogValue}.IntegerValue").Insert(NewRecord);
-										if (insert == 1)
-										{
-											_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-										}
-									}
-								}
-							}
-						}
-						if (PlmDbPRoc.DefinitionType.Contains("Float"))
-						{
-							var RowControl = _plm2.Query($"{catalogValue}.dbo.EPMDocNumberList").Where(new
-							{
-								documentNumber = PlmDbPRoc.Number.Trim(),
-								//versionIdA2versionInfo = PlmDbPRoc.Version
-							}).Get().ToList();
-
-							var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-							if (RowControl.Count() > 0)
-							{
-								var ID = RowControl[0].EPMDocNumber;
-								FloatValue NewRecord = new FloatValue();
-								NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-								NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-								NewRecord.idA3A4 = Convert.ToInt64(ID);
-								NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
-								NewRecord.idA3A5 = 0;
-								NewRecord.wtprecision = -1;
-								NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-								NewRecord.markForDeleteA2 = 0;
-								NewRecord.modifyStampA2 = DateTime.Now;
-								NewRecord.updateCountA2 = 1;
-								NewRecord.updateStampA2 = DateTime.Now;
-								NewRecord.createStampA2 = DateTime.Now;
-								if (importType == "EPM Document")
-								{
-									NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-								}
-								if (importType == "WTPart")
-								{
-									NewRecord.classnamekeyA4 = "wt.part.WTPart";
-								}
-								NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-								NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
-									if (PlmDbPRoc.AttrValue != "")
-									{
-
-										var existingRecord = _plm2.Query($"{catalogValue}.FloatValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<IntegerValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.FloatValue
-        SET
-            value = @AttrValueUpper,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-
-
-											var insert = _plm2.Query($"{catalogValue}.FloatValue").Insert(NewRecord);
-										if (insert == 1)
-										{
-											_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-										}
-									}
-								}
-							}
-						}
-						if (PlmDbPRoc.DefinitionType.Contains("Unit"))
-						{
-							var RowControl = _plm2.Query($"{catalogValue}.dbo.EPMDocNumberList").Where(new
-							{
-								documentNumber = PlmDbPRoc.Number.Trim(),
-								//versionIdA2versionInfo = PlmDbPRoc.Version
-							}).Get().ToList();
-
-							var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-							if (RowControl.Count() > 0)
-							{
-								var ID = RowControl[0].EPMDocNumber;
-								UnitValue NewRecord = new UnitValue();
-								NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-								NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-								NewRecord.idA3A4 = Convert.ToInt64(ID);
-								NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
-								NewRecord.idA3A5 = 0;
-								NewRecord.wtprecision = -1;
-								NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-								NewRecord.markForDeleteA2 = 0;
-								NewRecord.modifyStampA2 = DateTime.Now;
-								NewRecord.updateCountA2 = 1;
-								NewRecord.updateStampA2 = DateTime.Now;
-								NewRecord.createStampA2 = DateTime.Now;
-								if (importType == "EPM Document")
-								{
-									NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-								}
-								if (importType == "WTPart")
-								{
-									NewRecord.classnamekeyA4 = "wt.part.WTPart";
-								}
-								NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-								NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
-									if (PlmDbPRoc.AttrValue != "")
-									{
-
-										var existingRecord = _plm2.Query($"{catalogValue}.UnitValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<IntegerValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.UnitValue
-        SET
-            value = @AttrValueUpper,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-											var insert = _plm2.Query($"{catalogValue}.UnitValue").Insert(NewRecord);
-										if (insert == 1)
-										{
-											_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-										}
-									}
-								}
-							}
-						}
-						if (PlmDbPRoc.DefinitionType.Contains("Boolean"))
-						{
-							var RowControl = _plm2.Query($"{catalogValue}.dbo.EPMDocNumberList").Where(new
-							{
-								documentNumber = PlmDbPRoc.Number.Trim(),
-								//versionIdA2versionInfo = PlmDbPRoc.Version
-							}).Get().ToList();
-
-							var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-							if (RowControl.Count() > 0)
-							{
-								var ID = RowControl[0].EPMDocNumber;
-								bool BoolValue = false;
-								if (PlmDbPRoc.AttrValue.ToLower() == "yes")
-								{
-									BoolValue = true;
-								}
-								else
-								{
-									BoolValue = false;
-								}
-								BooleanValue NewRecord = new BooleanValue();
-								NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-								NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-								NewRecord.idA3A4 = Convert.ToInt64(ID);
-								NewRecord.classnameA2A2 = "wt.iba.value.BooleanValue";
-								NewRecord.idA3A5 = 0;
-								NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-								NewRecord.markForDeleteA2 = 0;
-								NewRecord.modifyStampA2 = DateTime.Now;
-								NewRecord.updateCountA2 = 1;
-								NewRecord.updateStampA2 = DateTime.Now;
-								NewRecord.createStampA2 = DateTime.Now;
-								if (importType == "EPM Document")
-								{
-									NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-								}
-								if (importType == "WTPart")
-								{
-									NewRecord.classnamekeyA4 = "wt.part.WTPart";
-								}
-								NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-								NewRecord.value = Convert.ToByte(BoolValue);
-								if (PlmDbPRoc.AttrValue != "")
-								{
-										var existingRecord = _plm2.Query($"{catalogValue}.BooleanValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<IntegerValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.BooleanValue
-        SET
-            value = @AttrValueUpper,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-											var insert = _plm2.Query($"{catalogValue}.BooleanValue").Insert(NewRecord);
-									if (insert == 1)
-									{
-										_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-									}
-									}
-								}
-							}
-						}
-						if (PlmDbPRoc.DefinitionType.Contains("Timestamp"))
-						{
-							var RowControl = _plm2.Query($"{catalogValue}.dbo.EPMDocNumberList").Where(new
-							{
-								documentNumber = PlmDbPRoc.Number.Trim(),
-								//versionIdA2versionInfo = PlmDbPRoc.Version
-							}).Get().ToList();
-
-							var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-							if (RowControl.Count() > 0)
-							{
-								var ID = RowControl[0].EPMDocNumber;
-
-								TimestampValue NewRecord = new TimestampValue();
-								NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-								NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-								NewRecord.idA3A4 = Convert.ToInt64(ID);
-								NewRecord.classnameA2A2 = "wt.iba.value.TimestampValue";
-								NewRecord.idA3A5 = 0;
-								NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-								NewRecord.markForDeleteA2 = 0;
-								NewRecord.modifyStampA2 = DateTime.Now;
-								NewRecord.updateCountA2 = 1;
-								NewRecord.updateStampA2 = DateTime.Now;
-								NewRecord.createStampA2 = DateTime.Now;
-								if (importType == "EPM Document")
-								{
-									NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-								}
-								if (importType == "WTPart")
-								{
-									NewRecord.classnamekeyA4 = "wt.part.WTPart";
-								}
-								NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-								NewRecord.value = Convert.ToDateTime(PlmDbPRoc.AttrValue).Date;
-								if (PlmDbPRoc.AttrValue != "")
-								{
-										var existingRecord = _plm2.Query($"{catalogValue}.TimestampValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<IntegerValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.TimestampValue
-        SET
-            value = @AttrValueUpper,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-											var insert = _plm2.Query($"{catalogValue}.TimestampValue").Insert(NewRecord);
-									if (insert == 1)
-									{
-										_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-									}
-									}
-								}
-							}
-						}
-						}
-						catch (Exception ex)
-						{
-							TempData["ErrorMessage"] = "HATA!" + ex.Message;
-						}
-					}
-
-					if (importType == "WTPart")
-					{
-						try
-						{
-							if (PlmDbPRoc.DefinitionType.Contains("String"))
-						{
-
-								var RowControl = _plm2.Query($"{catalogValue}.dbo.WTPartNoList").Where(new
-								{
-									WTPartNumber = PlmDbPRoc.Number.Trim(),
-									//versionIdA2versionInfo = PlmDbPRoc.Version
-								}).Get().ToList();
-
-								// Son veriyi dynamic türünde bir değişkene atıyoruz
-								dynamic lastRowControl = RowControl.LastOrDefault();
-
-								// lastRowList adında yeni bir liste oluşturuyoruz ve dynamic türündeki veriyi ekliyoruz
-								var lastRowList = new List<dynamic>();
-								if (lastRowControl != null)
-								{
-									lastRowList.Add(lastRowControl);
-								}
-
-								var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-							if (lastRowList.Count() > 0)
-							{
-								var ID = lastRowList[0].WTPartNo;
-								StringValue NewRecord = new StringValue();
-								NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-								NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-								NewRecord.idA3A4 = Convert.ToInt64(ID);
-								NewRecord.classnameA2A2 = "wt.iba.value.StringValue";
-								NewRecord.idA3A5 = 0;
-								NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-								NewRecord.markForDeleteA2 = 0;
-								NewRecord.modifyStampA2 = DateTime.Now;
-								NewRecord.updateCountA2 = 1;
-								NewRecord.updateStampA2 = DateTime.Now;
-								NewRecord.createStampA2 = DateTime.Now;
-								if (importType == "EPM Document")
-								{
-									NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-								}
-								if (importType == "WTPart")
-								{
-									NewRecord.classnamekeyA4 = "wt.part.WTPart";
-								}
-								NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-								NewRecord.value = PlmDbPRoc.AttrValue.ToUpper();
-								NewRecord.value2 = PlmDbPRoc.AttrValue;
-								if (PlmDbPRoc.AttrValue != "")
-								{
-									//var existingRecord = _plm2.Query($"{catalogValue}.StringValue WHERE idA3A4 = {ID} AND value2 = {PlmDbPRoc.AttrValue.Trim()}").Get().FirstOrDefault();
-
-									var existingRecord = _plm2.Query($"{catalogValue}.StringValue").Where(new
-									{
-										idA3A4 = ID,
-										idA3A6 = PlmDbPRoc.idA2A2,
-									}).Get<StringValue>().FirstOrDefault();
-
-									if (existingRecord != null)
-                                    {
-										var connectionString = _configuration.GetConnectionString("Plm");
-										using (SqlConnection conn = new SqlConnection(connectionString))
-										{
-											conn.Open();
-
-											// Güncelleme sorgusu
-											var updateQuery = $@"
-        UPDATE {catalogValue}.StringValue
-        SET
-            value = @AttrValueUpper,
-            value2 = @AttrValue,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-											// Güncelleme için parametreler
-											var parameters = new
-											{
-												ID = existingRecord.idA3A4,
-												PlmIdA2A2 = existingRecord.idA3A6,
-												AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-												AttrValue = PlmDbPRoc.AttrValue,
-												UpdateStamp = DateTime.Now
-											};
-
-											// Güncelleme sorgusunu çalıştır
-											conn.Execute(updateQuery, parameters);
-										}
-
-										//                              existingRecord.idA3A4 = Convert.ToInt32(ID);
-										//                              existingRecord.idA3A6 = Convert.ToInt32(PlmDbPRoc.idA2A2);
-										//existingRecord.value = PlmDbPRoc.AttrValue.ToUpper();
-										//existingRecord.value2 = PlmDbPRoc.AttrValue;
-										//existingRecord.updateStampA2 = DateTime.Now;
-
-										//var update = _plm2.Query($"{catalogValue}.StringValue").Update(existingRecord);
-
-									}
-									else
-                                    {
-										var insert = _plm2.Query($"{catalogValue}.StringValue").Insert(NewRecord);
-
-										if (insert == 1)
-										{
-											_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-										}
-									}
-
-								
-								}
-							}
-						}
-							if (PlmDbPRoc.DefinitionType.Contains("Integer"))
-							{
-								var RowControl = _plm2.Query($"{catalogValue}.dbo.WTPartNoList").Where(new
-								{
-									WTPartNumber = PlmDbPRoc.Number.Trim(),
-									//versionIdA2versionInfo = PlmDbPRoc.Version
-								}).Get().ToList();
-
-								var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-								if (RowControl.Count() > 0)
-								{
-									var ID = RowControl[0].WTPartNo;
-									IntegerValue NewRecord = new IntegerValue();
-									NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-									NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-									NewRecord.idA3A4 = Convert.ToInt64(ID);
-									NewRecord.classnameA2A2 = "wt.iba.value.IntegerValue";
-									NewRecord.idA3A5 = 0;
-									NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-									NewRecord.markForDeleteA2 = 0;
-									NewRecord.modifyStampA2 = DateTime.Now;
-									NewRecord.updateCountA2 = 1;
-									NewRecord.updateStampA2 = DateTime.Now;
-									NewRecord.createStampA2 = DateTime.Now;
-									if (importType == "EPM Document")
-									{
-										NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-									}
-									if (importType == "WTPart")
-									{
-										NewRecord.classnamekeyA4 = "wt.part.WTPart";
-									}
-									NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-									NewRecord.value = Convert.ToInt64(PlmDbPRoc.AttrValue.ToUpper());
-									if (PlmDbPRoc.AttrValue != "")
-									{
-										var existingRecord = _plm2.Query($"{catalogValue}.IntegerValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<IntegerValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.IntegerValue
-        SET
-            value = @AttrValueUpper,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-											var insert = _plm2.Query($"{catalogValue}.IntegerValue").Insert(NewRecord);
-											if (insert == 1)
-											{
-												_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-											}
-										}
-									}
-								}
-							}
-							if (PlmDbPRoc.DefinitionType.Contains("Float"))
-							{
-								var RowControl = _plm2.Query($"{catalogValue}.dbo.WTPartNoList").Where(new
-								{
-									WTPartNumber = PlmDbPRoc.Number.Trim(),
-									//versionIdA2versionInfo = PlmDbPRoc.Version
-								}).Get().ToList();
-
-								var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-								if (RowControl.Count() > 0)
-								{
-									var ID = RowControl[0].WTPartNo;
-									FloatValue NewRecord = new FloatValue();
-									NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-									NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-									NewRecord.idA3A4 = Convert.ToInt64(ID);
-									NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
-									NewRecord.idA3A5 = 0;
-									NewRecord.wtprecision = -1;
-									NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-									NewRecord.markForDeleteA2 = 0;
-									NewRecord.modifyStampA2 = DateTime.Now;
-									NewRecord.updateCountA2 = 1;
-									NewRecord.updateStampA2 = DateTime.Now;
-									NewRecord.createStampA2 = DateTime.Now;
-									if (importType == "EPM Document")
-									{
-										NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-									}
-									if (importType == "WTPart")
-									{
-										NewRecord.classnamekeyA4 = "wt.part.WTPart";
-									}
-									NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-									NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
-									if (PlmDbPRoc.AttrValue != "")
-									{
-										var existingRecord = _plm2.Query($"{catalogValue}.FloatValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<FloatValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.FloatValue
-        SET
-            value = @AttrValueUpper,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-											var insert = _plm2.Query($"{catalogValue}.FloatValue").Insert(NewRecord);
-											if (insert == 1)
-											{
-												_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-											}
-										}
-									}
-								}
-							}
-							if (PlmDbPRoc.DefinitionType.Contains("Unit"))
-							{
-								var RowControl = _plm2.Query($"{catalogValue}.dbo.WTPartNoList").Where(new
-								{
-									WTPartNumber = PlmDbPRoc.Number.Trim(),
-									//versionIdA2versionInfo = PlmDbPRoc.Version
-								}).Get().ToList();
-
-								var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-								if (RowControl.Count() > 0)
-								{
-									var ID = RowControl[0].WTPartNo;
-									UnitValue NewRecord = new UnitValue();
-									NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-									NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-									NewRecord.idA3A4 = Convert.ToInt64(ID);
-									NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
-									NewRecord.idA3A5 = 0;
-									NewRecord.wtprecision = -1;
-									NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-									NewRecord.markForDeleteA2 = 0;
-									NewRecord.modifyStampA2 = DateTime.Now;
-									NewRecord.updateCountA2 = 1;
-									NewRecord.updateStampA2 = DateTime.Now;
-									NewRecord.createStampA2 = DateTime.Now;
-									if (importType == "EPM Document")
-									{
-										NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-									}
-									if (importType == "WTPart")
-									{
-										NewRecord.classnamekeyA4 = "wt.part.WTPart";
-									}
-									NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-									NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
-									if (PlmDbPRoc.AttrValue != "")
-									{
-										var existingRecord = _plm2.Query($"{catalogValue}.UnitValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<UnitValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.UnitValue
-        SET
-            value = @AttrValueUpper,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-											var insert = _plm2.Query($"{catalogValue}.UnitValue").Insert(NewRecord);
-											if (insert == 1)
-											{
-												_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-											}
-										}
-									}
-								}
-							}
-							if (PlmDbPRoc.DefinitionType.Contains("Boolean"))
-							{
-								var RowControl = _plm2.Query($"{catalogValue}.dbo.WTPartNoList").Where(new
-								{
-									WTPartNumber = PlmDbPRoc.Number.Trim(),
-									//versionIdA2versionInfo = PlmDbPRoc.Version
-								}).Get().ToList();
-
-								var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-								if (RowControl.Count() > 0)
-								{
-									var ID = RowControl[0].WTPartNo;
-									bool BoolValue = false;
-									if (PlmDbPRoc.AttrValue.ToLower() == "yes")
-									{
-										BoolValue = true;
-									}
-									else
-									{
-										BoolValue = false;
-									}
-									BooleanValue NewRecord = new BooleanValue();
-									NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-									NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-									NewRecord.idA3A4 = Convert.ToInt64(ID);
-									NewRecord.classnameA2A2 = "wt.iba.value.BooleanValue";
-									NewRecord.idA3A5 = 0;
-									NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-									NewRecord.markForDeleteA2 = 0;
-									NewRecord.modifyStampA2 = DateTime.Now;
-									NewRecord.updateCountA2 = 1;
-									NewRecord.updateStampA2 = DateTime.Now;
-									NewRecord.createStampA2 = DateTime.Now;
-									if (importType == "EPM Document")
-									{
-										NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-									}
-									if (importType == "WTPart")
-									{
-										NewRecord.classnamekeyA4 = "wt.part.WTPart";
-									}
-									NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-									NewRecord.value = Convert.ToByte(BoolValue);
-									if (PlmDbPRoc.AttrValue != "")
-									{
-										var existingRecord = _plm2.Query($"{catalogValue}.BooleanValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<BooleanValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.BooleanValue
-        SET
-            value = @AttrValueUpper,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-											var insert = _plm2.Query($"{catalogValue}.BooleanValue").Insert(NewRecord);
-											if (insert == 1)
-											{
-												_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-											}
-										}
-									}
-								}
-							}
-							if (PlmDbPRoc.DefinitionType.Contains("Timestamp"))
-							{
-								var RowControl = _plm2.Query($"{catalogValue}.dbo.WTPartNoList").Where(new
-								{
-									WTPartNumber = PlmDbPRoc.Number.Trim(),
-									//versionIdA2versionInfo = PlmDbPRoc.Version
-								}).Get().ToList();
-
-								var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
-								if (RowControl.Count() > 0)
-								{
-									var ID = RowControl[0].WTPartNo;
-
-									TimestampValue NewRecord = new TimestampValue();
-									NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
-									NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
-									NewRecord.idA3A4 = Convert.ToInt64(ID);
-									NewRecord.classnameA2A2 = "wt.iba.value.TimestampValue";
-									NewRecord.idA3A5 = 0;
-									NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
-									NewRecord.markForDeleteA2 = 0;
-									NewRecord.modifyStampA2 = DateTime.Now;
-									NewRecord.updateCountA2 = 1;
-									NewRecord.updateStampA2 = DateTime.Now;
-									NewRecord.createStampA2 = DateTime.Now;
-									if (importType == "EPM Document")
-									{
-										NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
-									}
-									if (importType == "WTPart")
-									{
-										NewRecord.classnamekeyA4 = "wt.part.WTPart";
-									}
-									NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
-									NewRecord.value = Convert.ToDateTime(PlmDbPRoc.AttrValue).Date;
-									if (PlmDbPRoc.AttrValue != "")
-									{
-										var existingRecord = _plm2.Query($"{catalogValue}.TimestampValue").Where(new
-										{
-											idA3A4 = ID,
-											idA3A6 = PlmDbPRoc.idA2A2,
-										}).Get<TimestampValue>().FirstOrDefault();
-
-										if (existingRecord != null)
-										{
-											var connectionString = _configuration.GetConnectionString("Plm");
-											using (SqlConnection conn = new SqlConnection(connectionString))
-											{
-												conn.Open();
-
-												// Güncelleme sorgusu
-												var updateQuery = $@"
-        UPDATE {catalogValue}.TimestampValue
-        SET
-            value = @AttrValueUpper,
-            updateStampA2 = @UpdateStamp
-        WHERE
-            idA3A4 = @ID
-            AND idA3A6 = @PlmIdA2A2";
-
-												// Güncelleme için parametreler
-												var parameters = new
-												{
-													ID = existingRecord.idA3A4,
-													PlmIdA2A2 = existingRecord.idA3A6,
-													AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
-													AttrValue = PlmDbPRoc.AttrValue,
-													UpdateStamp = DateTime.Now
-												};
-
-												// Güncelleme sorgusunu çalıştır
-												conn.Execute(updateQuery, parameters);
-											}
-										}
-										else
-										{
-											var insert = _plm2.Query($"{catalogValue}.TimestampValue").Insert(NewRecord);
-											if (insert == 1)
-											{
-												_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
-											}
-										}
-									}
-								}
-							}
-
-						}
-						catch (Exception ex)
-						{
-							TempData["ErrorMessage"] = "HATA!" + ex.Message;
-						}
+					//	if (PlmDbPRoc.DefinitionType.Contains("String"))
+					//	{
+						
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+					//		if (lastRowList.Count() > 0)
+					//		{
+					//			var ID = lastRowList[0].EPMDocNumber;
+					//			StringValue NewRecord = new StringValue();
+					//			NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+					//			NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+					//			NewRecord.idA3A4 = Convert.ToInt64(ID);
+					//			NewRecord.classnameA2A2 = "wt.iba.value.StringValue";
+					//			NewRecord.idA3A5 = 0;
+					//			NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+					//			NewRecord.markForDeleteA2 = 0;
+					//			NewRecord.modifyStampA2 = DateTime.Now;
+					//			NewRecord.updateCountA2 = 1;
+					//			NewRecord.updateStampA2 = DateTime.Now;
+					//			NewRecord.createStampA2 = DateTime.Now;
+					//			if (importType == "EPM Document")
+					//			{
+					//				NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+					//			}
+					//			if (importType == "WTPart")
+					//			{
+					//				NewRecord.classnamekeyA4 = "wt.part.WTPart";
+					//			}
+					//			NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+					//			NewRecord.value = PlmDbPRoc.AttrValue.ToUpper();
+					//			NewRecord.value2 = PlmDbPRoc.AttrValue;
+					//			if (PlmDbPRoc.AttrValue != "")
+					//			{
+					//					var existingRecord = _plm2.Query($"{catalogValue}.StringValue").Where(new
+					//					{
+					//						idA3A4 = ID,
+					//						idA3A6 = PlmDbPRoc.idA2A2,
+					//					}).Get<IntegerValue>().FirstOrDefault();
+
+					//					if (existingRecord != null)
+					//					{
+					//						using (SqlConnection conn = new SqlConnection(connectionString))
+					//						{
+					//							conn.Open();
+
+					//							// Güncelleme sorgusu
+					//							var updateQuery = $@"
+     //   UPDATE {catalogValue}.StringValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       value2 = @AttrValue,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+					//							// Güncelleme için parametreler
+					//							var parameters = new
+					//							{
+					//								ID = existingRecord.idA3A4,
+					//								PlmIdA2A2 = existingRecord.idA3A6,
+					//								AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+					//								AttrValue = PlmDbPRoc.AttrValue,
+					//								UpdateStamp = DateTime.Now
+					//							};
+
+					//							// Güncelleme sorgusunu çalıştır
+					//							conn.Execute(updateQuery, parameters);
+					//						}
+					//					}
+					//					else
+					//					{
+
+
+					//				var insert = _plm2.Query($"{catalogValue}.StringValue").Insert(NewRecord);
+
+					//				if (insert == 1)
+					//				{
+					//					_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+					//				}
+					//					}
+					//			}
+					//		}
+					//	}
+					//	if (PlmDbPRoc.DefinitionType.Contains("Integer"))
+					//	{
+							
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+					//			if (lastRowList.Count() > 0)
+					//			{
+					//				var ID = lastRowList[0].EPMDocNumber;
+					//				IntegerValue NewRecord = new IntegerValue();
+					//				NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+					//				NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+					//				NewRecord.idA3A4 = Convert.ToInt64(ID);
+					//				NewRecord.classnameA2A2 = "wt.iba.value.IntegerValue";
+					//				NewRecord.idA3A5 = 0;
+					//				NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+					//				NewRecord.markForDeleteA2 = 0;
+					//				NewRecord.modifyStampA2 = DateTime.Now;
+					//				NewRecord.updateCountA2 = 1;
+					//				NewRecord.updateStampA2 = DateTime.Now;
+					//				NewRecord.createStampA2 = DateTime.Now;
+					//				if (importType == "EPM Document")
+					//				{
+					//					NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+					//				}
+					//				if (importType == "WTPart")
+					//				{
+					//					NewRecord.classnamekeyA4 = "wt.part.WTPart";
+					//				}
+					//				NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+					//				NewRecord.value = Convert.ToInt64(PlmDbPRoc.AttrValue.ToUpper());
+					//				if (PlmDbPRoc.AttrValue != "")
+					//				{
+					//					var existingRecord = _plm2.Query($"{catalogValue}.IntegerValue").Where(new
+					//					{
+					//						idA3A4 = ID,
+					//						idA3A6 = PlmDbPRoc.idA2A2,
+					//					}).Get<IntegerValue>().FirstOrDefault();
+
+					//					if (existingRecord != null)
+					//					{
+					//						using (SqlConnection conn = new SqlConnection(connectionString))
+					//						{
+					//							conn.Open();
+
+					//							// Güncelleme sorgusu
+					//							var updateQuery = $@"
+     //   UPDATE {catalogValue}.IntegerValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+					//							// Güncelleme için parametreler
+					//							var parameters = new
+					//							{
+					//								ID = existingRecord.idA3A4,
+					//								PlmIdA2A2 = existingRecord.idA3A6,
+					//								AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+					//								AttrValue = PlmDbPRoc.AttrValue,
+					//								UpdateStamp = DateTime.Now
+					//							};
+
+					//							// Güncelleme sorgusunu çalıştır
+					//							conn.Execute(updateQuery, parameters);
+					//						}
+					//					}
+					//					else
+					//					{
+
+					//						var insert = _plm2.Query($"{catalogValue}.IntegerValue").Insert(NewRecord);
+					//					if (insert == 1)
+					//					{
+					//						_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+					//					}
+					//				}
+					//			}
+					//		}
+					//	}
+					//	if (PlmDbPRoc.DefinitionType.Contains("Float"))
+					//	{
+							
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+					//		if (lastRowList.Count() > 0)
+					//		{
+					//			var ID = lastRowList[0].EPMDocNumber;
+					//			FloatValue NewRecord = new FloatValue();
+					//			NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+					//			NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+					//			NewRecord.idA3A4 = Convert.ToInt64(ID);
+					//			NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
+					//			NewRecord.idA3A5 = 0;
+					//			NewRecord.wtprecision = -1;
+					//			NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+					//			NewRecord.markForDeleteA2 = 0;
+					//			NewRecord.modifyStampA2 = DateTime.Now;
+					//			NewRecord.updateCountA2 = 1;
+					//			NewRecord.updateStampA2 = DateTime.Now;
+					//			NewRecord.createStampA2 = DateTime.Now;
+					//			if (importType == "EPM Document")
+					//			{
+					//				NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+					//			}
+					//			if (importType == "WTPart")
+					//			{
+					//				NewRecord.classnamekeyA4 = "wt.part.WTPart";
+					//			}
+					//			NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+					//			NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
+					//				if (PlmDbPRoc.AttrValue != "")
+					//				{
+
+					//					var existingRecord = _plm2.Query($"{catalogValue}.FloatValue").Where(new
+					//					{
+					//						idA3A4 = ID,
+					//						idA3A6 = PlmDbPRoc.idA2A2,
+					//					}).Get<IntegerValue>().FirstOrDefault();
+
+					//					if (existingRecord != null)
+					//					{
+					//						using (SqlConnection conn = new SqlConnection(connectionString))
+					//						{
+					//							conn.Open();
+
+					//							// Güncelleme sorgusu
+					//							var updateQuery = $@"
+     //   UPDATE {catalogValue}.FloatValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+					//							// Güncelleme için parametreler
+					//							var parameters = new
+					//							{
+					//								ID = existingRecord.idA3A4,
+					//								PlmIdA2A2 = existingRecord.idA3A6,
+					//								AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+					//								AttrValue = PlmDbPRoc.AttrValue,
+					//								UpdateStamp = DateTime.Now
+					//							};
+
+					//							// Güncelleme sorgusunu çalıştır
+					//							conn.Execute(updateQuery, parameters);
+					//						}
+					//					}
+					//					else
+					//					{
+
+
+					//						var insert = _plm2.Query($"{catalogValue}.FloatValue").Insert(NewRecord);
+					//					if (insert == 1)
+					//					{
+					//						_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+					//					}
+					//				}
+					//			}
+					//		}
+					//	}
+					//	if (PlmDbPRoc.DefinitionType.Contains("Unit"))
+					//	{
+						
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+					//		if (lastRowList.Count() > 0)
+					//		{
+					//			var ID = lastRowList[0].EPMDocNumber;
+					//			UnitValue NewRecord = new UnitValue();
+					//			NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+					//			NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+					//			NewRecord.idA3A4 = Convert.ToInt64(ID);
+					//			NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
+					//			NewRecord.idA3A5 = 0;
+					//			NewRecord.wtprecision = -1;
+					//			NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+					//			NewRecord.markForDeleteA2 = 0;
+					//			NewRecord.modifyStampA2 = DateTime.Now;
+					//			NewRecord.updateCountA2 = 1;
+					//			NewRecord.updateStampA2 = DateTime.Now;
+					//			NewRecord.createStampA2 = DateTime.Now;
+					//			if (importType == "EPM Document")
+					//			{
+					//				NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+					//			}
+					//			if (importType == "WTPart")
+					//			{
+					//				NewRecord.classnamekeyA4 = "wt.part.WTPart";
+					//			}
+					//			NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+					//			NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
+					//				if (PlmDbPRoc.AttrValue != "")
+					//				{
+
+					//					var existingRecord = _plm2.Query($"{catalogValue}.UnitValue").Where(new
+					//					{
+					//						idA3A4 = ID,
+					//						idA3A6 = PlmDbPRoc.idA2A2,
+					//					}).Get<IntegerValue>().FirstOrDefault();
+
+					//					if (existingRecord != null)
+					//					{
+					//						using (SqlConnection conn = new SqlConnection(connectionString))
+					//						{
+					//							conn.Open();
+
+					//							// Güncelleme sorgusu
+					//							var updateQuery = $@"
+     //   UPDATE {catalogValue}.UnitValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+					//							// Güncelleme için parametreler
+					//							var parameters = new
+					//							{
+					//								ID = existingRecord.idA3A4,
+					//								PlmIdA2A2 = existingRecord.idA3A6,
+					//								AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+					//								AttrValue = PlmDbPRoc.AttrValue,
+					//								UpdateStamp = DateTime.Now
+					//							};
+
+					//							// Güncelleme sorgusunu çalıştır
+					//							conn.Execute(updateQuery, parameters);
+					//						}
+					//					}
+					//					else
+					//					{
+					//						var insert = _plm2.Query($"{catalogValue}.UnitValue").Insert(NewRecord);
+					//					if (insert == 1)
+					//					{
+					//						_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+					//					}
+					//				}
+					//			}
+					//		}
+					//	}
+					//	if (PlmDbPRoc.DefinitionType.Contains("Boolean"))
+					//	{
+						
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+					//		if (lastRowList.Count() > 0)
+					//		{
+					//			var ID = lastRowList[0].EPMDocNumber;
+					//			bool BoolValue = false;
+					//			if (PlmDbPRoc.AttrValue.ToLower() == "yes")
+					//			{
+					//				BoolValue = true;
+					//			}
+					//			else
+					//			{
+					//				BoolValue = false;
+					//			}
+					//			BooleanValue NewRecord = new BooleanValue();
+					//			NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+					//			NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+					//			NewRecord.idA3A4 = Convert.ToInt64(ID);
+					//			NewRecord.classnameA2A2 = "wt.iba.value.BooleanValue";
+					//			NewRecord.idA3A5 = 0;
+					//			NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+					//			NewRecord.markForDeleteA2 = 0;
+					//			NewRecord.modifyStampA2 = DateTime.Now;
+					//			NewRecord.updateCountA2 = 1;
+					//			NewRecord.updateStampA2 = DateTime.Now;
+					//			NewRecord.createStampA2 = DateTime.Now;
+					//			if (importType == "EPM Document")
+					//			{
+					//				NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+					//			}
+					//			if (importType == "WTPart")
+					//			{
+					//				NewRecord.classnamekeyA4 = "wt.part.WTPart";
+					//			}
+					//			NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+					//			NewRecord.value = Convert.ToByte(BoolValue);
+					//			if (PlmDbPRoc.AttrValue != "")
+					//			{
+					//					var existingRecord = _plm2.Query($"{catalogValue}.BooleanValue").Where(new
+					//					{
+					//						idA3A4 = ID,
+					//						idA3A6 = PlmDbPRoc.idA2A2,
+					//					}).Get<IntegerValue>().FirstOrDefault();
+
+					//					if (existingRecord != null)
+					//					{
+					//						using (SqlConnection conn = new SqlConnection(connectionString))
+					//						{
+					//							conn.Open();
+
+					//							// Güncelleme sorgusu
+					//							var updateQuery = $@"
+     //   UPDATE {catalogValue}.BooleanValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+					//							// Güncelleme için parametreler
+					//							var parameters = new
+					//							{
+					//								ID = existingRecord.idA3A4,
+					//								PlmIdA2A2 = existingRecord.idA3A6,
+					//								AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+					//								AttrValue = PlmDbPRoc.AttrValue,
+					//								UpdateStamp = DateTime.Now
+					//							};
+
+					//							// Güncelleme sorgusunu çalıştır
+					//							conn.Execute(updateQuery, parameters);
+					//						}
+					//					}
+					//					else
+					//					{
+					//						var insert = _plm2.Query($"{catalogValue}.BooleanValue").Insert(NewRecord);
+					//				if (insert == 1)
+					//				{
+					//					_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+					//				}
+					//				}
+					//			}
+					//		}
+					//	}
+					//	if (PlmDbPRoc.DefinitionType.Contains("Timestamp"))
+					//	{
+						
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+					//		if (lastRowList.Count() > 0)
+					//		{
+					//			var ID = lastRowList[0].EPMDocNumber;
+
+					//			TimestampValue NewRecord = new TimestampValue();
+					//			NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+					//			NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+					//			NewRecord.idA3A4 = Convert.ToInt64(ID);
+					//			NewRecord.classnameA2A2 = "wt.iba.value.TimestampValue";
+					//			NewRecord.idA3A5 = 0;
+					//			NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+					//			NewRecord.markForDeleteA2 = 0;
+					//			NewRecord.modifyStampA2 = DateTime.Now;
+					//			NewRecord.updateCountA2 = 1;
+					//			NewRecord.updateStampA2 = DateTime.Now;
+					//			NewRecord.createStampA2 = DateTime.Now;
+					//			if (importType == "EPM Document")
+					//			{
+					//				NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+					//			}
+					//			if (importType == "WTPart")
+					//			{
+					//				NewRecord.classnamekeyA4 = "wt.part.WTPart";
+					//			}
+					//			NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+					//			NewRecord.value = Convert.ToDateTime(PlmDbPRoc.AttrValue).Date;
+					//			if (PlmDbPRoc.AttrValue != "")
+					//			{
+					//					var existingRecord = _plm2.Query($"{catalogValue}.TimestampValue").Where(new
+					//					{
+					//						idA3A4 = ID,
+					//						idA3A6 = PlmDbPRoc.idA2A2,
+					//					}).Get<IntegerValue>().FirstOrDefault();
+
+					//					if (existingRecord != null)
+					//					{
+					//						using (SqlConnection conn = new SqlConnection(connectionString))
+					//						{
+					//							conn.Open();
+
+					//							// Güncelleme sorgusu
+					//							var updateQuery = $@"
+     //   UPDATE {catalogValue}.TimestampValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+					//							// Güncelleme için parametreler
+					//							var parameters = new
+					//							{
+					//								ID = existingRecord.idA3A4,
+					//								PlmIdA2A2 = existingRecord.idA3A6,
+					//								AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+					//								AttrValue = PlmDbPRoc.AttrValue,
+					//								UpdateStamp = DateTime.Now
+					//							};
+
+					//							// Güncelleme sorgusunu çalıştır
+					//							conn.Execute(updateQuery, parameters);
+					//						}
+					//					}
+					//					else
+					//					{
+					//						var insert = _plm2.Query($"{catalogValue}.TimestampValue").Insert(NewRecord);
+					//				if (insert == 1)
+					//				{
+					//					_plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+					//				}
+					//				}
+					//			}
+					//		}
+					//	}
+						
+                        
+     //                   }
+					//	catch (Exception ex)
+					//	{
+					//		TempData["ErrorMessage"] = "HATA!" + ex.Message;
+					//	}
+					
+     //               }
+
+					//if (importType == "WTPart")
+					//{
+					//	try
+					//	{
+
+     //                       ////WTPartMaster Name Güncelleme sorgusu
+
+
+     //                       if (PlmDbPRoc.DefinitionType.Contains("String"))
+     //                       {
+     //                           documentFunction(catalogValue, "StringValue", lastRowList, PlmDbPRoc, importType, connectionString);
+     //                       }
+     //                       if (PlmDbPRoc.DefinitionType.Contains("Integer"))
+     //                       {
+     //                           documentFunction(catalogValue, "IntegerValue", lastRowList, PlmDbPRoc, importType, connectionString);
+     //                       }
+     //                       if (PlmDbPRoc.DefinitionType.Contains("Float"))
+     //                       {
+     //                           documentFunction(catalogValue, "FloatValue", lastRowList, PlmDbPRoc, importType, connectionString);
+     //                       }
+     //                       if (PlmDbPRoc.DefinitionType.Contains("Unit"))
+     //                       {
+     //                           documentFunction(catalogValue, "UnitValue", lastRowList, PlmDbPRoc, importType, connectionString);
+     //                       }
+     //                       if (PlmDbPRoc.DefinitionType.Contains("Boolean"))
+     //                       {
+     //                           documentFunction(catalogValue, "BooleanValue", lastRowList, PlmDbPRoc, importType, connectionString);
+     //                       }  
+     //                       if (PlmDbPRoc.DefinitionType.Contains("Timestamp"))
+     //                       {
+     //                           documentFunction(catalogValue, "TimestampValue", lastRowList, PlmDbPRoc, importType, connectionString);
+     //                       }
+
+     //                       if (PlmDbPRoc.DefinitionType.Contains("String"))
+     //                       {
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+     //                           if (lastRowList.Count() > 0)
+     //                           {
+     //                               var ID = lastRowList[0].WTPartNo;
+     //                               StringValue NewRecord = new StringValue();
+     //                               NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+     //                               NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+     //                               NewRecord.idA3A4 = Convert.ToInt64(ID);
+     //                               NewRecord.classnameA2A2 = "wt.iba.value.StringValue";
+     //                               NewRecord.idA3A5 = 0;
+     //                               NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+     //                               NewRecord.markForDeleteA2 = 0;
+     //                               NewRecord.modifyStampA2 = DateTime.Now;
+     //                               NewRecord.updateCountA2 = 1;
+     //                               NewRecord.updateStampA2 = DateTime.Now;
+     //                               NewRecord.createStampA2 = DateTime.Now;
+
+     //                               if (importType == "EPM Document")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+     //                               }
+     //                               if (importType == "WTPart")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.part.WTPart";
+     //                               }
+     //                               NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+     //                               NewRecord.value = PlmDbPRoc.AttrValue.ToUpper();
+     //                               NewRecord.value2 = PlmDbPRoc.AttrValue;
+     //                               if (PlmDbPRoc.AttrValue != "")
+     //                               {
+     //                                   //var existingRecord = _plm2.Query($"{catalogValue}.StringValue WHERE idA3A4 = {ID} AND value2 = {PlmDbPRoc.AttrValue.Trim()}").Get().FirstOrDefault();
+
+     //                                   var existingRecord = _plm2.Query($"{catalogValue}.StringValue").Where(new
+     //                                   {
+     //                                       idA3A4 = ID,
+     //                                       idA3A6 = PlmDbPRoc.idA2A2,
+     //                                   }).Get<StringValue>().FirstOrDefault();
+
+     //                                   if (existingRecord != null)
+     //                                   {
+
+     //                                       using (SqlConnection conn = new SqlConnection(connectionString))
+     //                                       {
+     //                                           conn.Open();
+
+
+
+
+     //                                           // Güncelleme sorgusu
+     //                                           var updateQuery = $@"
+     //   UPDATE {catalogValue}.StringValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       value2 = @AttrValue,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+     //                                           // Güncelleme için parametreler
+     //                                           var parameters = new
+     //                                           {
+     //                                               ID = existingRecord.idA3A4,
+     //                                               PlmIdA2A2 = existingRecord.idA3A6,
+     //                                               AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+     //                                               AttrValue = PlmDbPRoc.AttrValue,
+     //                                               UpdateStamp = DateTime.Now
+     //                                           };
+
+     //                                           // Güncelleme sorgusunu çalıştır
+     //                                           conn.Execute(updateQuery, parameters);
+     //                                       }
+
+     //                                       //                              existingRecord.idA3A4 = Convert.ToInt32(ID);
+     //                                       //                              existingRecord.idA3A6 = Convert.ToInt32(PlmDbPRoc.idA2A2);
+     //                                       //existingRecord.value = PlmDbPRoc.AttrValue.ToUpper();
+     //                                       //existingRecord.value2 = PlmDbPRoc.AttrValue;
+     //                                       //existingRecord.updateStampA2 = DateTime.Now;
+
+     //                                       //var update = _plm2.Query($"{catalogValue}.StringValue").Update(existingRecord);
+
+     //                                   }
+     //                                   else
+     //                                   {
+     //                                       var insert = _plm2.Query($"{catalogValue}.StringValue").Insert(NewRecord);
+
+     //                                       if (insert == 1)
+     //                                       {
+     //                                           _plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+     //                                       }
+     //                                   }
+
+
+     //                               }
+     //                           }
+     //                       }
+     //                       if (PlmDbPRoc.DefinitionType.Contains("Integer"))
+     //                       {
+
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+     //                           if (lastRowList.Count() > 0)
+     //                           {
+     //                               var ID = lastRowList[0].WTPartNo;
+     //                               IntegerValue NewRecord = new IntegerValue();
+     //                               NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+     //                               NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+     //                               NewRecord.idA3A4 = Convert.ToInt64(ID);
+     //                               NewRecord.classnameA2A2 = "wt.iba.value.IntegerValue";
+     //                               NewRecord.idA3A5 = 0;
+     //                               NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+     //                               NewRecord.markForDeleteA2 = 0;
+     //                               NewRecord.modifyStampA2 = DateTime.Now;
+     //                               NewRecord.updateCountA2 = 1;
+     //                               NewRecord.updateStampA2 = DateTime.Now;
+     //                               NewRecord.createStampA2 = DateTime.Now;
+     //                               if (importType == "EPM Document")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+     //                               }
+     //                               if (importType == "WTPart")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.part.WTPart";
+     //                               }
+     //                               NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+     //                               NewRecord.value = Convert.ToInt64(PlmDbPRoc.AttrValue.ToUpper());
+     //                               if (PlmDbPRoc.AttrValue != "")
+     //                               {
+     //                                   var existingRecord = _plm2.Query($"{catalogValue}.IntegerValue").Where(new
+     //                                   {
+     //                                       idA3A4 = ID,
+     //                                       idA3A6 = PlmDbPRoc.idA2A2,
+     //                                   }).Get<IntegerValue>().FirstOrDefault();
+
+     //                                   if (existingRecord != null)
+     //                                   {
+     //                                       using (SqlConnection conn = new SqlConnection(connectionString))
+     //                                       {
+     //                                           conn.Open();
+
+     //                                           // Güncelleme sorgusu
+     //                                           var updateQuery = $@"
+     //   UPDATE {catalogValue}.IntegerValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+     //                                           // Güncelleme için parametreler
+     //                                           var parameters = new
+     //                                           {
+     //                                               ID = existingRecord.idA3A4,
+     //                                               PlmIdA2A2 = existingRecord.idA3A6,
+     //                                               AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+     //                                               AttrValue = PlmDbPRoc.AttrValue,
+     //                                               UpdateStamp = DateTime.Now
+     //                                           };
+
+     //                                           // Güncelleme sorgusunu çalıştır
+     //                                           conn.Execute(updateQuery, parameters);
+     //                                       }
+     //                                   }
+     //                                   else
+     //                                   {
+     //                                       var insert = _plm2.Query($"{catalogValue}.IntegerValue").Insert(NewRecord);
+     //                                       if (insert == 1)
+     //                                       {
+     //                                           _plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+     //                                       }
+     //                                   }
+     //                               }
+     //                           }
+     //                       }
+     //                       if (PlmDbPRoc.DefinitionType.Contains("Float"))
+     //                       {
+
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+     //                           if (lastRowList.Count() > 0)
+     //                           {
+     //                               var ID = lastRowList[0].WTPartNo;
+     //                               FloatValue NewRecord = new FloatValue();
+     //                               NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+     //                               NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+     //                               NewRecord.idA3A4 = Convert.ToInt64(ID);
+     //                               NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
+     //                               NewRecord.idA3A5 = 0;
+     //                               NewRecord.wtprecision = -1;
+     //                               NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+     //                               NewRecord.markForDeleteA2 = 0;
+     //                               NewRecord.modifyStampA2 = DateTime.Now;
+     //                               NewRecord.updateCountA2 = 1;
+     //                               NewRecord.updateStampA2 = DateTime.Now;
+     //                               NewRecord.createStampA2 = DateTime.Now;
+     //                               if (importType == "EPM Document")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+     //                               }
+     //                               if (importType == "WTPart")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.part.WTPart";
+     //                               }
+     //                               NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+     //                               NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
+     //                               if (PlmDbPRoc.AttrValue != "")
+     //                               {
+     //                                   var existingRecord = _plm2.Query($"{catalogValue}.FloatValue").Where(new
+     //                                   {
+     //                                       idA3A4 = ID,
+     //                                       idA3A6 = PlmDbPRoc.idA2A2,
+     //                                   }).Get<FloatValue>().FirstOrDefault();
+
+     //                                   if (existingRecord != null)
+     //                                   {
+     //                                       using (SqlConnection conn = new SqlConnection(connectionString))
+     //                                       {
+     //                                           conn.Open();
+
+     //                                           // Güncelleme sorgusu
+     //                                           var updateQuery = $@"
+     //   UPDATE {catalogValue}.FloatValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+     //                                           // Güncelleme için parametreler
+     //                                           var parameters = new
+     //                                           {
+     //                                               ID = existingRecord.idA3A4,
+     //                                               PlmIdA2A2 = existingRecord.idA3A6,
+     //                                               AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+     //                                               AttrValue = PlmDbPRoc.AttrValue,
+     //                                               UpdateStamp = DateTime.Now
+     //                                           };
+
+     //                                           // Güncelleme sorgusunu çalıştır
+     //                                           conn.Execute(updateQuery, parameters);
+     //                                       }
+     //                                   }
+     //                                   else
+     //                                   {
+     //                                       var insert = _plm2.Query($"{catalogValue}.FloatValue").Insert(NewRecord);
+     //                                       if (insert == 1)
+     //                                       {
+     //                                           _plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+     //                                       }
+     //                                   }
+     //                               }
+     //                           }
+     //                       }
+     //                       if (PlmDbPRoc.DefinitionType.Contains("Unit"))
+     //                       {
+
+     //                           if (lastRowControl != null)
+     //                           {
+     //                               lastRowList.Add(lastRowControl);
+     //                           }
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+     //                           if (lastRowList.Count() > 0)
+     //                           {
+     //                               var ID = lastRowList[0].WTPartNo;
+     //                               UnitValue NewRecord = new UnitValue();
+     //                               NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+     //                               NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+     //                               NewRecord.idA3A4 = Convert.ToInt64(ID);
+     //                               NewRecord.classnameA2A2 = "wt.iba.value.FloatValue";
+     //                               NewRecord.idA3A5 = 0;
+     //                               NewRecord.wtprecision = -1;
+     //                               NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+     //                               NewRecord.markForDeleteA2 = 0;
+     //                               NewRecord.modifyStampA2 = DateTime.Now;
+     //                               NewRecord.updateCountA2 = 1;
+     //                               NewRecord.updateStampA2 = DateTime.Now;
+     //                               NewRecord.createStampA2 = DateTime.Now;
+     //                               if (importType == "EPM Document")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+     //                               }
+     //                               if (importType == "WTPart")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.part.WTPart";
+     //                               }
+     //                               NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+     //                               NewRecord.value = float.Parse(PlmDbPRoc.AttrValue);
+     //                               if (PlmDbPRoc.AttrValue != "")
+     //                               {
+     //                                   var existingRecord = _plm2.Query($"{catalogValue}.UnitValue").Where(new
+     //                                   {
+     //                                       idA3A4 = ID,
+     //                                       idA3A6 = PlmDbPRoc.idA2A2,
+     //                                   }).Get<UnitValue>().FirstOrDefault();
+
+     //                                   if (existingRecord != null)
+     //                                   {
+     //                                       using (SqlConnection conn = new SqlConnection(connectionString))
+     //                                       {
+     //                                           conn.Open();
+
+     //                                           // Güncelleme sorgusu
+     //                                           var updateQuery = $@"
+     //   UPDATE {catalogValue}.UnitValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+     //                                           // Güncelleme için parametreler
+     //                                           var parameters = new
+     //                                           {
+     //                                               ID = existingRecord.idA3A4,
+     //                                               PlmIdA2A2 = existingRecord.idA3A6,
+     //                                               AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+     //                                               AttrValue = PlmDbPRoc.AttrValue,
+     //                                               UpdateStamp = DateTime.Now
+     //                                           };
+
+     //                                           // Güncelleme sorgusunu çalıştır
+     //                                           conn.Execute(updateQuery, parameters);
+     //                                       }
+     //                                   }
+     //                                   else
+     //                                   {
+     //                                       var insert = _plm2.Query($"{catalogValue}.UnitValue").Insert(NewRecord);
+     //                                       if (insert == 1)
+     //                                       {
+     //                                           _plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+     //                                       }
+     //                                   }
+     //                               }
+     //                           }
+     //                       }
+     //                       if (PlmDbPRoc.DefinitionType.Contains("Boolean"))
+     //                       {
+
+     //                           if (lastRowControl != null)
+     //                           {
+     //                               lastRowList.Add(lastRowControl);
+     //                           }
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+     //                           if (lastRowList.Count() > 0)
+     //                           {
+     //                               var ID = lastRowList[0].WTPartNo;
+     //                               bool BoolValue = false;
+     //                               if (PlmDbPRoc.AttrValue.ToLower() == "yes")
+     //                               {
+     //                                   BoolValue = true;
+     //                               }
+     //                               else
+     //                               {
+     //                                   BoolValue = false;
+     //                               }
+     //                               BooleanValue NewRecord = new BooleanValue();
+     //                               NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+     //                               NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+     //                               NewRecord.idA3A4 = Convert.ToInt64(ID);
+     //                               NewRecord.classnameA2A2 = "wt.iba.value.BooleanValue";
+     //                               NewRecord.idA3A5 = 0;
+     //                               NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+     //                               NewRecord.markForDeleteA2 = 0;
+     //                               NewRecord.modifyStampA2 = DateTime.Now;
+     //                               NewRecord.updateCountA2 = 1;
+     //                               NewRecord.updateStampA2 = DateTime.Now;
+     //                               NewRecord.createStampA2 = DateTime.Now;
+     //                               if (importType == "EPM Document")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+     //                               }
+     //                               if (importType == "WTPart")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.part.WTPart";
+     //                               }
+     //                               NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+     //                               NewRecord.value = Convert.ToByte(BoolValue);
+     //                               if (PlmDbPRoc.AttrValue != "")
+     //                               {
+     //                                   var existingRecord = _plm2.Query($"{catalogValue}.BooleanValue").Where(new
+     //                                   {
+     //                                       idA3A4 = ID,
+     //                                       idA3A6 = PlmDbPRoc.idA2A2,
+     //                                   }).Get<BooleanValue>().FirstOrDefault();
+
+     //                                   if (existingRecord != null)
+     //                                   {
+     //                                       using (SqlConnection conn = new SqlConnection(connectionString))
+     //                                       {
+     //                                           conn.Open();
+
+     //                                           // Güncelleme sorgusu
+     //                                           var updateQuery = $@"
+     //   UPDATE {catalogValue}.BooleanValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+     //                                           // Güncelleme için parametreler
+     //                                           var parameters = new
+     //                                           {
+     //                                               ID = existingRecord.idA3A4,
+     //                                               PlmIdA2A2 = existingRecord.idA3A6,
+     //                                               AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+     //                                               AttrValue = PlmDbPRoc.AttrValue,
+     //                                               UpdateStamp = DateTime.Now
+     //                                           };
+
+     //                                           // Güncelleme sorgusunu çalıştır
+     //                                           conn.Execute(updateQuery, parameters);
+     //                                       }
+     //                                   }
+     //                                   else
+     //                                   {
+     //                                       var insert = _plm2.Query($"{catalogValue}.BooleanValue").Insert(NewRecord);
+     //                                       if (insert == 1)
+     //                                       {
+     //                                           _plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+     //                                       }
+     //                                   }
+     //                               }
+     //                           }
+     //                       }
+     //                       if (PlmDbPRoc.DefinitionType.Contains("Timestamp"))
+     //                       {
+
+     //                           if (lastRowControl != null)
+     //                           {
+     //                               lastRowList.Add(lastRowControl);
+     //                           }
+
+     //                           var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+     //                           if (lastRowList.Count() > 0)
+     //                           {
+     //                               var ID = lastRowList[0].WTPartNo;
+
+     //                               TimestampValue NewRecord = new TimestampValue();
+     //                               NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+     //                               NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+     //                               NewRecord.idA3A4 = Convert.ToInt64(ID);
+     //                               NewRecord.classnameA2A2 = "wt.iba.value.TimestampValue";
+     //                               NewRecord.idA3A5 = 0;
+     //                               NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+     //                               NewRecord.markForDeleteA2 = 0;
+     //                               NewRecord.modifyStampA2 = DateTime.Now;
+     //                               NewRecord.updateCountA2 = 1;
+     //                               NewRecord.updateStampA2 = DateTime.Now;
+     //                               NewRecord.createStampA2 = DateTime.Now;
+     //                               if (importType == "EPM Document")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+     //                               }
+     //                               if (importType == "WTPart")
+     //                               {
+     //                                   NewRecord.classnamekeyA4 = "wt.part.WTPart";
+     //                               }
+     //                               NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+     //                               NewRecord.value = Convert.ToDateTime(PlmDbPRoc.AttrValue).Date;
+     //                               if (PlmDbPRoc.AttrValue != "")
+     //                               {
+     //                                   var existingRecord = _plm2.Query($"{catalogValue}.TimestampValue").Where(new
+     //                                   {
+     //                                       idA3A4 = ID,
+     //                                       idA3A6 = PlmDbPRoc.idA2A2,
+     //                                   }).Get<TimestampValue>().FirstOrDefault();
+
+     //                                   if (existingRecord != null)
+     //                                   {
+     //                                       using (SqlConnection conn = new SqlConnection(connectionString))
+     //                                       {
+     //                                           conn.Open();
+
+     //                                           // Güncelleme sorgusu
+     //                                           var updateQuery = $@"
+     //   UPDATE {catalogValue}.TimestampValue
+     //   SET
+     //       value = @AttrValueUpper,
+     //       updateStampA2 = @UpdateStamp
+     //   WHERE
+     //       idA3A4 = @ID
+     //       AND idA3A6 = @PlmIdA2A2";
+
+     //                                           // Güncelleme için parametreler
+     //                                           var parameters = new
+     //                                           {
+     //                                               ID = existingRecord.idA3A4,
+     //                                               PlmIdA2A2 = existingRecord.idA3A6,
+     //                                               AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+     //                                               AttrValue = PlmDbPRoc.AttrValue,
+     //                                               UpdateStamp = DateTime.Now
+     //                                           };
+
+     //                                           // Güncelleme sorgusunu çalıştır
+     //                                           conn.Execute(updateQuery, parameters);
+     //                                       }
+     //                                   }
+     //                                   else
+     //                                   {
+     //                                       var insert = _plm2.Query($"{catalogValue}.TimestampValue").Insert(NewRecord);
+     //                                       if (insert == 1)
+     //                                       {
+     //                                           _plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+     //                                       }
+     //                                   }
+     //                               }
+     //                           }
+     //                       }
+
+     //                   }
+					//	catch (Exception ex)
+					//	{
+					//		TempData["ErrorMessage"] = "HATA!" + ex.Message;
+					//	}
 
 	
-					}
+					//}
 
 
 				}
@@ -2099,6 +2150,125 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
             {
                 TempData["ErrorMessage"] = "HATA!" + ex.Message;
                 return RedirectToAction("Index");
+            }
+        }
+
+
+		public void documentFunction(string catalogValue, string valueType,List<dynamic> data, GenericObjectViewModel PlmDbPRoc,string importType,string connectionString)
+		{
+            var IdSeq = _plm2.Query($"{catalogValue}.id_sequence").OrderByDesc("value").FirstOrDefault();
+            if (data.Count() > 0)
+            {
+                long ID = 0;
+                if(importType == "WTPart")
+                {
+                ID = data[0].WTPartNo;
+                }
+                if(importType == "EPM Document")
+                {
+                    ID = data[0].EPMDocNumber;
+                }
+                StringValue NewRecord = new StringValue();
+                NewRecord.hierarchyIDA6 = PlmDbPRoc.HierId;
+                NewRecord.idA2A2 = Convert.ToInt64(IdSeq.value) + 100;
+                NewRecord.idA3A4 = Convert.ToInt64(ID);
+                NewRecord.classnameA2A2 = $"wt.iba.value.{valueType}";
+                NewRecord.idA3A5 = 0;
+                NewRecord.idA3A6 = Convert.ToInt64(PlmDbPRoc.idA2A2);
+                NewRecord.markForDeleteA2 = 0;
+                NewRecord.modifyStampA2 = DateTime.Now;
+                NewRecord.updateCountA2 = 1;
+                NewRecord.updateStampA2 = DateTime.Now;
+                NewRecord.createStampA2 = DateTime.Now;
+
+                if (importType == "EPM Document")
+                {
+                    NewRecord.classnamekeyA4 = "wt.epm.EPMDocument";
+                }
+                if (importType == "WTPart")
+                {
+                    NewRecord.classnamekeyA4 = "wt.part.WTPart";
+                }
+                NewRecord.classnamekeyA6 = PlmDbPRoc.DefinitionType;
+                NewRecord.value = PlmDbPRoc.AttrValue.ToUpper();
+                if(valueType == "StringValue")
+                {
+                NewRecord.value2 = PlmDbPRoc.AttrValue;
+                }
+                if (PlmDbPRoc.AttrValue != "")
+                {
+
+                    var existingRecord = _plm2.Query($"{catalogValue}.{valueType}").Where(new
+                    {
+                        idA3A4 = ID,
+                        idA3A6 = PlmDbPRoc.idA2A2,
+                    }).Get<StringValue>().FirstOrDefault();
+
+                    if (existingRecord != null)
+                    {
+
+                        using (SqlConnection conn = new SqlConnection(connectionString))
+                        {
+                            conn.Open();
+
+
+
+
+                            // Güncelleme sorgusu
+                            var updateQuery = "";
+                            if (valueType == "StringValue")
+                            {
+                                 updateQuery = $@"
+        UPDATE {catalogValue}.{valueType}
+        SET
+            value = @AttrValueUpper,
+            value2 = @AttrValue,
+            updateStampA2 = @UpdateStamp
+        WHERE
+            idA3A4 = @ID
+            AND idA3A6 = @PlmIdA2A2";
+                            }
+                            else
+                            {
+                                 updateQuery = $@"
+        UPDATE {catalogValue}.{valueType}
+        SET
+            value = @AttrValueUpper,
+            updateStampA2 = @UpdateStamp
+        WHERE
+            idA3A4 = @ID
+            AND idA3A6 = @PlmIdA2A2";
+                            }
+       
+
+                            // Güncelleme için parametreler
+                            var parameters = new
+                            {
+                                ID = existingRecord.idA3A4,
+                                PlmIdA2A2 = existingRecord.idA3A6,
+                                AttrValueUpper = PlmDbPRoc.AttrValue.ToUpper(),
+                                AttrValue = PlmDbPRoc.AttrValue,
+                                UpdateStamp = DateTime.Now
+                            };
+
+                            // Güncelleme sorgusunu çalıştır
+                         conn.Execute(updateQuery, parameters);
+                        }
+
+               
+                    }
+                    else
+                    {
+                        var insert = _plm2.Query($"{catalogValue}.{valueType}").Insert(NewRecord);
+
+                        if (insert == 1)
+                        {
+                            _plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
+                        }
+                    }
+
+
+                }
             }
         }
 

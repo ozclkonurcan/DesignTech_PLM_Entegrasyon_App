@@ -134,6 +134,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 
 						// Dosyayı güncelle
 						await System.IO.File.WriteAllTextAsync(path, newAppSettingsText);
+
+
 						TempData["SuccessMessage"] = "Bağlantı başarılı.";
 
 						return Json(appSettingsJson);

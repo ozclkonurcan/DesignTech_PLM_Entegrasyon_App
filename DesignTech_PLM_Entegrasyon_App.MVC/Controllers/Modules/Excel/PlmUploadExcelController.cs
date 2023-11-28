@@ -22,7 +22,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 				}
 
 
-				int pageSize = 8; // Sayfa başına dosya sayısı
+				int pageSize = 12; // Sayfa başına dosya sayısı
 				int totalCount = filePaths.Length;
 				int pageCount = (int)Math.Ceiling((double)totalCount / pageSize);
 

@@ -8,5 +8,6 @@
         public string DefinitionType { get; set; }
         public string idA2A2 { get; set; }
         public string AttrValue { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

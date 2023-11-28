@@ -43,20 +43,20 @@
 
         </div>
 
-        <div class="card-body  pt-2">
+        <div class="card-body  pt-2 h-100">
             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                <table class="table align-middle table-row-dashed fs-6 gy-3 dataTable no-footer" id="excel_table">
+                <table class="table table-striped gy-2 gs-2 bg-gray-400" " id="excel_table">
                     @using (Html.BeginForm("excelproc", "PlmExcelIntegrate", FormMethod.Post, new { id = "excelheadform" }))
                     {
                         <input type="hidden" value="@ViewBag.excelfile" name="excel" id="excelFileName" />
-                        <thead>
+                        <thead >
                             <tr>
                                 @try
                                 {
                                     @foreach (var item in ViewBag.exceldata.Columns)
                                     {
                                             <td>
-                                                <select name="selected_headers[]" colHeadName="@item"  id="headselect_@item" class="form-select multiple_attr m-2">
+                                                <select name="selected_headers[]" colHeadName="@item"  id="headselect_@item" class="form-select-sm multiple_attr m-2 w-100">
                                                     <option value="0">None</option>
                                                     @foreach (var AttrItem in ViewBag.AttrList)
                                                     {
@@ -78,8 +78,8 @@
                             </tr>
                         </thead>
                     }
-                    <thead>
-                        <tr>
+                    <thead class="bg-gray-800" >
+                        <tr class="fw-semibold fs-6 text-white border-bottom-2 border-gray-300">
                             @try
                             {
                                 @foreach (var item in ViewBag.exceldata.Columns)
@@ -157,11 +157,11 @@
 </style>
 
 <script>
-    $('#headselect_Number').attr('disabled', true);
-    $('#headselect_CIFTYON').attr('disabled', true);
-    $('#headselect_ALTERNATIF').attr('disabled', true);
-    $('#headselect_ESKI_NAME').attr('disabled', true);
-    $('#headselect_NAME').attr('disabled', true);
+    $('#headselect_Number').attr('hidden', true);
+    $('#headselect_CIFTYON').attr('hidden', true);
+    $('#headselect_ALTERNATIF').attr('hidden', true);
+    $('#headselect_ESKI_NAME').attr('hidden', true);
+    $('#headselect_NAME').attr('hidden', true);
 
     // $('#headselect_Number').addClass("d-none");
     // $('#headselect_ESKI_NAME').addClass("d-none");
