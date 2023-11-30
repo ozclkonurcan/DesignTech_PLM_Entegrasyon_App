@@ -58,8 +58,31 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
             }
         }
 
+		public IActionResult Log2()
+		{
+			try
+			{
+				string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
+				if (!Directory.Exists(logsPath))
+				{
+					// Logs klasörü yoksa oluşturun
+					Directory.CreateDirectory(logsPath);
+				}
 
-        public ActionResult ViewJsonFiles(string dateFolder)
+				string[] dateFolders = Directory.GetDirectories(logsPath);
+
+				// Tarih klasörlerini ViewBag'e aktarın
+				ViewBag.DateFolders = dateFolders;
+				return View();
+			}
+			catch (Exception)
+			{
+				return View();
+			}
+		}
+
+
+		public ActionResult ViewJsonFiles(string dateFolder)
         {
 
             try {
@@ -79,33 +102,59 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
         }
 
 
-        //public ActionResult ViewLogFile(string dateFolder, string jsonFile)
-        //{
-        //    string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
-        //    string dateFolderPath = Path.Combine(logsPath, dateFolder);
-        //    string jsonFilePath = Path.Combine(dateFolderPath, jsonFile);
+		public ActionResult ViewJsonFiles2(string dateFolder)
+		{
 
-        //    string jsonContent = System.IO.File.ReadAllText(jsonFilePath);
+			try
+			{
 
-        //    // JSON içeriği ViewBag'e aktarın
-        //    ViewBag.JsonContent = jsonContent;
+				string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
+				string dateFolderPath = Path.Combine(logsPath, dateFolder);
+				string[] jsonFiles = Directory.GetFiles(dateFolderPath, "*.json");
 
-        //    return View();
-        //}
+				// JSON dosyalarını ViewBag'e aktarın
+				ViewBag.DateFolder = dateFolderPath;
+				ViewBag.JsonFiles = jsonFiles;
+				return View();
+			}
+			catch (Exception) { return View(); }
 
 
-        public class LogEntry
+
+
+		}
+
+
+		//public ActionResult ViewLogFile(string dateFolder, string jsonFile)
+		//{
+		//    string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
+		//    string dateFolderPath = Path.Combine(logsPath, dateFolder);
+		//    string jsonFilePath = Path.Combine(dateFolderPath, jsonFile);
+
+		//    string jsonContent = System.IO.File.ReadAllText(jsonFilePath);
+
+		//    // JSON içeriği ViewBag'e aktarın
+		//    ViewBag.JsonContent = jsonContent;
+
+		//    return View();
+		//}
+
+
+		public class LogEntry
         {
             public string Timestamp { get; set; }
             public LogMessage Message { get; set; }
             public Dictionary<string, string> Properties { get; set; }
         }
 
-      
-        public class ExcelLogEntry
+
+
+		public class ExcelLogEntry
         {
-            public string ExcelDosya { get; set; }
-            public string Hata { get; set; }
+            public string ExcelDosya { get; set; } = string.Empty;
+            public string Hata { get; set; } = string.Empty;
+			public string Text { get; set; } = string.Empty;
+            public string Operation { get; set; } = string.Empty;
             public int Satir { get; set; }
             public int Sutun { get; set; }
             public bool Durum { get; set; }
@@ -117,23 +166,29 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
             }
         }
 
+
+
         public class LogMessage
         {
-            public string ExcelDosya { get; set; }
-            public string Hata { get; set; }
+            public string ExcelDosya { get; set; } = string.Empty;
+            public string Text { get; set; } = string.Empty;
+            public string Operation { get; set; } = string.Empty;
+            public string Hata { get; set; } = string.Empty;
             public int Satir { get; set; }
             public int Sutun { get; set; }
-            public string islemTarihi { get; set; }
+            public string islemTarihi { get; set; } = string.Empty;
             public bool Durum { get; set; }
         }
 
         public class LogData
         {
-            public string ExcelDosya { get; set; }
-            public string Hata { get; set; }
+            public string ExcelDosya { get; set; } = string.Empty;
+			public string Text { get; set; } = string.Empty;
+			public string Operation { get; set; } = string.Empty;
+            public string Hata { get; set; } = string.Empty;
             public int Satir { get; set; }
             public int Sutun { get; set; }
-            public string islemTarihi { get; set; }
+            public string islemTarihi { get; set; } = string.Empty;
             public bool Durum { get; set; }
         }
 
@@ -169,7 +224,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
                     {
                         string jsonContent = streamReader.ReadToEnd();
 
-                        // JSON verilerini ayrıştırma
+
+
                         JArray jsonArray = JArray.Parse("[" + jsonContent + "]");
                         foreach (var jsonEntry in jsonArray.Children())
                         {
@@ -181,6 +237,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
                                 var excelLogEntry = new ExcelLogEntry(logEntry.Message.Hata)
                                 {
                                     ExcelDosya = logEntry.Message.ExcelDosya,
+                                    Text = logEntry.Message.Text,
+                                    Operation = logEntry.Message.Operation,
                                     Hata = logEntry.Message.Hata,
                                     Satir = logEntry.Message.Satir,
                                     Sutun = logEntry.Message.Sutun,
@@ -222,9 +280,96 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
          
         }
 
-  
+		public ActionResult ViewLogFile2(string dateFolder, string jsonFile)
+		{
+			try
+			{
+				if (string.IsNullOrEmpty(dateFolder) || string.IsNullOrEmpty(jsonFile))
+				{
+					TempData["ErrorMessage"] = "Hata oluştu";
+					return RedirectToAction("Index");
+				}
 
-        public ActionResult UpdateLogControlJson(LogUpdateRequest logUpdateRequest)
+				string logsPath = "wwwroot\\Logs";
+				string dateFolderPath = Path.Combine(dateFolder);
+				string jsonFilePath = Path.Combine(dateFolderPath, jsonFile);
+
+				if (!System.IO.File.Exists(jsonFilePath))
+				{
+					TempData["ErrorMessage"] = "Belirtilen JSON dosyası bulunamadı.";
+					return RedirectToAction("Index");
+				}
+
+				var excelLogEntries = new List<ExcelLogEntry>();
+
+				// Dosyayı okuma işlemi için try-catch kullanarak hataları ele alın
+				// Dosyayı okuma işlemi için try-catch kullanarak hataları ele alın
+				try
+				{
+					using (var fileStream = System.IO.File.Open(jsonFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+					using (var streamReader = new StreamReader(fileStream))
+					{
+						string jsonContent = streamReader.ReadToEnd();
+
+                 
+
+						JArray jsonArray = JArray.Parse("[" + jsonContent + "]");
+						foreach (var jsonEntry in jsonArray.Children())
+						{
+							try
+							{
+								var logEntry = jsonEntry.ToObject<LogEntry>();
+
+								// LogEntry sınıfını ExcelLogEntry sınıfına dönüştür
+								var excelLogEntry = new ExcelLogEntry(logEntry.Message.Hata)
+								{
+									ExcelDosya = logEntry.Message.ExcelDosya,
+									Text = logEntry.Message.Text,
+									Operation = logEntry.Message.Operation,
+									Hata = logEntry.Message.Hata,
+									Satir = logEntry.Message.Satir,
+									Sutun = logEntry.Message.Sutun,
+									islemTarihi = logEntry.Timestamp,
+									Durum = logEntry.Message.Durum
+								};
+
+								excelLogEntries.Add(excelLogEntry);
+							}
+							catch (JsonReaderException ex)
+							{
+								TempData["ErrorMessage"] = "UYARI ! " + ex.Message;
+								return RedirectToAction("Index");
+							}
+							finally
+							{
+								streamReader.Close();
+								fileStream.Close();
+							}
+						}
+
+					}
+				}
+				catch (System.IO.IOException ex)
+				{
+					// Dosya erişimi hatası oluştuğunda yapılacak işlemler
+				}
+
+
+				// Verileri tazelemek için aynı sayfayı tekrar yükle
+				ViewBag.jsonFilePath = jsonFilePath;
+				ViewBag.excelLogEntries = excelLogEntries;
+				return View(excelLogEntries);
+			}
+			catch (Exception)
+			{
+				return View();
+			}
+
+		}
+
+
+
+		public ActionResult UpdateLogControlJson(LogUpdateRequest logUpdateRequest)
         {
             try
             {

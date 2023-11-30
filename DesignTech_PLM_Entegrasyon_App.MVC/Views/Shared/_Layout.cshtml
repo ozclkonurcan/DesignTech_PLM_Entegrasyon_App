@@ -9,7 +9,7 @@
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
 	<!--end::Fonts-->
 	<!--begin::Vendor Stylesheets(used for this page only)-->
-	<link href="/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
+
 	<link href="/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
 	<!--end::Vendor Stylesheets-->
 	<!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
@@ -17,7 +17,13 @@
 	<link href="/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
 	<!--end::Global Stylesheets Bundle-->
 	<link href="/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
-	<script src="/assets/plugins/global/plugins.bundle.js"></script>
+
+	<link href="/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css"
+		  rel="stylesheet"
+		  type="text/css" />
+	@* <script src="/assets/plugins/global/plugins.bundle.js"></script> *@
+
+
 
 
 
@@ -693,7 +699,24 @@
 													<span class="path4"></span>
 												</i>
 											</span>
-											<span class="menu-title">Log</span>
+											<span class="menu-title">Log1</span>
+										</a>
+										<!--end:Menu link-->
+									</div>
+									<!--end:Menu item-->
+									<!--begin:Menu item-->
+									<div class="menu-item">
+										<!--begin:Menu link-->
+										<a class="menu-link" href="@Url.Action("Log2", "Log")">
+											<span class="menu-icon">
+												<i class="ki-duotone ki-code fs-2">
+													<span class="path1"></span>
+													<span class="path2"></span>
+													<span class="path3"></span>
+													<span class="path4"></span>
+												</i>
+											</span>
+											<span class="menu-title">Log2</span>
 										</a>
 										<!--end:Menu link-->
 									</div>
@@ -3243,12 +3266,15 @@
 
 
 	<!-- begin::Global Javascript Bundle (mandatory for all pages) -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="/assets/js/scripts.bundle.js"></script>
+	<script src="/assets/plugins/global/plugins.bundle.js"></script>
+	<script src="/assets/plugins/custom/flot/flot.bundle.js"></script>
 	<!-- end::Global Javascript Bundle -->
 	<!-- begin::Vendors Javascript (used for this page only) -->
+	<script src="/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
 	<script src="/dropzoneJS/dropzone.js"></script>
 	<script src="/dropzoneJS/dropzoneStockCodeUpdate.js"></script>
-	<script src="/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
 	<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
 	<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
 	<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
@@ -3263,6 +3289,7 @@
 	<script src="/assets/plugins/custom/datatables/datatables.bundle.js"></script>
 	<!-- end::Vendors Javascript -->
 	<!-- begin::Custom Javascript (used for this page only) -->
+	<script src="/assets/js/custom/apps/calendar/calendar.js"></script>
 	<script src="/assets/js/widgets.bundle.js"></script>
 	<script src="/assets/js/custom/widgets.js"></script>
 	<script src="/assets/js/custom/apps/chat/chat.js"></script>
@@ -3273,6 +3300,7 @@
 	<script src="/assets/js/custom/authentication/sign-up/general.js"></script>
 	<!-- Sonradan Eklediklerim -->
 	<script src="/assets/js/custom/apps/ecommerce/sales/listing.js"></script>
+
 	<!-- end::Custom Javascript -->
 	@await RenderSectionAsync("Scripts", required: false)
 

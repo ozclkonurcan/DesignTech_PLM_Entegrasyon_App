@@ -1,4 +1,21 @@
-﻿@if (ViewBag.JsonFiles != null)
+﻿
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth'
+        });
+
+   
+        calendar.render();
+    });
+
+</script>
+@* <div id='calendar'></div> *@
+
+@if (ViewBag.JsonFiles != null)
 {
     <ul>
         @foreach (var jsonFile in ViewBag.JsonFiles)
@@ -14,3 +31,114 @@ else
 {
     <p>No JSON files found in this date folder.</p>
 }
+
+
+
+
+
+
+
+@* 
+
+
+
+
+@{
+    int daysInMonth = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+
+}
+@if (ViewBag.JsonFiles != null)
+{
+    <ul>
+
+
+        <li>
+
+        </li>
+
+    </ul>
+
+
+
+    <div id="kt_calendar_app" class="fc fc-media-screen fc-direction-ltr fc-theme-standard">
+        <div class="fc-header-toolbar fc-toolbar fc-toolbar-ltr"><div class="fc-toolbar-chunk"><div class="fc-button-group"><button type="button" title="Previous month" aria-pressed="false" class="fc-prev-button fc-button fc-button-primary"><span class="fc-icon fc-icon-chevron-left"></span></button><button type="button" title="Next month" aria-pressed="false" class="fc-next-button fc-button fc-button-primary"><span class="fc-icon fc-icon-chevron-right"></span></button></div><button type="button" title="This month" disabled="" aria-pressed="false" class="fc-today-button fc-button fc-button-primary">today</button></div><div class="fc-toolbar-chunk"><h2 class="fc-toolbar-title" id="fc-dom-1">November 2023</h2></div><div class="fc-toolbar-chunk"><div class="fc-button-group"><button type="button" title="month view" aria-pressed="true" class="fc-dayGridMonth-button fc-button fc-button-primary fc-button-active">month</button><button type="button" title="week view" aria-pressed="false" class="fc-timeGridWeek-button fc-button fc-button-primary">week</button><button type="button" title="day view" aria-pressed="false" class="fc-timeGridDay-button fc-button fc-button-primary">day</button></div></div></div><div aria-labelledby="fc-dom-1" class="fc-view-harness fc-view-harness-active" style="height: 888.889px;">
+            <div class="fc-daygrid fc-dayGridMonth-view fc-view">
+                <table role="grid" class="fc-scrollgrid  fc-scrollgrid-liquid">
+                    <thead role="rowgroup"><tr role="presentation" class="fc-scrollgrid-section fc-scrollgrid-section-header "><th role="presentation"><div class="fc-scroller-harness"><div class="fc-scroller" style="overflow: hidden;"><table role="presentation" class="fc-col-header " style="width: 1197px;"><colgroup></colgroup><thead role="presentation"><tr role="row"><th role="columnheader" class="fc-col-header-cell fc-day fc-day-sun"><div class="fc-scrollgrid-sync-inner"><a aria-label="Sunday" class="fc-col-header-cell-cushion ">Sun</a></div></th><th role="columnheader" class="fc-col-header-cell fc-day fc-day-mon"><div class="fc-scrollgrid-sync-inner"><a aria-label="Monday" class="fc-col-header-cell-cushion ">Mon</a></div></th><th role="columnheader" class="fc-col-header-cell fc-day fc-day-tue"><div class="fc-scrollgrid-sync-inner"><a aria-label="Tuesday" class="fc-col-header-cell-cushion ">Tue</a></div></th><th role="columnheader" class="fc-col-header-cell fc-day fc-day-wed"><div class="fc-scrollgrid-sync-inner"><a aria-label="Wednesday" class="fc-col-header-cell-cushion ">Wed</a></div></th><th role="columnheader" class="fc-col-header-cell fc-day fc-day-thu"><div class="fc-scrollgrid-sync-inner"><a aria-label="Thursday" class="fc-col-header-cell-cushion ">Thu</a></div></th><th role="columnheader" class="fc-col-header-cell fc-day fc-day-fri"><div class="fc-scrollgrid-sync-inner"><a aria-label="Friday" class="fc-col-header-cell-cushion ">Fri</a></div></th><th role="columnheader" class="fc-col-header-cell fc-day fc-day-sat"><div class="fc-scrollgrid-sync-inner"><a aria-label="Saturday" class="fc-col-header-cell-cushion ">Sat</a></div></th></tr></thead></table></div></div></th></tr></thead>
+                    <tbody role="rowgroup">
+                        <tr role="presentation" class="fc-scrollgrid-section fc-scrollgrid-section-body  fc-scrollgrid-section-liquid">
+                            <td role="presentation">
+                                <div class="fc-scroller-harness fc-scroller-harness-liquid">
+                                    <div class="fc-scroller fc-scroller-liquid-absolute" style="overflow: hidden auto;">
+                                        <div class="fc-daygrid-body fc-daygrid-body-balanced " style="width: 1197px;">
+                                            <table role="presentation" class="fc-scrollgrid-sync-table" style="width: 1197px; height: 840px;">
+                                                <colgroup></colgroup>
+                                                <tbody role="presentation">
+                                                    @for (int day = 1; day <= daysInMonth; day++)
+                                                    {
+                                                        <tr role="row">
+
+                                                            @foreach (var jsonFile in ViewBag.JsonFiles)
+                                                            {
+                                                                var folderName = System.IO.Path.GetFileName(jsonFile);
+                                                                var dayPart = folderName.Substring(0, folderName.IndexOf('-'));
+
+                                                                int dayOfMonth;
+                                                                if (int.TryParse(dayPart, out dayOfMonth) && dayOfMonth == day)
+                                                                {
+                                                                    <td role="gridcell" class="fc-daygrid-day fc-day fc-day-wed fc-day-past" data-date="2023-11-01" aria-labelledby="fc-dom-8">
+                                                                        <div class="fc-daygrid-day-frame fc-scrollgrid-sync-inner">
+                                                                            <div class="fc-daygrid-day-top">
+                                                                                <a id="fc-dom-8" class="fc-daygrid-day-number" title="Go to November 1, 2023" data-navlink="" tabindex="0">@dayOfMonth</a>
+                                                                            </div>
+
+
+
+                                                                            <div class="fc-daygrid-day-events">
+                                                                                <div class="fc-daygrid-event-harness" style="margin-top: 0px;">
+                                                                                    <a class="fc-daygrid-event fc-daygrid-block-event fc-h-event fc-event fc-event-draggable fc-event-resizable fc-event-start fc-event-end fc-event-past border-success bg-success text-inverse-success" tabindex="0" href='@Url.Action("ViewLogFile", new { dateFolder = ViewBag.DateFolder, jsonFile = folderName })'>
+                                                                                        <div class="fc-event-main">
+                                                                                            <div class="fc-event-main-frame">
+                                                                                                <div class="fc-event-title-container">
+                                                                                                    <div class="fc-event-title fc-sticky">@folderName</div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="fc-event-resizer fc-event-resizer-end"></div>
+                                                                                    </a>
+                                                                                </div>
+                                                                                <div class="fc-daygrid-day-bottom" style="margin-top: 0px;"></div>
+                                                                            </div>
+
+
+                                                                            <div class="fc-daygrid-day-bg"></div>
+                                                                        </div>
+                                                                    </td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td role="gridcell" class="fc-daygrid-day fc-day fc-day-wed fc-day-past" data-date="2023-11-01" aria-labelledby="fc-dom-8"></td>
+                                                                }
+                                                            }
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+    <p>No JSON files found in this date folder.</p>
+}
+ *@
+

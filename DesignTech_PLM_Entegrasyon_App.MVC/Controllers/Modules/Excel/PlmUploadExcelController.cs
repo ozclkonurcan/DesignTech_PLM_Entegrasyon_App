@@ -1,10 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 {
 	public class PlmUploadExcelController : Controller
 	{
+        private readonly IConfiguration _configuration;
+
+		public PlmUploadExcelController(IConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
+
 		public IActionResult Index(int page = 1, string search = "")
 		{
 			try
@@ -60,6 +69,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
         {
             try
             {
+				LogService logService = new LogService(_configuration);
+
+				var randomName = "";
                 foreach (var formData in formFile)
                 {
                     if (formData.Length > 0)
@@ -70,11 +82,11 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         // İzin verilen dosya uzantıları
                         string[] allowedExtensions = { ".xls", ".xlsx" }; // Sadece Excel dosyalarına izin veriyoruz
 
-                        if (allowedExtensions.Contains(fileExtension))
+						if (allowedExtensions.Contains(fileExtension))
                         {
                             var originalFileName = Path.GetFileNameWithoutExtension(formData.FileName);
                             var timeStamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm");
-                            var randomName = $"{originalFileName}_{timeStamp}{fileExtension}";
+                            randomName = $"{originalFileName}_{timeStamp}{fileExtension}";
                             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\ExcelInformation", randomName);
 
                             using (var stream = new FileStream(path, FileMode.Create))
@@ -91,7 +103,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                 }
 
                 TempData["SuccessMessage"] = "Excel dosyaları başarıyla yüklendi.";
-                Log.Error("Upload Excel File Message: Başarılı - Kullanıcı : Onur ÖZÇELİK" + " Kullanıcı ID : 1");
+                logService.AddNewLogEntry("Excel dosyaları başarıyla yüklendi." , randomName , "Yüklendi");
+                //Log.Information("Excel dosyaları başarıyla yüklendi.FileName:"+randomName+"Operation:Yüklendi") ;
                 return RedirectToAction("Index", "PlmUploadExcel");
             }
             catch (Exception ex)
@@ -143,12 +156,16 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 		{
 			try
 			{
+				LogService logService = new LogService(_configuration);
+
 				string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelInformation");
 				string filePath = Path.Combine(directoryPath, fileName);
 
 				if (System.IO.File.Exists(filePath))
 				{
 					System.IO.File.Delete(filePath);
+					logService.AddNewLogEntry("Excel dosyası silindi.", fileName, "Silme");
+					//Log.Information("Excel dosyası silindi.FileName:"+fileName+"Operation:Silme");
 					TempData["SuccessMessage"] = "Dosya başarıyla silindi.";
 
 

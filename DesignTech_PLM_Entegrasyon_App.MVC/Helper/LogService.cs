@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Serilog;
 using System.Globalization;
 using static DesignTech_PLM_Entegrasyon_App.MVC.Controllers.LogController;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography;
 using ExcelDataReader;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using SqlKata.Execution;
+using Azure;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
 {
@@ -88,8 +89,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
 
 
 
-        public void AddNewLogEntry(string message)
+        public void AddNewLogEntry(string message,string fileName, string operation)
         {
+
             currentMonthFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logs", DateTime.Now.ToString("MMMM-yyyy", CultureInfo.InvariantCulture));
             string dateFormatted = DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
             logFileName = Path.Combine(currentMonthFolder, dateFormatted + ".json");
@@ -99,7 +101,21 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
                 .WriteTo.File(new CustomJsonFormatter(), logFileName, shared: true)
                 .CreateLogger();
 
-            Log.Information(message);
+			var logObject = new
+			{
+					ExcelDosya = fileName,
+					Text = message,
+					Operation = operation,
+					Durum = true // veya ilgili durum bilgisini verin
+				,
+
+				Properties = new { }
+			};
+
+			string json = JsonConvert.SerializeObject(logObject);
+
+			Log.Information(json);
+
             Log.CloseAndFlush();
         }
 

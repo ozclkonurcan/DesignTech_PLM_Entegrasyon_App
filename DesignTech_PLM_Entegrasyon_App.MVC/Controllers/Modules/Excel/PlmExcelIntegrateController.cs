@@ -2294,7 +2294,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     LogService logService = new LogService(_configuration);
                     foreach (var hata in hataListesi)
                     {
-                        logService.AddNewLogEntry(hata);
+                        //logService.AddNewLogEntry(hata);
                         logService.ErrorFileManagement(hata, "errorFile.json");
                         //Log.Information(hata);
                     }

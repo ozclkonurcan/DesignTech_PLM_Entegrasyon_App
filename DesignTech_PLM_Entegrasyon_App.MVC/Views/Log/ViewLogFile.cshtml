@@ -1,113 +1,4 @@
-﻿@* @using DesignTech_PLM_Entegrasyon_App.MVC.Models.Log;
-@using static DesignTech_PLM_Entegrasyon_App.MVC.Controllers.LogController
-
-@model List<ExcelLogEntry>
-
-@{
-    ViewBag.Title = "View JSON Log Files";
-}
-
-<h2>JSON Log Files</h2>
-<span class="badge py-3 px-4 fs-7 badge-light-primary"> @ViewBag.jsonFilePath </span>
-
-@if (Model != null && Model.Any())
-{
-    <form asp-action="UpdateLogControlJson" asp-controller="Log" method="post">
-        <button type="submit" class="btn btn-success btn-sm">Toplu Güncelle</button>
-        <div class="table-responsive">
-            <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="ExcelLogTables">
-                <thead>
-                    <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                        <th>Seç</th>
-                        <th>Dosya İsmi</th>
-                        <th>Hata</th>
-                        <th>Satır</th>
-                        <th>Sütun</th>
-                        <th>İşlem Tarihi</th>
-                        <th>Durum</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var logEntry in Model)
-                    {
-                        <tr class="alert alert-danger">
-                            <td>
-                                <input type="checkbox" name="islemTarihi" value="@logEntry.islemTarihi" />
-                            </td>
-                            <td><span class="badge py-3 px-4 fs-7 badge-light-primary">@logEntry.ExcelDosya</span>
-                            </td>
-                            @if (logEntry.Durum)
-                            {
-                                <td><span class="badge py-3 px-4 fs-7 badge-light-danger">@logEntry.Hata</span></td>
-                            }
-                            else
-                            {
-                                <td><span class="badge py-3 px-4 fs-7 badge-light-success">@logEntry.Hata</span></td>
-                            }
-                            <td>@logEntry.Satir
-                            </td>
-                            <td>@logEntry.Sutun
-                            </td>
-                            <td>@logEntry.islemTarihi
-                            </td>
-                            <td>
-                                    @if (logEntry.Durum)
-                                    {
-                                        <input hidden name="ExcelDosya" value="@logEntry.ExcelDosya" />
-                                        <input hidden name="Hata" value="@logEntry.Hata" />
-                                        <input hidden name="Satir" value="@logEntry.Satir" />
-                                        <input hidden name="Sutun" value="@logEntry.Sutun" />
-                                        <input hidden name="LogFileName" value="@ViewBag.jsonFilePath" />
-                                        <input hidden name="islemTarihi" value="@logEntry.islemTarihi" />
-                                        <input hidden name="Durum" value="false" />
-                                        <button class="btn btn-secondary btn-sm" type="submit">Hatalı</button>
-                                    }
-                                    else
-                                    {
-                                        <input hidden name="ExcelDosya" value="@logEntry.ExcelDosya" />
-                                        <input hidden name="Hata" value="@logEntry.Hata" />
-                                        <input hidden name="Satir" value="@logEntry.Satir" />
-                                        <input hidden name="Sutun" value="@logEntry.Sutun" />
-                                        <input hidden name="LogFileName" value="@ViewBag.jsonFilePath" />
-                                        <input hidden name="islemTarihi" value="@logEntry.islemTarihi" />
-                                        <input hidden name="Durum" value="true" />
-
-                                        <button class="btn btn-sm btn-success" type="submit">Hatasız</button>
-                                    }
-
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </form>
-}
-else
-{
-    <p>No JSON files found in this date folder.</p>
-}
-
-@section scripts {
-    <script>
-        $(document).ready(function () {
-            $('#ExcelLogTables').DataTable({
-                "pageLength": 5,
-                "info": false,
-                "ordering": false,
-                "dom": 'Bfrtip',
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.11.6/i18n/Turkish.json",
-                    "search": "",
-                    "searchPlaceholder": "Log Ara ...",
-                    "sInfo": "Toplam _TOTAL_ kayıt arasından _START_ - _END_ arasındaki kayıtlar gösteriliyor",
-                    "sInfoFiltered": "(toplam _MAX_ kayıttan süzülmüş)",
-                }
-            });
-        });
-    </script>
-} *@
-
+﻿
 
 
 @using DesignTech_PLM_Entegrasyon_App.MVC.Models.Log;
@@ -129,12 +20,9 @@ else
             <thead>
                 <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                     <th>Dosya İsmi</th>
-                    <th>Hata</th>
-                    <th>Satır</th>
-                    <th>Sütun</th>
+                    <th>Mesaj</th>
+                    <th>İşlem</th>
                     <th>İşlem Tarihi</th>
-                    <th>Durum</th>
-                     <th>Detay</th> 
                 </tr>
             </thead>
             <tbody>
@@ -142,48 +30,24 @@ else
                 {
                     <tr class="alert alert-danger">
                         <td><span class="badge py-3 px-4 fs-7 badge-light-primary">@logEntry.ExcelDosya</span></td>
-                        @if (logEntry.Durum)
+                     
+                        
+                            <td>@logEntry.Text</td>
+                        
+                        @if(logEntry.Operation == "Yüklendi")
                         {
-                            <td> <span class="badge py-3 px-4 fs-7 badge-light-danger"> @logEntry.Hata </span></td>
+                            <td>
+                                <span class="badge py-3 px-4 fs-7 badge-light-success">@logEntry.Operation</span>
+
+                            </td>
                         }
-                        else
+                        @if (logEntry.Operation == "Silme")
                         {
-                            <td> <span class="badge py-3 px-4 fs-7 badge-light-success"> @logEntry.Hata </span></td>
+                            <td> <span class="badge py-3 px-4 fs-7 badge-light-danger"> @logEntry.Operation</span></td>
                         }
-                        <td>@logEntry.Satir</td>
-                        <td>@logEntry.Sutun</td>
                         <td>@logEntry.islemTarihi</td>
 
-                        <td id="kekwtd2">
-                            <form asp-action="updateLogControlJson" asp-controller="Log">
-                                @if (logEntry.Durum)
-                                {
-                                    <input hidden id="ExcelDosya" name="ExcelDosya" value="@logEntry.ExcelDosya" />
-                                    <input hidden id="Hata" name="Hata" value="@logEntry.Hata" />
-                                    <input hidden id="Satir" name="Satir" value="@logEntry.Satir" />
-                                    <input hidden id="Sutun" name="Sutun" value="@logEntry.Sutun" />
-                                    <input hidden id="LogFileName" name="LogFileName" value="@ViewBag.jsonFilePath" />
-                                    <input hidden id="islemTarihi" name="islemTarihi" value="@logEntry.islemTarihi" />
-                                    <input hidden id="Durum" name="Durum" value="false" />
-                                    <button class="btn btn-secondary btn-sm" type="submit">Hatalı</button>
-                                }
-                                else
-                                {
-                                    <input hidden id="ExcelDosya" name="ExcelDosya" value="@logEntry.ExcelDosya" />
-                                    <input hidden id="Hata" name="Hata" value="@logEntry.Hata" />
-                                    <input hidden id="Satir" name="Satir" value="@logEntry.Satir" />
-                                    <input hidden id="Sutun" name="Sutun" value="@logEntry.Sutun" />
-                                    <input hidden id="LogFileName" name="LogFileName" value="@ViewBag.jsonFilePath" />
-                                    <input hidden id="islemTarihi" name="islemTarihi" value="@logEntry.islemTarihi" />
-                                    <input hidden id="Durum" name="Durum" value="true" />
-
-                                    <button class="btn btn-sm btn-success" type="submit">Hatasız</button>
-                                }
-                            </form>
-                        </td>
-                        <td>
-                            <div class="btn btn-info btn-sm detail-button">Detay</div>
-                        </td> 
+                  
                     </tr>
 
                 }
@@ -192,29 +56,6 @@ else
     </div>
 
 
-    <!-- Detay Modal -->
-    <div class="modal fade" tabindex="-1" id="excelDetailModal">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="tabloSatirNo"></h3>
-
-                    <!--begin::Close-->
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
-                    </div>
-                    <!--end::Close-->
-                </div>
-
-                <div class="modal-body" id="excelDetailContent">
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Kapat</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 
 
@@ -227,27 +68,11 @@ else
 }
 
 
+
+
+
+
 @section scripts {
-
-   
-
-    @*   <script>
-        $(document).ready(function () {
-            $('#ExcelLogTables').DataTable({
-                "pageLength": 5,
-                "info": false,
-                "ordering": false,
-                "dom": 'Bfrtip',
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.11.6/i18n/Turkish.json",
-                    "search": "",
-                    "searchPlaceholder": "Log Ara ...",
-                    "sInfo": "Toplam _TOTAL_ kayıt arasından _START_ - _END_ arasındaki kayıtlar gösteriliyor",
-                    "sInfoFiltered": "(toplam _MAX_ kayıttan süzülmüş)",
-                }
-            });
-        });
-    </script> *@
 
     <script>
         $(document).ready(function () {
@@ -265,125 +90,8 @@ else
                 }
             });
 
-            // Detay düğmelerini tıklamak için olay ekle
-            $('.detail-button').click(function () {
-                var tr = $(this).closest('tr'); // tıklanan satırı bul
-                var td = tr.find('td:eq(5)'); // 6. td, yani form bulunan td
-                var excelFileName = td.find('input:eq(0)').val();
-                var hataNo = td.find('input:eq(1)').val();
-                var satirNo = td.find('input:eq(2)').val();
-                var sutunNo = td.find('input:eq(3)').val();
-                var islemTarihi = td.find('input:eq(5)').val();
-                var durum = td.find('input:eq(6)').val();
+  
 
-                // var excelFileName = $('#ExcelDosya').val();
-                // var satirNo = $('#Satir').val();
-                // var sutunNo = $('#Sutun').val();
-                // var hataNo = $('#Hata').val();
-                var tabloSatirNo = +satirNo+1;
-
-                // Excel detaylarını yükle ve modal içine yerleştir
-                $.ajax({
-                    url: '/Log/GetExcelDetail', // Excel detaylarını getiren bir işlem oluşturun
-                    method: 'GET',
-                    data: { excelFileName: excelFileName, satirNo: satirNo, sutunNo: sutunNo, hataNo: hataNo },
-
-                    success: function (data) {
-
-                        let basliklar = data.basliklar;
-                        let veriler = data.veriler;
-
-                        let table = `
-                  <div class="table-responsive"><table class="table">
-                    <tr>
-                      ${basliklar.map(b => `<th>${b}</th>`).join('')}
-                    </tr>
-                `;
-
-                        veriler.forEach(satir => {
-
-                            let satirHtml = `<tr>`;
-
-                            satir.forEach(hucre => {
-
-                                if (hucre === Object(hucre)) {
-                                    hucre = "N/A"; // veya "N/A"
-                                }
-
-                                // if(hucre.contains(hataNo)){
-                                //     hucre = `<span class="badge py-3 px-4 fs-7 badge-light-danger">${hataNo}</span>`
-                                // }
-
-                                if (
-                                    hucre === hataNo
-                                ) {
-                                    satirHtml += `<td><span class="badge py-3 px-4 fs-7 badge-light-danger">${hucre}</span></td>`;
-                                } else {
-                                    satirHtml += `<td>${hucre}</td>`;
-                                }
-
-
-                            });
-
-                            satirHtml += `</tr>`;
-
-                            table += satirHtml;
-
-                        });
-
-                        table += `</table></div>`;
-
-                        $('#excelDetailContent').html(table);
-                        $('#tabloSatirNo').html(`<span class="badge py-3 px-4 fs-7 badge-light-info">Excel Satır Numarası : ${tabloSatirNo} </span>`);
-                        $('#excelDetailModal').modal('show'); // Modalı aç
-                    },
-                    error: function () {
-                        alert('Excel detayları alınamadı.');
-                    }
-                });
-            });
-
-
-            // $('.detail-button').click(function () {
-            //     var excelFileName = $('#ExcelDosya').val();
-            //     var sutunNo = $('#Sutun').val();
-            //     var hataNo = $('#Hata').val();
-            //     var satirNo = $('#Satir').val();
-
-            //     // Excel detaylarını yükle ve modal içine yerleştir
-            //     $.ajax({
-            //         url: '/Log/GetExcelDetail', // Excel detaylarını getiren bir işlem oluşturun
-            //         method: 'GET',
-            //         data: { excelFileName: excelFileName, satirNo: satirNo, sutunNo: sutunNo, hataNo: hataNo },
-            //         success: function (data) {
-            //             if (Array.isArray(data) && data.length > 0) {
-            //                 var tableHtml = '<table class="table"><thead><tr><th>Satır No</th>';
-            //                 for (var i = 0; i < data[0].Veri.length; i++) {
-            //                     tableHtml += '<th>Sütun ' + (i + 1) + '</th>';
-            //                 }
-            //                 tableHtml += '</tr></thead><tbody>';
-
-            //                 data.forEach(function (item) {
-            //                     tableHtml += '<tr><td>' + item.SatirNo + '</td>';
-            //                     item.Veri.forEach(function (veri) {
-            //                         tableHtml += '<td>' + veri + '</td>';
-            //                     });
-            //                     tableHtml += '</tr>';
-            //                 });
-
-            //                 tableHtml += '</tbody></table>';
-            //                 $('#kt_modal_1').html(tableHtml);
-            //             } else {
-            //                 $('#kt_modal_1').html(data);
-            //             }
-
-            //             $('#kt_modal_1').modal('show'); // Modalı aç
-            //         },
-            //         error: function () {
-            //             alert('Excel detayları alınamadı.');
-            //         }
-            //     });
-            // });
         });
     </script>
 
