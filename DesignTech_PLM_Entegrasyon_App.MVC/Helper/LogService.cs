@@ -91,31 +91,38 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
 
         public void AddNewLogEntry(string message,string fileName, string operation)
         {
+            try
+            {
 
+          
             currentMonthFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logs", DateTime.Now.ToString("MMMM-yyyy", CultureInfo.InvariantCulture));
             string dateFormatted = DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
             logFileName = Path.Combine(currentMonthFolder, dateFormatted + ".json");
+                var logObject = new
+                {
+                    ExcelDosya = fileName,
+                    Text = message,
+                    Operation = operation,
+                    Durum = true,
 
-            Log.Logger = new LoggerConfiguration()
+                    Properties = new { }
+                };
+
+                string json = JsonConvert.SerializeObject(logObject);
+                Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .WriteTo.File(new CustomJsonFormatter(), logFileName, shared: true)
                 .CreateLogger();
 
-			var logObject = new
-			{
-					ExcelDosya = fileName,
-					Text = message,
-					Operation = operation,
-					Durum = true,
-
-				Properties = new { }
-			};
-
-			string json = JsonConvert.SerializeObject(logObject);
+			
 
 			Log.Information(json);
-
             Log.CloseAndFlush();
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Log oluşturulurken hata oluştu: " + ex.Message);
+            }
         }
 
 
