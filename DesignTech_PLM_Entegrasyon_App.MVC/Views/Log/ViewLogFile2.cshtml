@@ -1,0 +1,42 @@
+﻿@using DesignTech_PLM_Entegrasyon_App.MVC.Models.Log;
+@using static DesignTech_PLM_Entegrasyon_App.MVC.Controllers.LogController
+
+@model List<ExcelLogEntry>
+
+@{
+    ViewBag.Title = "View JSON Log Files";
+}
+
+<style>
+
+</style>
+<h2>JSON Log Files </h2>
+@if (Model != null && Model.Any())
+{
+  
+
+
+
+        @foreach (var logEntry in Model)
+        {
+            <div style="display: inline-block; margin-right: 20px; white-space: nowrap;">
+                {"Timestamp":"@logEntry.islemTarihi","Message":{"ExcelDosya":"@logEntry.ExcelDosya","Text":"@logEntry.Text","Operation":"@logEntry.Operation","Durum":@logEntry.Durum.ToString().ToLower(),"Properties":{}},"Properties":{}}
+            </div>
+        }
+
+  
+
+
+
+
+
+
+}
+else
+{
+    <p>No JSON files found in this date folder.</p>
+}
+
+
+
+</div>
