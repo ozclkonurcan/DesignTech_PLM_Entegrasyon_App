@@ -106,8 +106,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
 					ExcelDosya = fileName,
 					Text = message,
 					Operation = operation,
-					Durum = true // veya ilgili durum bilgisini verin
-				,
+					Durum = true,
 
 				Properties = new { }
 			};
