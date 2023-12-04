@@ -10,18 +10,21 @@
     ViewBag.Title = "View JSON Log Files";
 }
 
-<h2>JSON Log Files </h2>
 <span class="badge py-3 px-4 fs-7 badge-light-primary"> @ViewBag.jsonFilePath </span>
+@try
+{
+
 
 @if (Model != null && Model.Any())
 {
     <div class="table-responsive">
-        <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="ExcelLogTables">
+        <table class="table align-middle table-row-dashed fs-7 gy-2 dataTable no-footer" id="ExcelLogTables">
             <thead>
                 <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                    <th>Dosya İsmi</th>
+                    <th>Dosya Açıklaması</th>
                     <th>Mesaj</th>
                     <th>İşlem</th>
+                    <th>Kullanıcı</th>
                     <th>İşlem Tarihi</th>
                 </tr>
             </thead>
@@ -29,22 +32,24 @@
                 @foreach (var logEntry in Model)
                 {
                     <tr class="alert alert-danger">
-                        <td><span class="badge py-3 px-4 fs-7 badge-light-primary">@logEntry.ExcelDosya</span></td>
+                        <td>
+                            @if(logEntry.ExcelDosya != null) 
+                            {
+                                
+                                <span class="badge py-3 px-4 fs-7 badge-light-primary">@logEntry.ExcelDosya</span>
+                            }
+                            else{
+                                <span class="badge py-3 px-4 fs-7 badge-light-warning">Veri yok</span>
+                                }
+                            </td>
                      
                         
                             <td>@logEntry.Text</td>
                         
-                        @if(logEntry.Operation == "Yüklendi")
-                        {
-                            <td>
-                                <span class="badge py-3 px-4 fs-7 badge-light-success">@logEntry.Operation</span>
-
-                            </td>
-                        }
-                        @if (logEntry.Operation == "Silme")
-                        {
-                            <td> <span class="badge py-3 px-4 fs-7 badge-light-danger"> @logEntry.Operation</span></td>
-                        }
+                      
+                            <td>@logEntry.Operation</td>
+                            <td>@logEntry.KullaniciAdi</td>
+                      
                         <td>@logEntry.islemTarihi</td>
 
                   
@@ -66,7 +71,11 @@ else
 {
     <p>No JSON files found in this date folder.</p>
 }
-
+}
+catch (Exception ex)
+{
+    <h4 class="alert alert-danger">HATA : @ex.Message</h4>
+}
 
 
 
@@ -77,7 +86,7 @@ else
     <script>
         $(document).ready(function () {
             $('#ExcelLogTables').DataTable({
-                "pageLength": 5,
+                "pageLength": 10,
                 "info": false,
                 "ordering": false,
                 "dom": 'Bfrtip',

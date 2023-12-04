@@ -1,4 +1,5 @@
 ﻿using DesignTech_PLM_Entegrasyon_App.MVC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 {
+    [Authorize]
     public class PLMController : Controller
     {
 		private readonly IConfiguration _configuration;

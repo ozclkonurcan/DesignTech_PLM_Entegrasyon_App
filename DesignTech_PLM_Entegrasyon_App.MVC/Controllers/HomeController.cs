@@ -1,9 +1,11 @@
 using DesignTech_PLM_Entegrasyon_App.MVC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 {
+	[Authorize]
 	public class HomeController : Controller
 	{
 		private readonly ILogger<HomeController> _logger;

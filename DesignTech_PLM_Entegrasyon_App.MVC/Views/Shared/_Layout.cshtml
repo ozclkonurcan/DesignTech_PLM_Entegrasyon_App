@@ -91,10 +91,10 @@
 
 						<!--end::Menu wrapper-->
 						<!--begin::Navbar-->
-						<div class="app-navbar flex-shrink-0" hidden>
+						<div class="app-navbar flex-shrink-0" >
 
 							<!--begin::Notifications-->
-							<div class="app-navbar-item ms-1 ms-md-4">
+							<div class="app-navbar-item ms-1 ms-md-4" hidden>
 								<!--begin::Menu- wrapper-->
 								<div class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end" id="kt_menu_item_wow">
 									<i class="ki-duotone ki-notification-status fs-2">
@@ -453,25 +453,27 @@
 							<div class="app-navbar-item ms-1 ms-md-4" id="kt_header_user_menu_toggle">
 								<!--begin::Menu wrapper-->
 								<div class="cursor-pointer symbol symbol-35px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-									<img src="/assets/" class="rounded-3" alt="user" />
+									@if (User.Identity.IsAuthenticated)
+									{
+										<span class="rounded-4 badge badge-primary p-3">@User.Identity.Name.Substring(0, 1).ToUpper()</span>
+									}
 								</div>
+
 								<!--begin::User account menu-->
 								<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px" data-kt-menu="true">
 									<!--begin::Menu item-->
 									<div class="menu-item px-3">
 										<div class="menu-content d-flex align-items-center px-3">
 											<!--begin::Avatar-->
-											<div class="symbol symbol-50px me-5">
+											<div class="symbol symbol-50px me-5" hidden>
 												<img alt="Logo" src="/assets/media/avatars/300-3.jpg" />
 											</div>
 											<!--end::Avatar-->
 											<!--begin::Username-->
 											<div class="d-flex flex-column">
 												<div class="fw-bold d-flex align-items-center fs-5">
-													Admin Ad Soyad
-													<span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Admin</span>
+													<span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">@User.Identity.Name</span>
 												</div>
-												<a href="#" class="fw-semibold text-muted text-hover-primary fs-7">kullanıcı email olursa eğer</a>
 											</div>
 											<!--end::Username-->
 										</div>
@@ -481,7 +483,7 @@
 									<div class="separator my-2"></div>
 									<!--end::Menu separator-->
 									<!--begin::Menu item-->
-									<div class="menu-item px-5">
+									<div class="menu-item px-5" hidden>
 										<a href="../../demo1/dist/account/overview.html" class="menu-link px-5">My Profile</a>
 									</div>
 									<!--end::Menu item-->
@@ -490,7 +492,11 @@
 									<!--end::Menu separator-->
 									<!--begin::Menu item-->
 									<div class="menu-item px-5">
-										<a href="../../demo1/dist/authentication/layouts/corporate/sign-in.html" class="menu-link px-5">Sign Out</a>
+										<form id="logoutForm" asp-controller="Login" asp-action="Logout" method="post" class="form-inline">
+											<button type="submit" class="btn btn-link text-dark">Çıkış Yap</button>
+										</form>
+
+
 									</div>
 									<!--end::Menu item-->
 								</div>
@@ -707,7 +713,7 @@
 									<!--begin:Menu item-->
 									<div class="menu-item">
 										<!--begin:Menu link-->
-										<a class="menu-link" href="@Url.Action("Log2", "Log")">
+										<a class="menu-link" href="@Url.Action("ViewLogFile2", "Log")">
 											<span class="menu-icon">
 												<i class="ki-duotone ki-code fs-2">
 													<span class="path1"></span>

@@ -89,7 +89,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
 
 
 
-        public void AddNewLogEntry(string message,string fileName, string operation)
+        public void AddNewLogEntry(string message,string fileName, string operation,string kullaniciAdi)
         {
             try
             {
@@ -103,6 +103,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
                     ExcelDosya = fileName,
                     Text = message,
                     Operation = operation,
+                    KullaniciAdi = kullaniciAdi,
                     Durum = true,
 
                     Properties = new { }
@@ -125,6 +126,42 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
             }
         }
 
+		public void AddNewLogEntry2(string message, string fileName, string operation)
+		{
+			try
+			{
+
+
+				currentMonthFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logs2/ProcessLog");
+				//string dateFormatted = DateTime.Now.ToString("standartLogFile");
+				logFileName = Path.Combine(currentMonthFolder, "standartLogFile.json");
+
+				var logObject = new
+				{
+					ExcelDosya = fileName,
+					Text = message,
+					Operation = operation,
+					Durum = true,
+
+					Properties = new { }
+				};
+
+				string json = JsonConvert.SerializeObject(logObject);
+				Log.Logger = new LoggerConfiguration()
+				.MinimumLevel.Information()
+				.WriteTo.File(new CustomJsonFormatter(), logFileName, shared: true)
+				.CreateLogger();
+
+
+
+				Log.Information(json);
+				Log.CloseAndFlush();
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Log oluşturulurken hata oluştu: " + ex.Message);
+			}
+		}
 
 
 
@@ -132,7 +169,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
 
 
 
-        public List<ExcelLogEntry> GetConvertedDataFromJson()
+		public List<ExcelLogEntry> GetConvertedDataFromJson()
         {
             string fullPath = logFileName;
             string desiredPath = fullPath.Substring(fullPath.IndexOf("wwwroot"));

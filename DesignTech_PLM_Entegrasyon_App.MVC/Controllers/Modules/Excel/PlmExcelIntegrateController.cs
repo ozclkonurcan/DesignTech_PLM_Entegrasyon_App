@@ -5,6 +5,7 @@ using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models;
 using DesignTech_PLM_Entegrasyon_App.MVC.ViewModels;
 using ExcelDataReader;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Primitives;
@@ -22,6 +23,7 @@ using static DesignTech_PLM_Entegrasyon_App.MVC.Helper.LogService;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 {
+    [Authorize]
     public class PlmExcelIntegrateController : Controller
 	{
 		private readonly IConfiguration _configuration;
@@ -1036,8 +1038,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     {
 
                         if (PlmDbPRoc.DefinitionType.Contains("String"))
-                        {
-                            documentFunction(catalogValue, "StringValue", lastRowList, PlmDbPRoc, importType, connectionString);
+						{
+							
+							documentFunction(catalogValue, "StringValue", lastRowList, PlmDbPRoc, importType, connectionString);
                         }
                         if (PlmDbPRoc.DefinitionType.Contains("Integer"))
                         {
@@ -2253,15 +2256,20 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 
                             // Güncelleme sorgusunu çalıştır
                          conn.Execute(updateQuery, parameters);
-                        }
+							LogService logService = new LogService(_configuration);
+							var loggedInUsername = HttpContext.User.Identity.Name;
+							logService.AddNewLogEntry(importType+" da '" + PlmDbPRoc.AttrValue + "' verisi başarılı bir şekilde güncelleştirildi.", PlmDbPRoc.AttrValue, "Update",loggedInUsername);
+						}
 
                
                     }
                     else
                     {
                         var insert = _plm2.Query($"{catalogValue}.{valueType}").Insert(NewRecord);
-
-                        if (insert == 1)
+						LogService logService = new LogService(_configuration);
+						var loggedInUsername = HttpContext.User.Identity.Name;
+						logService.AddNewLogEntry(importType + " a '" + PlmDbPRoc.AttrValue + "'  verisi başarılı bir şekilde eklendi.", PlmDbPRoc.AttrValue, "Insert", loggedInUsername);
+						if (insert == 1)
                         {
                             _plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });
                         }

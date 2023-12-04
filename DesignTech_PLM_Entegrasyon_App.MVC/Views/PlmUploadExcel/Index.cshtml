@@ -190,7 +190,12 @@
                         <!--begin::Col-->
                         <div class="col-lg-7">
                             <!--begin::Dropzone-->
-                            <div class="dropzone dropzone-queue mb-2" id="kt_dropzonejs_example_2">
+
+							<input type="file" class="form-file" name="formFile" />
+
+							<button type="submit" class="btn btn-primary btn-sm">Ekle</button>
+
+                            @* <div class="dropzone dropzone-queue mb-2" id="kt_dropzonejs_example_2">
                                 <!--begin::Controls-->
                                 <div class="dropzone-panel mb-lg-0 mb-2">
                                     <a class="dropzone-select btn btn-sm btn-primary me-2">Dosya Seç</a>
@@ -231,9 +236,11 @@
                                 </div>
                                 <!--end::Items-->
                             </div>
-                            <!--end::Dropzone-->
+                           
+							 *@
+							<!--end::Dropzone-->
                             <!--begin::Hint-->
-							<span class="form-text text-muted">Maksimum dosya sayısı 5'tir.</span>
+							@* <span class="form-text text-muted">Maksimum dosya sayısı 5'tir.</span> *@
                             <!--end::Hint-->
                         </div>
                         <!--end::Col-->

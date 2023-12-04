@@ -1,4 +1,5 @@
 ﻿using ExcelDataReader;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -11,7 +12,8 @@ using System.Web;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 {
-	public class LogController : Controller
+    [Authorize]
+    public class LogController : Controller
 	{
         //public IActionResult Index()
         //{
@@ -71,8 +73,11 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 
 				string[] dateFolders = Directory.GetDirectories(logsPath);
 
+				// Filter folders containing "ProcessLog"
+				var filteredFolders = dateFolders.Where(folder => folder.Contains("ProcessLog")).ToArray();
+
 				// Tarih klasörlerini ViewBag'e aktarın
-				ViewBag.DateFolders = dateFolders;
+				ViewBag.DateFolders = filteredFolders;
 				return View();
 			}
 			catch (Exception)
@@ -80,6 +85,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 				return View();
 			}
 		}
+
 
 
 		public ActionResult ViewJsonFiles(string dateFolder)
@@ -109,7 +115,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 			{
 
 				string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
-				string dateFolderPath = Path.Combine(logsPath, dateFolder);
+				string dateFolderPath = Path.Combine(logsPath, "ProcessLog");
 				string[] jsonFiles = Directory.GetFiles(dateFolderPath, "*.json");
 
 				// JSON dosyalarını ViewBag'e aktarın
@@ -158,6 +164,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
             public int Satir { get; set; }
             public int Sutun { get; set; }
             public bool Durum { get; set; }
+            public string KullaniciAdi { get; set; }
             public string islemTarihi { get; set; }
 
             public ExcelLogEntry(string hata)
@@ -173,6 +180,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
             public string ExcelDosya { get; set; } = string.Empty;
             public string Text { get; set; } = string.Empty;
             public string Operation { get; set; } = string.Empty;
+            public string kullaniciAdi { get; set; } = string.Empty;
             public string Hata { get; set; } = string.Empty;
             public int Satir { get; set; }
             public int Sutun { get; set; }
@@ -243,6 +251,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
                                     Satir = logEntry.Message.Satir,
                                     Sutun = logEntry.Message.Sutun,
                                     islemTarihi = logEntry.Timestamp,
+                                    KullaniciAdi = logEntry.Message.kullaniciAdi,
                                     Durum = logEntry.Message.Durum
                                 };
 
@@ -284,15 +293,15 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 		{
 			try
 			{
-				if (string.IsNullOrEmpty(dateFolder) || string.IsNullOrEmpty(jsonFile))
-				{
-					TempData["ErrorMessage"] = "Hata oluştu";
-					return RedirectToAction("Index");
-				}
+				//if (string.IsNullOrEmpty(dateFolder) || string.IsNullOrEmpty(jsonFile))
+				//{
+				//	TempData["ErrorMessage"] = "Hata oluştu";
+				//	return RedirectToAction("Index");
+				//}
 
-				string logsPath = "wwwroot\\Logs";
-				string dateFolderPath = Path.Combine(dateFolder);
-				string jsonFilePath = Path.Combine(dateFolderPath, jsonFile);
+				string logsPath = "wwwroot\\Logs2\\ProcessLog";
+				//string dateFolderPath = Path.Combine(dateFolder);
+				string jsonFilePath = Path.Combine(logsPath, "standartLogFile.json");
 
 				if (!System.IO.File.Exists(jsonFilePath))
 				{

@@ -1,12 +1,14 @@
 ﻿using Dapper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models;
 using DesignTech_PLM_Entegrasyon_App.MVC.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WTPartProgress
 {
+    [Authorize]
     public class PlmWTPartProgressController : Controller
     {
         //private readonly DTExcelDbContext _context;

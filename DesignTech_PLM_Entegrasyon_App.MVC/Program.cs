@@ -1,5 +1,6 @@
 using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.DapperContext;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -43,7 +44,27 @@ Log.Logger = new LoggerConfiguration()
 
 
 
+builder.Services.AddAuthorization();
+
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(options =>
+{
+	options.LoginPath = "/Login/Index"; // Giriþ sayfasýnýn yolu
+});
+builder.Services.AddSession(options =>
+{
+	//options.IdleTimeout = TimeSpan.FromMinutes(60); // 
+	options.Cookie.HttpOnly = true;
+	options.Cookie.IsEssential = true;
+});
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -57,8 +78,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllerRoute(
 	name: "default",

@@ -10,6 +10,7 @@
     <Folder Include="Repositories\" />
     <Folder Include="wwwroot\errorFile\" />
     <Folder Include="wwwroot\ExcelUpdateStockCode\" />
+    <Folder Include="wwwroot\logs2\" />
   </ItemGroup>
 
   <ItemGroup>

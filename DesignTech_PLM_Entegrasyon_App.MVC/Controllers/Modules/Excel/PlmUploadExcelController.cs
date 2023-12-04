@@ -1,11 +1,13 @@
 ﻿using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 {
-	public class PlmUploadExcelController : Controller
+    [Authorize]
+    public class PlmUploadExcelController : Controller
 	{
         private readonly IConfiguration _configuration;
 
@@ -69,7 +71,6 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
         {
             try
             {
-				LogService logService = new LogService(_configuration);
 
 				var randomName = "";
                 foreach (var formData in formFile)
@@ -101,9 +102,11 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         }
                     }
                 }
-
+                LogService logService = new LogService(_configuration);
+				var loggedInUsername = HttpContext.User.Identity.Name;
+				logService.AddNewLogEntry("Excel dosyaları başarıyla yüklendi." , randomName , "Yüklendi",loggedInUsername);
+                logService.AddNewLogEntry2("Excel dosyaları başarıyla yüklendi." , randomName , "Yüklendi");
                 TempData["SuccessMessage"] = "Excel dosyaları başarıyla yüklendi.";
-                logService.AddNewLogEntry("Excel dosyaları başarıyla yüklendi." , randomName , "Yüklendi");
                 //Log.Information("Excel dosyaları başarıyla yüklendi.FileName:"+randomName+"Operation:Yüklendi") ;
                 return RedirectToAction("Index", "PlmUploadExcel");
             }
@@ -156,7 +159,6 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 		{
 			try
 			{
-				LogService logService = new LogService(_configuration);
 
 				string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelInformation");
 				string filePath = Path.Combine(directoryPath, fileName);
@@ -164,7 +166,10 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 				if (System.IO.File.Exists(filePath))
 				{
 					System.IO.File.Delete(filePath);
-					logService.AddNewLogEntry("Excel dosyası silindi.", fileName, "Silme");
+                    LogService logService = new LogService(_configuration);
+					var loggedInUsername = HttpContext.User.Identity.Name;
+					logService.AddNewLogEntry("Excel dosyası silindi.", fileName, "Silme",loggedInUsername);
+                    logService.AddNewLogEntry2("Excel dosyası silindi.", fileName, "Silme");
 					//Log.Information("Excel dosyası silindi.FileName:"+fileName+"Operation:Silme");
 					TempData["SuccessMessage"] = "Dosya başarıyla silindi.";
 

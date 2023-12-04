@@ -1,6 +1,8 @@
 ﻿using Dapper;
+using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
 using DesignTech_PLM_Entegrasyon_App.MVC.ViewModels;
 using ExcelDataReader;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +13,8 @@ using System.Text.RegularExpressions;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 {
-	public class PlmUpdateStokCodeController : Controller
+    [Authorize]
+    public class PlmUpdateStokCodeController : Controller
 	{
 		private readonly IConfiguration _configuration;
 		public QueryFactory _plm2;
@@ -77,6 +80,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 		{
 			try
 			{
+				var randomName = "";
 				foreach (var formData in formFile)
 				{
 					if (formData.Length > 0)
@@ -91,7 +95,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 						{
 							var originalFileName = Path.GetFileNameWithoutExtension(formData.FileName);
 							var timeStamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm");
-							var randomName = $"{originalFileName}_{timeStamp}{fileExtension}";
+							 randomName = $"{originalFileName}_{timeStamp}{fileExtension}";
 							var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\ExcelUpdateStockCode", randomName);
 
 							using (var stream = new FileStream(path, FileMode.Create))
@@ -108,6 +112,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 				}
 
 				TempData["SuccessMessage"] = "Excel dosyaları başarıyla yüklendi.";
+				LogService logService = new LogService(_configuration);
+				var loggedInUsername = HttpContext.User.Identity.Name;
+				logService.AddNewLogEntry("Excel dosyası başarıyla yüklendi.", randomName, "Yüklendi",loggedInUsername);
 				Log.Error("Upload Excel File Message: Başarılı - Kullanıcı : Onur ÖZÇELİK" + " Kullanıcı ID : 1");
 				return RedirectToAction("Index", "PlmUpdateStokCode");
 			}
@@ -132,6 +139,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 				if (System.IO.File.Exists(filePath))
 				{
 					System.IO.File.Delete(filePath);
+					LogService logService = new LogService(_configuration);
+					var loggedInUsername = HttpContext.User.Identity.Name;
+					logService.AddNewLogEntry("Excel dosyası silindi.", fileName, "Silme",loggedInUsername);
 					TempData["SuccessMessage"] = "Dosya başarıyla silindi.";
 
 
@@ -373,7 +383,11 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                                     updateCmd.Parameters.AddWithValue("@Number", Number);
 
                                     updateCmd.ExecuteNonQuery();
-                                }
+
+									LogService logService = new LogService(_configuration);
+									var loggedInUsername = HttpContext.User.Identity.Name;
+									logService.AddNewLogEntry(Number + " değeri '" + Stock_Code + "' değeri ile değiştirildi.", file, "Update",loggedInUsername);
+								}
                             }
                             else
                             {
@@ -381,7 +395,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                             }
                         }
                     }
-                }
+
+				}
 
                 ViewBag.exceldata = excelData.Tables[0];
                 ViewBag.excelfile = file;
@@ -402,6 +417,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 				}
                 else
                 {
+			
 					TempData["UpdateStockCodeToastrSuccessMessage"] = "Güncelleme işlemi başarılı bir şekilde gerçekleştirildi.";
 
 					return Json(new { success = true });
