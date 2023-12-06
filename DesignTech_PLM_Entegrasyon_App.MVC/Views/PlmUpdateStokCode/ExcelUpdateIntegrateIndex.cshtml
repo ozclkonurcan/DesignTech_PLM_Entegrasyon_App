@@ -18,8 +18,14 @@
 
             <div class="d-flex align-items-center">
                 <!--begin::Checkbox-->
+
+
+                <form asp-action="updatePlmExcelFileData" asp-controller="PlmUpdateStokCode" method="post">
+                    <input hidden value="@ViewBag.excelfile" name="file" id="excelFileName" />
+                <button  class="btn btn-sm btn-success btn-sm ml-auto float-end">Güncelle</button>
+                </form>
                 
-                <button onclick="ExcelAktar();" id="excel_aktar_btn" class="btn btn-sm btn-success btn-sm ml-auto float-end">Güncelle</button>
+                @* <button onclick="ExcelAktar();" id="excel_aktar_btn" class="btn btn-sm btn-success btn-sm ml-auto float-end">Güncelle</button> *@
             </div>
 
 
@@ -135,25 +141,24 @@
     function continueWithPost() {
         $.ajax({
             url: '/PlmUpdateStokCode/updatePlmExcelFileData',
-            type: 'POST',
             data: { file: file }, 
             dataType: "json",
             success: function (data) {
                 if (data.success) {
                     toastr.success("Güncelleme işlemi başarılı");
                     // window.location.href = "Index";
-                    window.location.href = '@Url.Action("Index", "PlmUpdateStokCode")';
+                    window.location.href = '@Url.Action("updatePlmExcelFileData", "PlmUpdateStokCode")';
                 } else {
                     toastr.info(data.message);
                     // window.location.href = "Index";
-                    window.location.href = '@Url.Action("Index", "PlmUpdateStokCode")';
+                    window.location.href = '@Url.Action("updatePlmExcelFileData", "PlmUpdateStokCode")';
                 }
                
             },
             error: function (error) {
                 toastr.error("Post işlemi sırasında hata oluştu: " + error);
                 // window.location.href = "Index";
-                window.location.href = '@Url.Action("Index", "PlmUpdateStokCode")';
+                window.location.href = '@Url.Action("updatePlmExcelFileData", "PlmUpdateStokCode")';
             }
         });
     }

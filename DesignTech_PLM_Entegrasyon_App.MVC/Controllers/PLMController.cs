@@ -140,9 +140,10 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 
 						TempData["SuccessMessage"] = "Bağlantı başarılı.";
 
+                        RunSqlScript(model.Catalog, connectionString);
 						return Json(appSettingsJson);
-						//return RedirectToAction("Index","Home"); // Kullanıcıyı başka bir sayfaya yönlendirin veya başka bir işlem yapın
-					}
+                        //return RedirectToAction("Index","Home"); // Kullanıcıyı başka bir sayfaya yönlendirin veya başka bir işlem yapın
+                    }
 					else
 					{
 						TempData["WarningMessage"] = "Bağlantınız başarısız. Sunucuya bağlantı sağlanamadı. Lütfen sunucuyu veya local hesabınızı kontrol ediniz.";
@@ -179,7 +180,143 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 				return false; // Bağlantı başarısız ise false döndürün
 			}
 		}
-		//SQL AYARLARINI APPSETTINGS JSON A AKTARMA KISMI
 
-	}
+
+
+        [HttpPost]
+        public async Task<IActionResult> RunSqlScript(string catalogValue, string connectionString)
+        {
+            try
+            {
+                //string catalogValue = _configuration["Catalog"]; // Kataloğunuzu buraya ekleyin
+
+                string sqlScript = @"
+            USE [" + catalogValue + @"]
+
+            /****** Object:  View [" + catalogValue + @"].[DocumentList]    Script Date: 25.09.2023 12:29:36 ******/
+            SET ANSI_NULLS ON
+            GO
+            SET QUOTED_IDENTIFIER ON
+            GO
+            CREATE VIEW [" + catalogValue + @"].[DocumentList]
+            AS
+            SELECT " + catalogValue + @".WTDocumentMaster.idA2A2, " + catalogValue + @".WTDocumentMaster.WTDocumentNumber, " + catalogValue + @".WTDocumentMaster.name, " + catalogValue + @".WTDocument.statestate, " + catalogValue + @".WTDocument.idA3containerReference, 
+                  " + catalogValue + @".PDMLinkProduct.namecontainerInfo, " + catalogValue + @".WTDocument.idA3B2folderingInfo, " + catalogValue + @".SubFolder.name AS EXPR1, " + catalogValue + @".WTDocument.idA3D2iterationInfo, " + catalogValue + @".WTUser.fullName, " + catalogValue + @".WTDocument.latestiterationInfo, 
+                  " + catalogValue + @".WTDocument.idA3B2iterationInfo, " + catalogValue + @".WTDocument.modifyStampA2, WTUser_1.fullName AS EXPR2, " + catalogValue + @".WTDocument.versionIdA2versionInfo, " + catalogValue + @".WTDocument.versionLevelA2versionInfo, 
+                  " + catalogValue + @".WTDocumentMaster.name + ' (v' + CAST(" + catalogValue + @".WTDocument.versionIdA2versionInfo AS VARCHAR(5)) + '.' + CAST(" + catalogValue + @".WTDocument.iterationIdA2iterationInfo AS VARCHAR(5)) + ') ' AS Version, 
+                  " + catalogValue + @".WTDocument.idA3C2iterationInfo
+            FROM     " + catalogValue + @".WTDocument INNER JOIN
+                  " + catalogValue + @".WTDocumentMaster ON " + catalogValue + @".WTDocument.idA3masterReference = " + catalogValue + @".WTDocumentMaster.idA2A2 INNER JOIN
+                  " + catalogValue + @".PDMLinkProduct ON " + catalogValue + @".WTDocument.idA3containerReference = " + catalogValue + @".PDMLinkProduct.idA2A2 INNER JOIN
+                  " + catalogValue + @".SubFolder ON " + catalogValue + @".WTDocument.idA3B2folderingInfo = " + catalogValue + @".SubFolder.idA2A2 INNER JOIN
+                  " + catalogValue + @".WTUser ON " + catalogValue + @".WTDocument.idA3D2iterationInfo = " + catalogValue + @".WTUser.idA2A2 INNER JOIN
+                  " + catalogValue + @".WTUser AS WTUser_1 ON " + catalogValue + @".WTDocument.idA3B2iterationInfo = WTUser_1.idA2A2
+            GO
+
+            /****** Object:  View [" + catalogValue + @"].[EPMDocNumberList]    Script Date: 25.09.2023 12:29:36 ******/
+            SET ANSI_NULLS ON
+            GO
+            SET QUOTED_IDENTIFIER ON
+            GO
+            CREATE VIEW [" + catalogValue + @"].[EPMDocNumberList]
+            AS
+            SELECT " + catalogValue + @".EPMDocumentMaster.idA2A2, " + catalogValue + @".EPMDocumentMaster.documentNumber, " + catalogValue + @".EPMDocumentMaster.name, " + catalogValue + @".EPMDocument.latestiterationInfo, " + catalogValue + @".EPMDocument.idA2A2 AS EPMDocNumber, 
+                  " + catalogValue + @".EPMDocument.versionIdA2versionInfo
+            FROM     " + catalogValue + @".EPMDocument INNER JOIN
+                  " + catalogValue + @".EPMDocumentMaster ON " + catalogValue + @".EPMDocument.idA3masterReference = " + catalogValue + @".EPMDocumentMaster.idA2A2
+            WHERE  (" + catalogValue + @".EPMDocument.latestiterationInfo = 1)
+            GO
+
+            /****** Object:  View [" + catalogValue + @"].[WTDocList]    Script Date: 25.09.2023 12:29:36 ******/
+            SET ANSI_NULLS ON
+            GO
+            SET QUOTED_IDENTIFIER ON
+            GO
+            CREATE VIEW [" + catalogValue + @"].[WTDocList]
+            AS
+            SELECT " + catalogValue + @".WTDocumentMaster.idA2A2, " + catalogValue + @".WTDocumentMaster.WTDocumentNumber, " + catalogValue + @".WTDocumentMaster.name, " + catalogValue + @".WTDocument.idA2A2 AS WTDocNo, " + catalogValue + @".WTDocument.latestiterationInfo
+            FROM     " + catalogValue + @".WTDocumentMaster INNER JOIN
+                  " + catalogValue + @".WTDocument ON " + catalogValue + @".WTDocumentMaster.idA2A2 = " + catalogValue + @".WTDocument.idA3masterReference
+            WHERE  (" + catalogValue + @".WTDocument.latestiterationInfo = 1)
+            GO
+
+            /****** Object:  View [" + catalogValue + @"].[WTPartNoList]    Script Date: 25.09.2023 12:29:36 ******/
+            SET ANSI_NULLS ON
+            GO
+            SET QUOTED_IDENTIFIER ON
+            GO
+            CREATE VIEW [" + catalogValue + @"].[WTPartNoList]
+            AS
+            SELECT " + catalogValue + @".WTPartMaster.idA2A2, " + catalogValue + @".WTPartMaster.WTPartNumber, " + catalogValue + @".WTPart.versionIdA2versionInfo, " + catalogValue + @".WTPartMaster.name, " + catalogValue + @".WTPart.latestiterationInfo, " + catalogValue + @".WTPart.idA2A2 AS WTPartNo
+            FROM     " + catalogValue + @".WTPartMaster INNER JOIN
+                  " + catalogValue + @".WTPart ON " + catalogValue + @".WTPartMaster.idA2A2 = " + catalogValue + @".WTPart.idA3masterReference
+            WHERE  (" + catalogValue + @".WTPart.latestiterationInfo = 1)
+            GO
+
+            /****** Object:  View [" + catalogValue + @"].[IntegrationDefinitionList]    Script Date: 25.09.2023 12:29:36 ******/
+            SET ANSI_NULLS ON
+            GO
+            SET QUOTED_IDENTIFIER ON
+            GO
+            CREATE VIEW [" + catalogValue + @"].[IntegrationDefinitionList] AS
+            select displayName,hierarchyID,classnameA2A2,idA2A2 from " + catalogValue + @".FloatDefinition where createStampA2 > DATEADD(day, 1,CONVERT(DATETIME, (select createStampA2 from " + catalogValue + @".WTOrganization), 102))
+            UNION
+            select displayName,hierarchyID,classnameA2A2,idA2A2 from " + catalogValue + @".BooleanDefinition where createStampA2 > DATEADD(day, 1,CONVERT(DATETIME, (select createStampA2 from " + catalogValue + @".WTOrganization), 102))
+            UNION
+            select displayName,hierarchyID,classnameA2A2,idA2A2 from " + catalogValue + @".IntegerDefinition  where createStampA2 > DATEADD(day, 1,CONVERT(DATETIME, (select createStampA2 from " + catalogValue + @".WTOrganization), 102))
+            UNION
+            select displayName,hierarchyID,classnameA2A2,idA2A2 from " + catalogValue + @".StringDefinition  where createStampA2 > DATEADD(day, 1,CONVERT(DATETIME, (select createStampA2 from " + catalogValue + @".WTOrganization), 102))
+            UNION
+            select displayName,hierarchyID,classnameA2A2,idA2A2 from " + catalogValue + @".TimestampDefinition  where createStampA2 > DATEADD(day, 1,CONVERT(DATETIME, (select createStampA2 from " + catalogValue + @".WTOrganization), 102))
+            UNION
+            select displayName,hierarchyID,classnameA2A2,idA2A2 from " + catalogValue + @".UnitDefinition  where createStampA2 > DATEADD(day, 1,CONVERT(DATETIME, (select createStampA2 from " + catalogValue + @".WTOrganization), 102))
+            ;
+        ";
+
+
+                //string connectionString = _configuration.GetConnectionString("Plm"); // ConnectionStrings'deki adı buraya ekleyin
+
+                await using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string[] sqlStatements = sqlScript.Split(new[] { "GO" }, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (string sqlStatement in sqlStatements)
+                    {
+                        await using (SqlCommand command = new SqlCommand(sqlStatement, connection))
+                        {
+                            try
+                            {
+
+                                command.ExecuteNonQuery();
+                            }
+                            catch (SqlException ex)
+                            {
+                                if (ex.Number == 2714) // 2714, SQL'de "There is already an object named 'xxx' in the database." hatasıdır.
+                                {
+                                    TempData["ErrorMessage"] = "UYARI!" + ex.Message;
+                                    continue;
+                                }
+                                throw;
+                            }
+                        }
+                    }
+
+                    connection.Close();
+                }
+
+                TempData["SuccessMessage"] = "SQL script başarıyla çalıştırıldı.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "HATA: " + ex.Message;
+
+            }
+
+            return RedirectToAction("Index");
+        }
+        //SQL AYARLARINI APPSETTINGS JSON A AKTARMA KISMI
+
+    }
 }

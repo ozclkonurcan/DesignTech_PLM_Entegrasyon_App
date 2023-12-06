@@ -30,6 +30,10 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Login(string username, string password)
 		{
+			try
+			{
+
+		
             LogService logService = new LogService(_configuration);
             string logsPath = "wwwroot\\LoginJson\\users.json";
 			var json = await System.IO.File.ReadAllTextAsync(logsPath);
@@ -85,9 +89,14 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
                 TempData["ErrorMessage"] = "Kullanıcı adı veya parola hatalı.";
 				return RedirectToAction("Index", "Login");
 			}
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Kullanıcı adı veya parola hatalı.";
+				return View();
+            }
 
-	
-		}
+        }
 
 		[HttpPost]
 		public async Task<IActionResult> Logout()
@@ -102,6 +111,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 			//return Json(new { success = true, message = "Çıkış başarılı." });
 
 		}
+
+
+
 
 
 	}
