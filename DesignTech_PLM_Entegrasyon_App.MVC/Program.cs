@@ -3,6 +3,7 @@ using DesignTech_PLM_Entegrasyon_App.MVC.Models.DapperContext;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using SqlKata.Compilers;
 using SqlKata.Execution;
@@ -55,13 +56,32 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(options =>
 {
 	options.LoginPath = "/Login/Index"; // Giriþ sayfasýnýn yolu
+    options.Events = new CookieAuthenticationEvents
+    {
+        OnValidatePrincipal = context =>
+        {
+            var loggedInUsername = context.Principal.Identity.Name;
+
+            // Çýkýþ yapýlýrsa logla
+            if (context.ShouldRenew)
+            {
+                LogService logService = new LogService(configuration);
+                logService.AddNewLogEntry("Çýkýþ baþarýlý.", null, "Çýkýþ Yapýldý", loggedInUsername);
+            }
+
+            return Task.CompletedTask;
+        }
+    };
 });
 builder.Services.AddSession(options =>
 {
-	options.IdleTimeout = TimeSpan.FromMinutes(180); 
-	options.Cookie.HttpOnly = true;
+	options.IdleTimeout = TimeSpan.FromMinutes(180);
+
+    options.Cookie.HttpOnly = true;
 	options.Cookie.IsEssential = true;
 });
+
+
 var app = builder.Build();
 
 

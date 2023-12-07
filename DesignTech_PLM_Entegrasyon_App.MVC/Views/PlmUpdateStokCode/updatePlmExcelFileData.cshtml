@@ -1,4 +1,6 @@
-﻿
+﻿@{
+    var index = 1;
+}
         <div class="row gy-5 g-xl-10  h-xl-100">
 
 
@@ -18,7 +20,8 @@
             <div class="card-body">
                 <ul class="nav nav-tabs nav-pills flex-row border-0 flex-md-column me-5 mb-3 mb-md-0 fs-6 min-w-lg-200px" role="tablist">
                     <li class="nav-item w-100 me-0 mb-md-2" role="presentation">
-                        <a class="nav-link w-100 btn btn-flex btn-active-light-success active" data-bs-toggle="tab" href="#kt_vtab_pane_4" aria-selected="false" role="tab" tabindex="-1">
+                        @* <a class="nav-link w-100 btn btn-flex btn-active-light-success active" data-bs-toggle="tab" href="#kt_vtab_pane_4" aria-selected="false" role="tab" tabindex="-1"> *@
+                        <a class="nav-link w-100 btn btn-flex btn-active-light-success active" data-bs-toggle="tab"  aria-selected="false" role="tab" tabindex="-1">
                             <i class="ki-duotone ki-icons/duotune/general/gen001.svg fs-2 text-primary"></i>
                             <span class="d-flex flex-column align-items-start">
                                 <span class="fs-4 fw-bold">Başarılı @ViewBag.successfulUpdatesCount</span>
@@ -28,7 +31,8 @@
                     </li>
 
                     <li class="nav-item w-100 me-0 mb-md-2" role="presentation">
-                        <a class="nav-link w-100 btn btn-flex btn-active-light-info" data-bs-toggle="tab" href="#kt_vtab_pane_5" aria-selected="false" role="tab" tabindex="-1">
+                        @* <a class="nav-link w-100 btn btn-flex btn-active-light-info" data-bs-toggle="tab" href="#kt_vtab_pane_5" aria-selected="false" role="tab" tabindex="-1"> *@
+                        <a class="nav-link w-100 btn btn-flex btn-active-light-info" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
                             <i class="ki-duotone ki-icons/duotune/general/gen003.svg fs-2 text-primary"></i>
                             <span class="d-flex flex-column align-items-start">
                                 <span class="fs-4 fw-bold">Boş Değer @ViewBag.emptyDataFailedUpdatesCount</span>
@@ -37,7 +41,8 @@
                         </a>
                     </li>
                     <li class="nav-item w-100" role="presentation">
-                        <a class="nav-link w-100 btn btn-flex btn-active-light-danger " data-bs-toggle="tab" href="#kt_vtab_pane_6" aria-selected="true" role="tab">
+                        @* <a class="nav-link w-100 btn btn-flex btn-active-light-danger " data-bs-toggle="tab" href="#kt_vtab_pane_6" aria-selected="true" role="tab"> *@
+                        <a class="nav-link w-100 btn btn-flex btn-active-light-danger " data-bs-toggle="tab" aria-selected="true" role="tab">
                             <i class="ki-duotone ki-icons/duotune/general/gen017.svg fs-2 text-primary"></i>
                             <span class="d-flex flex-column align-items-start">
                                 <span class="fs-4 fw-bold">Mevcut @ViewBag.failedUpdatesCount</span>
@@ -61,7 +66,36 @@
                     <div class="tab-pane fade  active show" id="kt_vtab_pane_4" role="tabpanel">
                     @try
                     {
-                        if (ViewBag.successfulUpdatesCount > 0)
+
+                        <div class="table-responsive">
+
+                                <table class="table table-hover  align-middle table-row-dashed fs-6 gs-2 gy-2 gx-2 dataTable no-footer" id="stockCodeProcessTableSettings">
+                                <thead >
+                                        <tr class="text-start text-gray-500 bg-gray-800 fw-bold fs-7 text-uppercase gs-0">
+                                            <th>Sıra No :</th>
+                                            <th>Eski Number</th>
+                                            <th>Yeni Number</th>
+                                            <th>Durum</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fw-semibold text-gray-600 hover-scroll-overlay-y" >
+                                   
+                                    @foreach (var item in ViewBag.stokCodeProcessStatus)
+                                    {
+                                       <tr>
+                                           <td>@index</td>
+                                           <td>@item.oldNumber</td>
+                                           <td>@item.newNumber</td>
+                                           <td>@item.status</td>
+                                            </tr>
+                                            index++;
+                                        }
+
+                                    </tbody>
+                                </table>
+                        </div>
+
+                      @*   if (ViewBag.successfulUpdatesCount > 0)
                         {
 
                             @foreach (var item in ViewBag.successfulUpdates)
@@ -72,7 +106,7 @@
                             else
                             {
                                 <span class="d-flex alert alert-warning w-100">Değer bulunamadı.</span>
-                            }
+                            } *@
                         }
                         catch (Exception ex)
                         {
@@ -137,3 +171,24 @@
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+        $('#stockCodeProcessTableSettings').DataTable({
+            "pageLength": 3000,
+            "info": false,
+            "ordering": false,
+            "dom": 'Bfrtip',
+            // "dom": '<"top">rt<"bottom"ip><"clear">',
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.11.6/i18n/Turkish.json",
+                "search": "",
+                "searchPlaceholder": "İşlem Ara ...",
+                "sInfo": "Toplam _TOTAL_ kayıt arasından _START_ - _END_ arasındaki kayıtlar gösteriliyor",
+                "sInfoFiltered": "(toplam _MAX_ kayıttan süzülmüş)",
+            }
+        });
+
+
+
+    });
+</script>

@@ -26,3 +26,8 @@
 {"Timestamp":"07.12.2023 - 08:22:18","Message":{"ExcelDosya":"PlmStockCode2 - Kopya_2023-12-07-08-22.xlsx","Text":"Excel dosyası silindi.","Operation":"Silme","Durum":true,"Properties":{}},"Properties": {}},
 {"Timestamp":"07.12.2023 - 10:16:41","Message":{"ExcelDosya":"DenemeExcel1_2023-12-07-10-16.xlsx","Text":"Excel dosyaları başarıyla yüklendi.","Operation":"Yüklendi","Durum":true,"Properties":{}},"Properties": {}},
 {"Timestamp":"07.12.2023 - 10:16:42","Message":{"ExcelDosya":"DenemeExcel1_2023-12-07-10-16.xlsx","Text":"Excel dosyası silindi.","Operation":"Silindi","Durum":true,"Properties":{}},"Properties": {}},
+{"Timestamp":"07.12.2023 - 13:35:46","Message":{"ExcelDosya":"","Text":"Excel dosyaları başarıyla yüklendi.","Operation":"Yüklendi","Durum":true,"Properties":{}},"Properties": {}},
+{"Timestamp":"07.12.2023 - 13:43:22","Message":{"ExcelDosya":"DenemeExcel1_2023-12-07-13-43.xlsx","Text":"Excel dosyaları başarıyla yüklendi.","Operation":"Yüklendi","Durum":true,"Properties":{}},"Properties": {}},
+{"Timestamp":"07.12.2023 - 13:43:24","Message":{"ExcelDosya":"DenemeExcel1_2023-12-07-13-43.xlsx","Text":"Excel dosyası silindi.","Operation":"Silindi","Durum":true,"Properties":{}},"Properties": {}},
+{"Timestamp":"07.12.2023 - 13:43:30","Message":{"ExcelDosya":"DenemeExcel2_2023-12-07-13-43.xlsx","Text":"Excel dosyaları başarıyla yüklendi.","Operation":"Yüklendi","Durum":true,"Properties":{}},"Properties": {}},
+{"Timestamp":"07.12.2023 - 13:43:33","Message":{"ExcelDosya":"DenemeExcel2_2023-12-07-13-43.xlsx","Text":"Excel dosyası silindi.","Operation":"Silindi","Durum":true,"Properties":{}},"Properties": {}},

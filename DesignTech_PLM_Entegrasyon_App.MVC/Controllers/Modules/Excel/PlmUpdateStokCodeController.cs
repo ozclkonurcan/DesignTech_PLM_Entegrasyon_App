@@ -326,7 +326,12 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
         //}
 
         //Bunda kayıtlı veri var ise güncelleme iptal ediliyor.
-
+        public class stokCodeErrorManagement
+        {
+            public string oldNumber { get; set; }
+            public string newNumber { get; set; }
+            public string status { get; set; }
+        }
         public IActionResult updatePlmExcelFileData(string file)
         {
             var fileName = Directory.GetCurrentDirectory() + "\\wwwroot\\ExcelUpdateStockCode\\" + file;
@@ -353,6 +358,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
             }
 
 
+      
 
             try
             {
@@ -362,6 +368,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     List<string> failedUpdates = new List<string>(); // List to store failed updates
                     List<string> successfulUpdates = new List<string>();
                     List<string> emptyDataFailedUpdates = new List<string>();
+                    List<stokCodeErrorManagement> stokCodeProcessStatus = new List<stokCodeErrorManagement>();
 
                     foreach (DataRow excelRow in excelData.Tables[0].Rows)
                     {
@@ -396,7 +403,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                                 try
                                 {
 
-                                int existingCount = (int)checkCmd.ExecuteScalar();
+                                int existingCount = (int)(checkCmd.ExecuteScalar() ?? 1);
                                 var checkNumberQuery = $"SELECT COUNT(*) FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Number and WTPartNumber = @Stock_Code";
                                 using (var checkNumberCmd = new SqlCommand(checkNumberQuery, conn3Sel))
                                 {
@@ -413,6 +420,13 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                                     {
 
                                         failedUpdates.Add(Stock_Code);
+                                            stokCodeProcessStatus.Add(
+   new stokCodeErrorManagement
+   {
+       oldNumber = Number,
+       newNumber = Stock_Code,
+       status = Stock_Code + " Mükerrer kayıt (değişiklik yapılmadı)."
+   });
 
                                             logService.AddNewLogEntry(Number + " ==> " + Stock_Code + " [" + Stock_Code + " Sistem de zaten mevcut.] ", file, "Güncellenmedi",loggedInUsername);
                                         }
@@ -422,7 +436,14 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                                         emptyDataFailedUpdates.Add(Number);
 
                                             logService.AddNewLogEntry(Number + " ==> " + Stock_Code + " ["+Number+ " Sistem de bulunamadı.] ", file, "Güncellenmedi",loggedInUsername);
-                                    }
+                                            stokCodeProcessStatus.Add(
+new stokCodeErrorManagement
+{
+oldNumber = Number,
+newNumber = Stock_Code,
+status = Number + " PLM'de kaydı yok."
+});
+                                        }
                                     
                                     if(existingCount == 3)
                                     {
@@ -435,9 +456,17 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                                             updateCmd.Parameters.AddWithValue("@Number", Number);
 
                                             updateCmd.ExecuteNonQuery();
-                                            logService.AddNewLogEntry(Number + " ==> '" + Stock_Code, file, "Güncellendi", loggedInUsername);
+                                            logService.AddNewLogEntry(Number + " ==> " + Stock_Code, file, "Güncellendi", loggedInUsername);
                                             successfulUpdates.Add(Number + " ==> " + Stock_Code);
-                                        }
+
+                                                stokCodeProcessStatus.Add(
+new stokCodeErrorManagement
+{
+oldNumber = Number,
+newNumber = Stock_Code,
+status = Number + " Güncellendi."
+});
+                                            }
                                     }
 
 
@@ -450,6 +479,13 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                                     var loggedInUsername = HttpContext.User.Identity.Name;
                                     emptyDataFailedUpdates.Add(Number);
                                     logService.AddNewLogEntry(Number + " ==> " + Stock_Code + " [" + Number + " Sistem de bulunamadı.] ", file, "Güncellenmedi", loggedInUsername);
+                                    stokCodeProcessStatus.Add(
+new stokCodeErrorManagement
+{
+oldNumber = Number,
+newNumber = Stock_Code,
+status = Number + " PLM'de kaydı yok."
+});
                                     continue;
                                 }
 
@@ -471,6 +507,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     ViewBag.emptyDataFailedUpdatesCount = emptyDataFailedUpdates.Count;
                     ViewBag.failedUpdates = failedUpdates;
                     ViewBag.failedUpdatesCount = failedUpdates.Count;
+                    ViewBag.stokCodeProcessStatus = stokCodeProcessStatus;
 
                     if (failedUpdates.Count > 0 || emptyDataFailedUpdates.Count > 0 || successfulUpdates.Count > 0)
                     {
