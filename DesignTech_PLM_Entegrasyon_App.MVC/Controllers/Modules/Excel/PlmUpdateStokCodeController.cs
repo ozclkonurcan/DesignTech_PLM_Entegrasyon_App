@@ -143,7 +143,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                     System.IO.File.Delete(filePath);
                     LogService logService = new LogService(_configuration);
                     var loggedInUsername = HttpContext.User.Identity.Name;
-                    logService.AddNewLogEntry("Excel dosyası silindi.", fileName, "Silme", loggedInUsername);
+                    logService.AddNewLogEntry("Excel dosyası silindi.", fileName, "Silindi", loggedInUsername);
                     TempData["SuccessMessage"] = "Dosya başarıyla silindi.";
 
 
@@ -406,17 +406,22 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 
                                     int numberCount = (int)checkNumberCmd.ExecuteScalar();
 
+                                            LogService logService = new LogService(_configuration);
+                                            var loggedInUsername = HttpContext.User.Identity.Name;
                                     
                                     if (existingCount == 2)
                                     {
 
                                         failedUpdates.Add(Stock_Code);
 
-                                    }
+                                            logService.AddNewLogEntry(Number + " ==> " + Stock_Code + " [" + Stock_Code + " Sistem de zaten mevcut.] ", file, "Güncellenmedi",loggedInUsername);
+                                        }
                                     
                                     if(existingCount == 1)
                                     {
                                         emptyDataFailedUpdates.Add(Number);
+
+                                            logService.AddNewLogEntry(Number + " ==> " + Stock_Code + " ["+Number+ " Sistem de bulunamadı.] ", file, "Güncellenmedi",loggedInUsername);
                                     }
                                     
                                     if(existingCount == 3)
@@ -430,10 +435,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                                             updateCmd.Parameters.AddWithValue("@Number", Number);
 
                                             updateCmd.ExecuteNonQuery();
-
-                                            LogService logService = new LogService(_configuration);
-                                            var loggedInUsername = HttpContext.User.Identity.Name;
-                                            logService.AddNewLogEntry(Number + " değeri '" + Stock_Code + "' değeri ile değiştirildi.", file, "Update", loggedInUsername);
+                                            logService.AddNewLogEntry(Number + " ==> '" + Stock_Code, file, "Güncellendi", loggedInUsername);
                                             successfulUpdates.Add(Number + " ==> " + Stock_Code);
                                         }
                                     }
@@ -444,7 +446,10 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                                 }
                                 catch (Exception)
                                 {
+                                    LogService logService = new LogService(_configuration);
+                                    var loggedInUsername = HttpContext.User.Identity.Name;
                                     emptyDataFailedUpdates.Add(Number);
+                                    logService.AddNewLogEntry(Number + " ==> " + Stock_Code + " [" + Number + " Sistem de bulunamadı.] ", file, "Güncellenmedi", loggedInUsername);
                                     continue;
                                 }
 

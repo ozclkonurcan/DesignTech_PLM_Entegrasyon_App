@@ -84,6 +84,105 @@
 		</div>
 	</div>
 
+
+	<script>
+
+		$(document).ready(function () {
+			var successMessage = '@TempData["SuccessMessage"]';
+			var infoMessage = '@TempData["InfoMessage"]';
+			var warningMessage = '@TempData["WarningMessage"]';
+			var errorMessage = '@TempData["ErrorMessage"]';
+			if (successMessage) {
+				toastr.success(successMessage);
+			} else if (infoMessage) {
+				toastr.info(infoMessage);
+			} else if (warningMessage) {
+				toastr.warning(warningMessage);
+			}
+			else if (errorMessage) {
+				toastr.error(errorMessage);
+			}
+		});
+
+
+		$(document).ready(function () {
+			var systemErrorMessage = '@TempData["SystemErrorMessage"]';
+
+			if (systemErrorMessage) {
+				// Hata mesajını belirtilen yapıya yerleştir
+				$("#system-error-content").html(systemErrorMessage);
+
+				// Hata mesajını göster
+				$("#system-error-message").show();
+
+				// İptal butonunun tıklama olayı
+				$("#system-error-cancel").click(function () {
+					// Hata mesajını gizle
+					$("#system-error-message").hide();
+				});
+
+				// "Ok" butonunun tıklama olayı
+				$("#system-error-ok").click(function () {
+					// Hata mesajını gizle
+					$("#system-error-message").hide();
+
+					// Diğer işlemleri burada yapabilirsiniz
+				});
+			}
+		});
+
+	</script>
+
+
+
+
+	<script>
+		//const button = document.querySelector("#kt_page_loading_overlay");
+		document.addEventListener("DOMContentLoaded", function () {
+			const buttons = document.querySelectorAll("[data-loading-button-id='kt_page_loading_overlay']");
+
+			buttons.forEach(button => {
+				button.addEventListener("click", function () {
+					const loadingEl = document.createElement("div");
+					document.body.prepend(loadingEl);
+					loadingEl.classList.add("page-loader");
+					loadingEl.classList.add("flex-column");
+					loadingEl.classList.add("bg-dark");
+					loadingEl.classList.add("bg-opacity-25");
+					loadingEl.innerHTML = `
+																	<span class="spinner-border text-primary" role="status"></span>
+																	<span class="text-gray-800 fs-6 fw-semibold mt-5">Loading...</span>
+																	`;
+
+					KTApp.showPageLoading();
+
+					setTimeout(function () {
+						KTApp.hidePageLoading();
+						loadingEl.remove();
+					}, 2000);
+				});
+			});
+		});
+
+		toastr.options = {
+			"closeButton": true,
+			"debug": false,
+			"newestOnTop": false,
+			"progressBar": true,
+			"positionClass": "toastr-top-right",
+			"preventDuplicates": false,
+			"onclick": null,
+			"showDuration": "300",
+			"hideDuration": "1000",
+			"timeOut": "5000",
+			"extendedTimeOut": "1000",
+			"showEasing": "swing",
+			"hideEasing": "linear",
+			"showMethod": "fadeIn",
+			"hideMethod": "fadeOut"
+		};
+	</script>
+
 	<script>var hostUrl = "assets/";</script>
 	<script src="assets/plugins/global/plugins.bundle.js"></script>
 	<script src="assets/js/scripts.bundle.js"></script>

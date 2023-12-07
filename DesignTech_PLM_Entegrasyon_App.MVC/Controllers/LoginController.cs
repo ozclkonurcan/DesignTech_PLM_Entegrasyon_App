@@ -27,12 +27,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 		}
 
 
-		[HttpPost]
 		public async Task<IActionResult> Login(string username, string password)
 		{
-			try
-			{
-
 		
             LogService logService = new LogService(_configuration);
             string logsPath = "wwwroot\\LoginJson\\users.json";
@@ -85,16 +81,11 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 			else
 			{
                 // Kullanıcı bulunamadı
-                logService.AddNewLogEntry("Hatalı kullanıcı adı veya parola denemesi.", null, "Hatalı giriş denemesi.",user.Username);
+                logService.AddNewLogEntry("Hatalı kullanıcı adı veya parola denemesi.", null, "Hatalı giriş denemesi.", username);
                 TempData["ErrorMessage"] = "Kullanıcı adı veya parola hatalı.";
 				return RedirectToAction("Index", "Login");
 			}
-            }
-            catch (Exception)
-            {
-                TempData["ErrorMessage"] = "Kullanıcı adı veya parola hatalı.";
-				return View();
-            }
+          
 
         }
 

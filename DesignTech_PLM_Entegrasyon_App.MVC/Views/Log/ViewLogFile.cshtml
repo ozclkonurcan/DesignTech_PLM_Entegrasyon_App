@@ -8,17 +8,18 @@
 
 @{
     ViewBag.Title = "View JSON Log Files";
+    var orderedLogs = Model.OrderByDescending(x => x.islemTarihi);
 }
 
-<span class="badge py-3 px-4 fs-7 badge-light-primary"> @ViewBag.jsonFilePath </span>
+<span hidden class="badge py-3 px-4 fs-7 badge-light-primary"> @ViewBag.jsonFilePath </span>
 @try
 {
 
 
 @if (Model != null && Model.Any())
 {
-    <div class="table-responsive">
-        <table class="table align-middle table-row-dashed fs-7 gy-2 dataTable no-footer" id="ExcelLogTables">
+        <div class="table-responsive hover-scroll-overlay-y" style="height:80vh !important">
+            <table class="table align-middle table-row-dashed border-gray-400 fs-7 gy-1 dataTable no-footer " id="ExcelLogTables">
             <thead>
                 <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                     <th>Dosya Açıklaması</th>
@@ -28,8 +29,10 @@
                     <th>İşlem Tarihi</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var logEntry in Model)
+                <tbody >
+
+
+                    @foreach (var logEntry in orderedLogs)
                 {
                     <tr class="alert alert-danger">
                         <td>
@@ -47,7 +50,31 @@
                             <td>@logEntry.Text</td>
                         
                       
-                            <td>@logEntry.Operation</td>
+                            @if(logEntry.Operation == "Güncellendi")
+                            {
+                                
+                            <td>
+                                <span class="badge badge-light-success">
+                                @logEntry.Operation
+                                </span>
+                                </td>
+                            }
+                            else if (logEntry.Operation == "Güncellenmedi")
+                            {
+                                      <td>
+                                <span class="badge badge-light-danger">
+                                @logEntry.Operation
+                                </span>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <span class="badge badge-secondary">
+                                        @logEntry.Operation
+                                    </span>
+                                </td>
+                            }
                             <td>@logEntry.KullaniciAdi</td>
                       
                         <td>@logEntry.islemTarihi</td>
@@ -56,6 +83,7 @@
                     </tr>
 
                 }
+
             </tbody>
         </table>
     </div>
@@ -86,7 +114,7 @@ catch (Exception ex)
     <script>
         $(document).ready(function () {
             $('#ExcelLogTables').DataTable({
-                "pageLength": 10,
+                "pageLength": 3000,
                 "info": false,
                 "ordering": false,
                 "dom": 'Bfrtip',

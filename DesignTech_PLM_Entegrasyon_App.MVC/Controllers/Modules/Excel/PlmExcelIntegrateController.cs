@@ -2258,7 +2258,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                          conn.Execute(updateQuery, parameters);
 							LogService logService = new LogService(_configuration);
 							var loggedInUsername = HttpContext.User.Identity.Name;
-							logService.AddNewLogEntry(importType+" da '" + PlmDbPRoc.AttrValue + "' verisi başarılı bir şekilde güncelleştirildi.", PlmDbPRoc.AttrValue, "Update",loggedInUsername);
+							logService.AddNewLogEntry(importType+" da '" + PlmDbPRoc.AttrValue + "' verisi başarılı bir şekilde güncelleştirildi.", PlmDbPRoc.AttrValue, "Güncellendi",loggedInUsername);
 						}
 
                
@@ -2268,7 +2268,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         var insert = _plm2.Query($"{catalogValue}.{valueType}").Insert(NewRecord);
 						LogService logService = new LogService(_configuration);
 						var loggedInUsername = HttpContext.User.Identity.Name;
-						logService.AddNewLogEntry(importType + " a '" + PlmDbPRoc.AttrValue + "'  verisi başarılı bir şekilde eklendi.", PlmDbPRoc.AttrValue, "Insert", loggedInUsername);
+						logService.AddNewLogEntry(importType + " a '" + PlmDbPRoc.AttrValue + "'  verisi başarılı bir şekilde eklendi.", PlmDbPRoc.AttrValue, "Yüklendi", loggedInUsername);
 						if (insert == 1)
                         {
                             _plm2.Query($"{catalogValue}.id_sequence").Insert(new { dummy = "x" });

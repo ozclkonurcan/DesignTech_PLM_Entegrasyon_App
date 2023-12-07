@@ -168,8 +168,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 					System.IO.File.Delete(filePath);
                     LogService logService = new LogService(_configuration);
 					var loggedInUsername = HttpContext.User.Identity.Name;
-					logService.AddNewLogEntry("Excel dosyası silindi.", fileName, "Silme",loggedInUsername);
-                    logService.AddNewLogEntry2("Excel dosyası silindi.", fileName, "Silme");
+					logService.AddNewLogEntry("Excel dosyası silindi.", fileName, "Silindi",loggedInUsername);
+                    logService.AddNewLogEntry2("Excel dosyası silindi.", fileName, "Silindi");
 					//Log.Information("Excel dosyası silindi.FileName:"+fileName+"Operation:Silme");
 					TempData["SuccessMessage"] = "Dosya başarıyla silindi.";
 
