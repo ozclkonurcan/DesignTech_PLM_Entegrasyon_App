@@ -213,19 +213,55 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         // Eski Name değerini al
                         var getOldName = $"SELECT Name FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Number";
 
-                        using (SqlCommand getNameCmd = new SqlCommand(getOldName, conn3Sel))
+                        var getOldName2 = $"SELECT Name FROM {catalogValue}.WTPartMaster WHERE WTPartNumber = @Stock_Code";
+
+
+						//var getOldName = $"SELECT " +
+						//	 $"CASE " +
+						//	 $"WHEN WTPartNumber != @Number AND WTPartNumber != @Stock_Code THEN 1 " +
+						//	 $"WHEN WTPartNumber != @Number AND WTPartNumber = @Stock_Code THEN 2  " +
+						//	 $"WHEN WTPartNumber = @Number AND WTPartNumber != @Stock_Code THEN 3 " +
+						//	 $"ELSE 0  " +
+						//	 $"END " +
+						//	 $"Sonuc FROM {catalogValue}.WTPartMaster WHERE WTPartNumber IN (@Number, @Stock_Code)";
+
+						using (SqlCommand getNameCmd = new SqlCommand(getOldName, conn3Sel))
                         {
                             getNameCmd.Parameters.AddWithValue("@Number", Number);
+                            getNameCmd.Parameters.AddWithValue("@Stock_Code", Stock_Code);
                             var oldName = (string)getNameCmd.ExecuteScalar();
 
-                            if (oldName != null)
-                            {
-                                // Eğer EPMDocumentMaster tablosunda bulunduysa
-                                excelRow["Status"] = oldName;
-                            }
+							using (SqlCommand getNameCmd2 = new SqlCommand(getOldName2, conn3Sel))
+							{
 
-                            // Eski Name değerini Excel'e yaz
-                        }
+								getNameCmd2.Parameters.AddWithValue("@Stock_Code", Stock_Code);
+
+								string oldName2 = (string)getNameCmd2.ExecuteScalar();
+
+								if (oldName != null || oldName2 != null)
+                            {
+                                if(oldName2 != null)
+                                {
+									excelRow["Status"] = "Mükerrer Kayıt";
+                                }
+                                else
+                                {
+									excelRow["Status"] = oldName;
+								}
+                                // Eğer EPMDocumentMaster tablosunda bulunduysa
+
+
+                            }
+                            else
+                            {
+                                excelRow["Status"] = "PLM'de kaydı yok.";
+                            }
+							}
+
+
+
+							// Eski Name değerini Excel'e yaz
+						}
 
 
                     }

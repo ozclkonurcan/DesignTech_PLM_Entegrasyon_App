@@ -58,6 +58,7 @@
                                 <tr>
                                     @foreach (var header in ViewBag.exceldata.Columns)
                                     {
+
                                         <td class="@header">
                                             @{
                                                 if (string.IsNullOrEmpty(Convert.ToString(item[header])))
@@ -65,8 +66,21 @@
                                                 }
                                                 else
                                                 {
-                                                                @item[header]
+                                                    if (item[header] == "PLM'de kaydı yok.")
+                                                    {
+                                                        <span class="badge badge-light-danger">@item[header]</span>
+                                                    }
+                                                    else if (item[header] == "Mükerrer Kayıt")
+                                                    {
+                                                        <span class="badge badge-light-warning">@item[header]
+                                                        </span>
+                                                    }
+                                                    else
+
+                                                        @item[header]
+
                                                 }
+                                            
                                             }
                                         </td>
                                     }
