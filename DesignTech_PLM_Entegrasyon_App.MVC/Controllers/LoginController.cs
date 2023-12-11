@@ -63,7 +63,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 				{
 				
 
-					ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
+					ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(180),
 					IsPersistent = true
 				
 				};
@@ -94,6 +94,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 		{
             LogService logService = new LogService(_configuration);
             var loggedInUsername = HttpContext.User.Identity.Name;
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
 			HttpContext.Session.Clear();

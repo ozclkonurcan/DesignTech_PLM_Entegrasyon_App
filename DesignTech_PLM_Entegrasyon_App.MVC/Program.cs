@@ -1,5 +1,9 @@
+using DesignTech_PLM_Entegrasyon_App.MVC.Dtos;
 using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.DapperContext;
+using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
+using DesignTech_PLM_Entegrasyon_App.MVC.Services.SignalR;
+using Humanizer.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using SqlKata.Compilers;
 using SqlKata.Execution;
+using System.Data;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +21,8 @@ builder.Services.AddControllersWithViews();
 
 
 var configuration = builder.Configuration;
+
+
 
 //builder.Services.AddSingleton<IUygulamaDbContextFactory, UygulamaDbContextFactory>();
 
@@ -81,10 +88,28 @@ builder.Services.AddSession(options =>
 	options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddTransient<IDbConnection>(_ =>
+    new SqlConnection(configuration.GetConnectionString("Plm")));
 
+builder.Services.AddHostedService<ChangeNoticeService>();
+
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("CorsPolicy", builder =>
+//    {
+//        builder.WithOrigins("https://localhost:44444", "https://localhost:55555").  
+//         AllowAnyHeader().
+//         AllowAnyMethod().
+//         AllowCredentials();
+//    });
+//});
+
+//builder.Services.AddHostedService<StatusService>();
+//builder.Services.AddSignalR();
 var app = builder.Build();
 
-
+//app.MapHub<StatusHub>("/statushub");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -93,6 +118,9 @@ if (!app.Environment.IsDevelopment())
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
+
+
+//app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
