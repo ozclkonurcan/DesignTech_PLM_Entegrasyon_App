@@ -48,9 +48,9 @@
                      
                         
                             <td>@logEntry.Text</td>
-                        
-                      
-                            @if(logEntry.Operation == "Güncellendi")
+
+
+                            @if (logEntry.Operation == "Güncellendi" || logEntry.Operation == "İlişkilendirildi")
                             {
                                 
                             <td>
@@ -59,7 +59,7 @@
                                 </span>
                                 </td>
                             }
-                            else if (logEntry.Operation == "Güncellenmedi")
+                            else if (logEntry.Operation == "Güncellenmedi" || logEntry.Operation == "ilişkilendirilemedi")
                             {
                                       <td>
                                 <span class="badge badge-light-danger">

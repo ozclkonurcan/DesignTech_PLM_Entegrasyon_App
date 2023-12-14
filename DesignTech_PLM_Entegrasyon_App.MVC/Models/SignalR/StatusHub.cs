@@ -6,7 +6,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR
     {
         public async Task SendUpdate(string message)
         {
-            await Clients.All.SendAsync("statusChanged", message);
+            await Clients.All.SendAsync("ReceiveDocuments", message);
         }
     }
 

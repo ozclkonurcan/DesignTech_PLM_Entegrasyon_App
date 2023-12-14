@@ -44,9 +44,9 @@
                                     <th id="err_@item">@item</th>
                                 }
                             }
-                            catch (Exception)
+                            catch (Exception ex)
                             {
-                                <th class="alert alert-danger m-3 p-2">HATA!</th>
+                                <th class="alert alert-danger m-3 p-2">HATA! @ex.Message</th>
                             }
                         </tr>
                     </thead>
@@ -66,18 +66,18 @@
                                                 }
                                                 else
                                                 {
-                                                  
-                                                    if (item[header] == "PLM'de kaydı yok.")
+                                                    var it2em = Convert.ToString(item[header]);
+                                                    if (it2em == "PLM'de kaydı yok.")
                                                     {
                                                         <span class="badge badge-light-danger">@item[header]</span>
                                                     }
-                                                    else if (item[header] == "Mükerrer Kayıt")
+                                                    else if (it2em == "Mükerrer Kayıt")
                                                     {
                                                         <span class="badge badge-light-warning">@item[header]
                                                         </span>
                                                     }
                                                     else
-                                                        @item[header]
+                                                        @it2em
 
                                                 }
                                             
@@ -87,10 +87,10 @@
                                 </tr>
                             }
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
                             <tr>
-                                <td class="alert alert-danger">HATA!</td>
+                                <td class="alert alert-danger">HATA! @ex.Message</td>
                             </tr>
                         }
                     </tbody>

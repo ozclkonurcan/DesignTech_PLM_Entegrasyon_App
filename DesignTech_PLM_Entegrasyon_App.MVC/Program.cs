@@ -91,7 +91,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddTransient<IDbConnection>(_ =>
     new SqlConnection(configuration.GetConnectionString("Plm")));
 
-builder.Services.AddHostedService<ChangeNoticeService>();
+//builder.Services.AddHostedService<ChangeNoticeService>();
 
 
 //builder.Services.AddCors(options =>

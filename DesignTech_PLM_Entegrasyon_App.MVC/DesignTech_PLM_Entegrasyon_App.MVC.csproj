@@ -11,6 +11,7 @@
     <Folder Include="wwwroot\errorFile\" />
     <Folder Include="wwwroot\ExcelUpdateStockCode\" />
     <Folder Include="wwwroot\logs2\" />
+    <Folder Include="wwwroot\ExcelRelatePartsToDocumentFolder\" />
   </ItemGroup>
 
   <ItemGroup>

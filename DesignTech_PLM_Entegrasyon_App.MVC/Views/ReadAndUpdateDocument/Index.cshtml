@@ -1,0 +1,101 @@
+﻿@model List<WTDocument>
+
+
+
+<!-- İşlem devam ederken overlay ekranı -->
+<div id="loadingOverlay" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; text-align: center; padding-top: 20%;">
+    <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #fff;"></i>
+    <p style="color: #fff;">İşlem devam ediyor...</p>
+</div>
+
+
+<div class="warningInfoMessage"></div>
+
+<div class="col-xl-12 mb-5 mb-xl-10" id="excelListArea">
+    <div class="col-sm-12 m-2" id="errorList"></div>
+
+    <div class="card card-flush h-xl-100">
+        <div class="card-header pt-7 d-flex justify-content-between">
+            <div>
+                <h5>Döküman Güncelleme</h5>
+            </div>
+
+            <div class="d-flex align-items-center">
+                <form asp-action="UpdateAllDocument" asp-controller="ReadAndUpdateDocument" method="post" >
+                    <button class="btn btn-sm btn-success btn-sm ml-auto float-end" type="submit" >Güncelle</button>
+                </form>
+            </div>
+
+
+        </div>
+
+        <div class="card-body  pt-2">
+            <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">
+                <table class="table table-striped gy-3 gs-3 bg-gray-400" id="excel_table">
+
+                    <thead class="bg-gray-800">
+                        <tr class="fw-semibold fs-6 text-white border-bottom-2 border-gray-300">
+                        <th>No</th>
+                        <th>Dosya Adı</th>
+                        <th class="d-flex justify-content-end">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @try
+                        {
+                            var index = 1;
+                            @foreach (var item in ViewBag.RESP)
+                            {
+                                <tr>
+
+                                    <td class="">@index</td>
+                                    <td class="">@item.FileName</td>
+                                    <td class="d-flex justify-content-end">
+                                        @if(@item.Status == 0)
+                                        {
+                                            <span class="badge badge-light-danger">Uygun değil</span>
+                                        }
+                                        else
+                                        {
+                                           <span class="badge badge-light-success">Eşleşmeye uygun</span>
+                                            }
+                                        </td>
+                                    
+                                </tr>
+                                index++;
+                            }
+                            
+                        }
+                        catch (Exception ex)
+                        {
+                            <tr>
+                                <td class="alert alert-danger">HATA! @ex.Message</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    #excel_table_wrapper > .dt-buttons {
+        display: none;
+    }
+
+    #excel_table_filter {
+        float: left;
+    }
+</style>
+
+
+
+
+
+
+
+
+

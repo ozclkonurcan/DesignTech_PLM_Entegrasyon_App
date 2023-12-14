@@ -1,0 +1,220 @@
+﻿<!-- İşlem devam ederken overlay ekranı -->
+<div id="loadingOverlay" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; text-align: center; padding-top: 20%;">
+    <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #fff;"></i>
+    <p style="color: #fff;">İşlem devam ediyor...</p>
+</div>
+
+
+<div class="warningInfoMessage"></div>
+
+<div class="col-xl-12 mb-5 mb-xl-10" id="excelListArea">
+    <div class="col-sm-12 m-2" id="errorList"></div>
+
+    <div class="card card-flush h-xl-100">
+        <div class="card-header pt-7 d-flex justify-content-between">
+            <div>
+                <h5>PLM Excel Entegrasyon</h5>
+            </div>
+
+            <div class="d-flex align-items-center">
+             
+
+                <button onclick="ExcelAktar();"  id="excel_aktar_btn" class="btn btn-sm btn-success btn-sm ml-auto float-end">PLM IMPORT</button>
+            </div>
+
+
+        </div>
+
+        <div class="card-body pt-2 h-100">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-striped gy-2 gs-2 bg-gray-400" " id="excel_table">
+                @using (Html.BeginForm("ExcelProcPart", "PlmLoadExcelRelatePartsToDocument", FormMethod.Post, new { id = "excelheadform" }))
+                {
+                        <input type="hidden"value="@ViewBag.excelfile" name="excel" id="excelFileName" />
+                        
+                }
+                    <thead class="bg-gray-800">
+                        <tr class="fw-semibold fs-6 text-white border-bottom-2 border-gray-300">
+                @try
+                {
+                    @foreach (var item in ViewBag.exceldata.Columns)
+                    {
+                                    <th id="err_@item">@item</th>
+                    }
+                }
+                catch (Exception)
+                {
+                                <th class="alert alert-danger m-3 p-2">HATA!</th>
+                }
+                        </tr>
+                    </thead>
+                    <tbody>
+                @try
+                {
+                    @foreach (var item in ViewBag.exceldata.Rows)
+                    {
+                                <tr>
+                            @foreach (var header in ViewBag.exceldata.Columns)
+                            {
+                                        <td class="@header">
+                                    @{
+                                        if (string.IsNullOrEmpty(Convert.ToString(item[header])))
+                                        {
+                                        }
+                                        else
+                                        {
+                                            @item[header]
+                                        }
+                                    }
+                                        </td>
+                            }
+                                </tr>
+                    }
+                }
+                catch (Exception)
+                {
+                            <tr>
+                                <td class="alert alert-danger">HATA!</td>
+                            </tr>
+                }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-xl-12 mb-5 mb-xl-10 d-none" id="excelDetailArea">
+    <div class="col-sm-12 m-2" id="errorList"></div>
+
+    <div class="card card-flush h-xl-100 ">
+        <div class="card-header pt-7 d-flex justify-content-between">
+            <div>
+                <h5>Hata Yönetimi</h5>
+            </div>
+        </div>
+
+        <div class="card-body pt-2">
+            <div class="table-responsive" id="excelDetailContent">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #excel_table_wrapper > .dt-buttons {
+        display: none;
+    }
+
+    #excel_table_filter {
+        float: left;
+    }
+</style>
+
+<script>
+    var file = $('#excelFileName').val();
+    function ExcelAktar() {
+        Swal.fire({
+            title: "Uyarı !",
+            html: "Import işlemi yapılacak kontrolleri tamamladığınızdan emin olun.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Evet, Devam Et",
+            cancelButtonText: "Hayır, İptal Et",
+            customClass: {
+                confirmButton: "btn btn-primary",
+                cancelButton: "btn btn-danger"
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                continueWithPost();
+            }
+        });
+    }
+
+    function continueWithPost() {
+        let formData = $('#excelheadform').serialize();
+        $.ajax({
+            url: '/PlmLoadExcelRelatePartsToDocument/ExcelProcPart',
+            data: { excelFilePath: file },
+            dataType: "json",
+            success: function (data) {
+                if (data.success) {
+                    toastr.success("Güncelleme işlemi başarılı");
+                    // window.location.href = "Index";
+                    window.location.href = '@Url.Action("Index", "PlmLoadExcelRelatePartsToDocument")';
+                } else {
+                    toastr.info(data.message);
+                    // window.location.href = "Index";
+                    window.location.href = '@Url.Action("Index", "PlmLoadExcelRelatePartsToDocument")';
+                }
+
+            },
+            error: function (error) {
+                toastr.error("Post işlemi sırasında hata oluştu: " + error);
+                // window.location.href = "Index";
+                window.location.href = '@Url.Action("Index", "PlmLoadExcelRelatePartsToDocument")';
+            }
+        });
+    }
+
+
+</script>
+   @*  <script type="text/javascript" scoped>
+
+
+        $("#excelheadform").submit(function (e) {
+            return false;
+        });
+        function ExcelAktar() 
+        {
+        // Overlay ekranını göster
+        $('#loadingOverlay').show();
+            // $('#excel_aktar_btn').html('<i class="fas fa-spinner fa-spin"></i>');
+            // $('#excel_aktar_btn').attr('disabled', true);
+            let formData = $('#excelheadform').serialize();
+            ajaxClass('/upload/excelprocpart', formData,
+                function (data) {
+                // İşlem tamamlandığında overlay ekranını gizle
+                $('#loadingOverlay').hide();
+                    if (data.status == true) {
+                        toastr.success(data.message);
+                        $('#excel_aktar_btn').html("PLM IMPORT");
+                    } else {
+                        toastr.error(data.message);
+                        $('#excel_aktar_btn').attr('disabled', false);
+                    }
+                },
+                function (err) {
+                // İşlem tamamlandığında overlay ekranını gizle
+                $('#loadingOverlay').hide();
+                    toastr.error('Tip Dönüşüm Hatası');
+                }, null);
+        }
+
+        function gosterHeader() {
+            $('#header_fields').removeClass("d-none");
+            $('#excel_table').hide();
+            $('.multiple_attr').select2();
+            $('#aktar_btn').hide();
+            $('#excel_aktar_btn').removeAttr("disabled");
+        }
+
+    </script> *@
+<script>
+
+                    $('#excel_error_table').DataTable({
+                        "pageLength": 5,
+                        "info": false,
+                        "ordering": false,
+                        "dom": 'Bfrtip',
+                        "language": {
+                            "url": "//cdn.datatables.net/plug-ins/1.11.6/i18n/Turkish.json",
+                            "search": "",
+                            "searchPlaceholder": "Search...",
+                            "sInfo": "Toplam _TOTAL_ kayıt arasından _START_ - _END_ arasındaki kayıtlar gösteriliyor",
+                            "sInfoFiltered": "(toplam _MAX_ kayıttan süzülmüş)",
+                        }
+                    });
+
+   
+</script>
