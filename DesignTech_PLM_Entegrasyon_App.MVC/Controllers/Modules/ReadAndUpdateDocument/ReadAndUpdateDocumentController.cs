@@ -160,8 +160,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
 
                 return View();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                TempData["ErrorMessage"] = "HATA!" + ex.Message;
                 return View();
             }
 
@@ -260,10 +261,12 @@ WHERE
 
                         await _connection.ExecuteAsync(updateQuery, new { NewId = item.IdA2A2, OldId = item.HolderToContent_IdA3A5, OtherId = item.HolderToContent_IdA3B5 });
                         logService.AddNewLogEntry(item.HolderToContent_IdA3A5 + " => " + item.IdA2A2 + "&&" + item.HolderToContent_ClassnamekeyroleAObjectRef + " => wt.epm.EPMDocument "+ " && " + "Role => SECONDARY İle Güncellendi.", null, "Güncellendi", loggedInUsername);
+                        TempData["SuccessMessage"] = "Güncelleme işlemi gerçekleştirildi.";
                     }
                     catch (Exception ex)
                     {
                         logService.AddNewLogEntry(item.HolderToContent_IdA3A5 + " X " + item.IdA2A2 + "&&" + item.HolderToContent_ClassnamekeyroleAObjectRef + " X wt.epm.EPMDocument İle Güncellenmedi." + " HATA! : " + ex.Message, null, "Güncellenmedi", loggedInUsername);
+                        TempData["ErrorMessage"] = "HATA!" + ex.Message;
                     }
                 }
 
@@ -311,8 +314,9 @@ WHERE
 
                 return RedirectToAction("UpdateAllDocumentControlPage");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                TempData["ErrorMessage"] = "HATA!" + ex.Message;
                 return RedirectToAction("Index");
             }
 
@@ -323,19 +327,28 @@ WHERE
 
         public async Task<IActionResult> UpdateAllDocumentControlPage()
         {
-            string jsonResult = TempData["rest"] as string;
+            try
+            {
+                string jsonResult = TempData["rest"] as string;
 
-            List<AllUpdateDocumentErrorManagementViewModel> resultList = JsonConvert.DeserializeObject<List<AllUpdateDocumentErrorManagementViewModel>>(jsonResult);
+                List<AllUpdateDocumentErrorManagementViewModel> resultList = JsonConvert.DeserializeObject<List<AllUpdateDocumentErrorManagementViewModel>>(jsonResult);
 
-            var succeeded = resultList.Count(x => x.Status == 1);
-            ViewBag.SucceededCount = succeeded;
-            var failed = resultList.Count(x => x.Status == 0);
-            ViewBag.FailedCount = failed;
-            var total = resultList.Count;
-            ViewBag.TotalCount = total;
+                var succeeded = resultList.Count(x => x.Status == 1);
+                ViewBag.SucceededCount = succeeded;
+                var failed = resultList.Count(x => x.Status == 0);
+                ViewBag.FailedCount = failed;
+                var total = resultList.Count;
+                ViewBag.TotalCount = total;
 
-            ViewBag.resp = resultList;
-            return View();
+                ViewBag.resp = resultList;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "HATA!" + ex.Message;
+                return RedirectToAction("Index", "Home");
+            }
+ 
         }
 
         //public async Task<IActionResult> Index()

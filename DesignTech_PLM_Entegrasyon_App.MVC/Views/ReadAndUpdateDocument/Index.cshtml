@@ -22,7 +22,7 @@
 
             <div class="d-flex align-items-center">
                 <form asp-action="UpdateAllDocument" asp-controller="ReadAndUpdateDocument" method="post" >
-                    <button class="btn btn-sm btn-success btn-sm ml-auto float-end" type="submit" >Güncelle</button>
+                    <button class="btn btn-sm btn-success btn-sm ml-auto float-end" type="submit" id="btn-update" >Güncelle</button>
                 </form>
             </div>
 
@@ -31,7 +31,7 @@
 
         <div class="card-body  pt-2">
             <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">
-                <table class="table table-striped gy-3 gs-3 bg-gray-400" id="excel_table">
+                <table class="table table-striped gy-3 gs-3 bg-gray-400" id="document_table">
 
                     <thead class="bg-gray-800">
                         <tr class="fw-semibold fs-6 text-white border-bottom-2 border-gray-300">
@@ -98,9 +98,12 @@
 
 
 <script>
+
+
     $(document).ready(function () {
-        $('#excel_table').DataTable({
+        $('#document_table').DataTable({
             "dom": 'Bfrtip',
+            "autoClasses": false,
             "pageLength": 3000,
             "info": false,
             "ordering": false,
@@ -111,9 +114,21 @@
                 "sInfo": "Toplam _TOTAL_ kayıt arasından _START_ - _END_ arasındaki kayıtlar gösteriliyor",
                 "sInfoFiltered": "(toplam _MAX_ kayıttan süzülmüş)",
             }
+
+        
+        
         });
 
 
+        $('#btn-update').on('click', function () {
+
+            $('#loader').show();
+
+            $(window).on('load', function () {
+                $('#loader').hide();
+            });
+
+        });
 
     });
 </script>

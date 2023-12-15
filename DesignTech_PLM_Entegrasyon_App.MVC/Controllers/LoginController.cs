@@ -42,6 +42,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 			if (user == null)
 			{
 				TempData["ErrorMessage"] = "Kullanıcı adı veya parola hatalı.";
+				return RedirectToAction("Index", "Login");
 				//return Json(new { success = false, message = "Kullanıcı adı veya parola hatalı." });
 			}
 
