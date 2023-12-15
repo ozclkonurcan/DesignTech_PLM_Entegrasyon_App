@@ -1,26 +1,55 @@
 ﻿
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-<script>
 
+<script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth'
+        var events = [];
+
+    @foreach (var jsonFile in ViewBag.JsonFiles)
+    {
+        var fileName = System.IO.Path.GetFileNameWithoutExtension(jsonFile);
+        var folderName = System.IO.Path.GetFileName(jsonFile);
+        var dateParts = fileName.Split('.')[0];
+
+        var day =   dateParts.Split('-')[0];
+        var month = dateParts.Split('-')[1];
+        var year = dateParts.Split('-')[2];
+       
+        <text>
+                events.push({
+                    title: '@System.IO.Path.GetFileNameWithoutExtension(jsonFile)',
+                    start: new Date(@year, @month - 1, @day),
+                    url: '@Html.Raw(@Url.Action("ViewLogFile", new { dateFolder = ViewBag.DateFolder, jsonFile = folderName }))'
+                });
+        </text>
+    }
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: events,
+            eventClick: function (info) {
+                if (info.event.url) {
+                    window.location.href = info.event.url;
+                    return false; // Linke tıklamadan önce sayfanın değişmesini engeller
+                }
+            }
         });
 
-   
         calendar.render();
     });
-
 </script>
-@* <div id='calendar'></div> *@
 
-@if (ViewBag.JsonFiles != null)
+<div id='calendar'></div>
+
+
+@* @if (ViewBag.JsonFiles != null)
 {
     <ul>
         @foreach (var jsonFile in ViewBag.JsonFiles)
         {
             var folderName = System.IO.Path.GetFileName(jsonFile);
+            folderName = folderName.Split('.')[0];
             <li>
                 <a href='@Url.Action("ViewLogFile", new { dateFolder = ViewBag.DateFolder, jsonFile = folderName })'>@folderName</a>
             </li>
@@ -30,7 +59,7 @@
 else
 {
     <p>No JSON files found in this date folder.</p>
-}
+} *@
 
 
 
