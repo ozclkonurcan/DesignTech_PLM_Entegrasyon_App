@@ -8,27 +8,31 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 using System.Data;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Security.Cryptography;
+using DesignTech_PLM_Entegrasyon_App.MVC.Models.Views;
+using Newtonsoft.Json;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDocument
 {
     [Authorize]
-	public class ReadAndUpdateDocumentController : Controller
-	{
-		private readonly IConfiguration _configuration;
-		private readonly IDbConnection _connection;
-		//private readonly IHubContext<StatusHub> _hubContext;
+    public class ReadAndUpdateDocumentController : Controller
+    {
+        private readonly IConfiguration _configuration;
+        private readonly IDbConnection _connection;
+        //private readonly IHubContext<StatusHub> _hubContext;
 
-		public ReadAndUpdateDocumentController(IConfiguration configuration, IDbConnection connection)
-		{
-			_configuration = configuration;
-			_connection = connection;
-			//_hubContext = hubContext;
-		}
+        public ReadAndUpdateDocumentController(IConfiguration configuration, IDbConnection connection)
+        {
+            _configuration = configuration;
+            _connection = connection;
+            //_hubContext = hubContext;
+        }
 
         public async Task<IActionResult> Index()
         {
-			try
-			{
+            try
+            {
                 //var catalogValue = _configuration["Catalog"];
 
                 //// WTDocument sorgusu
@@ -56,29 +60,30 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
                 List<HolderToContent> holderToContents = new List<HolderToContent>();
                 foreach (var item in WTDocumentIdA2A2)
                 {
-                    
+
                     var HolderToContent = await _connection.QueryAsync<HolderToContent>($"SELECT * FROM {catalogValue}.HolderToContent WHERE idA3A5 IN ({item})");
-                  
+
                     holderToContents.AddRange(HolderToContent);
                 }
 
                 List<ApplicationDataViewModel> applicationDatas = new List<ApplicationDataViewModel>();
                 foreach (var item in holderToContents)
                 {
-                    
+
                     var ApplicationData = await _connection.QueryAsync<ApplicationDataViewModel>($"SELECT * FROM {catalogValue}.ApplicationData WHERE  idA2A2 IN ({item.idA3B5}) ");
 
 
                     foreach (var item2 in ApplicationData)
                     {
-                        
+
                         item2.HolderToContent_ClassnamekeyroleAObjectRef = item.classnamekeyroleAObjectRef;
                         item2.HolderToContent_IdA3A5 = item.idA3A5;
+                        item2.HolderToContent_IdA3B5 = item.idA3B5;
                     }
-                        applicationDatas.AddRange(ApplicationData);
+                    applicationDatas.AddRange(ApplicationData);
 
 
-                 
+
                 }
 
                 List<EPMDocumentMasterViewModel> ePMDocumentMasters = new List<EPMDocumentMasterViewModel>();
@@ -91,6 +96,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
                     {
                         item2.HolderToContent_ClassnamekeyroleAObjectRef = item.HolderToContent_ClassnamekeyroleAObjectRef;
                         item2.HolderToContent_IdA3A5 = item.HolderToContent_IdA3A5;
+                        item2.HolderToContent_IdA3B5 = item.HolderToContent_IdA3B5;
                     }
 
                     ePMDocumentMasters.AddRange(EPMDocumentMaster);
@@ -106,16 +112,19 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
                     {
                         item2.HolderToContent_ClassnamekeyroleAObjectRef = item.HolderToContent_ClassnamekeyroleAObjectRef;
                         item2.HolderToContent_IdA3A5 = item.HolderToContent_IdA3A5;
+                        item2.HolderToContent_IdA3B5 = item.HolderToContent_IdA3B5;
                     }
 
                     ePMDocuments.AddRange(EPMDocument);
                 }
                 //AllUpdateDocumentErrorManagementViewModel
 
-                var newApplicationDatas = (from a in applicationDatas where a.fileName.EndsWith(".pdf") select a ).ToList();
+                var newApplicationDatas = (from a in applicationDatas where a.fileName.EndsWith(".pdf") select a).ToList();
 
-                var NewEPMDocuments = (from a in await _connection.QueryAsync<EPMDocumentMasterViewModel>($"SELECT * FROM {catalogValue}.EPMDocumentMaster") join
-                                       b in ePMDocuments on a.IdA2A2 equals b.IdA3MasterReference select a.DocumentNumber).ToList();
+                var NewEPMDocuments = (from a in await _connection.QueryAsync<EPMDocumentMasterViewModel>($"SELECT * FROM {catalogValue}.EPMDocumentMaster")
+                                       join
+                                       b in ePMDocuments on a.IdA2A2 equals b.IdA3MasterReference
+                                       select a.DocumentNumber).ToList();
 
 
                 List<AllUpdateDocumentErrorManagementViewModel> allUpdateDocumentErrorManagementViewModel = new List<AllUpdateDocumentErrorManagementViewModel>();
@@ -125,24 +134,22 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
 
                     var documentRest = NewEPMDocuments.Any(item2 => item.fileName.ToUpper().Split(".")[0] == item2);
 
-                        if (!documentRest)
+                    if (!documentRest)
+                    {
+                        allUpdateDocumentErrorManagementViewModel.Add(new AllUpdateDocumentErrorManagementViewModel
                         {
-                            allUpdateDocumentErrorManagementViewModel.Add(new AllUpdateDocumentErrorManagementViewModel
-                            {
-                                FileName = item.fileName,
-                                Status = 0
-                            });
-                        }
-                        else
+                            FileName = item.fileName,
+                            Status = 0
+                        });
+                    }
+                    else
+                    {
+                        allUpdateDocumentErrorManagementViewModel.Add(new AllUpdateDocumentErrorManagementViewModel
                         {
-                            allUpdateDocumentErrorManagementViewModel.Add(new AllUpdateDocumentErrorManagementViewModel
-                            {
-                                FileName = item.fileName,
-                                Status = 1
-                            });
-                        }
-
-                    
+                            FileName = item.fileName,
+                            Status = 1
+                        });
+                    }
 
 
                 }
@@ -153,11 +160,11 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
 
                 return View();
             }
-			catch (Exception)
-			{
-				return View();
-			}
-       
+            catch (Exception)
+            {
+                return View();
+            }
+
         }
 
         [HttpPost]
@@ -165,7 +172,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
         {
             try
             {
-                 LogService logService = new LogService(_configuration);
+                LogService logService = new LogService(_configuration);
                 var loggedInUsername = HttpContext.User.Identity.Name;
 
                 var catalogValue = _configuration["Catalog"];
@@ -188,6 +195,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
                     {
                         item2.HolderToContent_ClassnamekeyroleAObjectRef = item.classnamekeyroleAObjectRef;
                         item2.HolderToContent_IdA3A5 = item.idA3A5;
+                        item2.HolderToContent_IdA3B5 = item.idA3B5;
                     }
                     applicationDatas.AddRange(ApplicationData);
 
@@ -205,6 +213,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
                     {
                         item2.HolderToContent_ClassnamekeyroleAObjectRef = item.HolderToContent_ClassnamekeyroleAObjectRef;
                         item2.HolderToContent_IdA3A5 = item.HolderToContent_IdA3A5;
+                        item2.HolderToContent_IdA3B5 = item.HolderToContent_IdA3B5;
                     }
 
                     ePMDocumentMasters.AddRange(EPMDocumentMaster);
@@ -220,6 +229,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
                     {
                         item2.HolderToContent_ClassnamekeyroleAObjectRef = item.HolderToContent_ClassnamekeyroleAObjectRef;
                         item2.HolderToContent_IdA3A5 = item.HolderToContent_IdA3A5;
+                        item2.HolderToContent_IdA3B5 = item.HolderToContent_IdA3B5;
                     }
 
                     ePMDocuments.AddRange(EPMDocument);
@@ -234,17 +244,22 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
                     {
 
                         var updateQuery = $@"
-                    UPDATE {catalogValue}.HolderToContent 
-                    SET 
-                        classnamekeyroleAObjectRef = 'wt.epm.EPMDocument', 
-                        idA3A5 = @NewId 
-                    WHERE 
-                        idA3A5 = @OldId
-                ";
+UPDATE {catalogValue}.HolderToContent
+SET
+   classnamekeyroleAObjectRef = 'wt.epm.EPMDocument',
+   idA3A5 = @NewId
+WHERE
+   idA3A5 = @OldId;
 
-                        await _connection.ExecuteAsync(updateQuery, new { NewId = item.IdA2A2, OldId = item.HolderToContent_IdA3A5 });
-                        logService.AddNewLogEntry(item.HolderToContent_IdA3A5 + " => " + item.IdA2A2 + "&&" + item.HolderToContent_ClassnamekeyroleAObjectRef + " => wt.epm.EPMDocument İle Güncellendi.", null, "Güncellendi", loggedInUsername);
+ UPDATE {catalogValue}.ApplicationData
+                        SET
+   role = 'SECONDARY'
+WHERE
+   idA2A2 = @OtherId
+";
 
+                        await _connection.ExecuteAsync(updateQuery, new { NewId = item.IdA2A2, OldId = item.HolderToContent_IdA3A5, OtherId = item.HolderToContent_IdA3B5 });
+                        logService.AddNewLogEntry(item.HolderToContent_IdA3A5 + " => " + item.IdA2A2 + "&&" + item.HolderToContent_ClassnamekeyroleAObjectRef + " => wt.epm.EPMDocument "+ " && " + "Role => SECONDARY İle Güncellendi.", null, "Güncellendi", loggedInUsername);
                     }
                     catch (Exception ex)
                     {
@@ -272,21 +287,55 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
                     if (!documentRest)
                     {
 
-                        logService.AddNewLogEntry(item.fileName +" dosyasına uygun döküman yok", null, "Güncellenmedi", loggedInUsername);
-               
+                        logService.AddNewLogEntry(item.fileName + " dosyasına uygun döküman yok", null, "Güncellenmedi", loggedInUsername);
+                        allUpdateDocumentErrorManagementViewModel.Add(new AllUpdateDocumentErrorManagementViewModel
+                        {
+                            FileName = item.fileName,
+                            Status = 0
+                        });
                     }
-                 
+                    else
+                    {
+                        allUpdateDocumentErrorManagementViewModel.Add(new AllUpdateDocumentErrorManagementViewModel
+                        {
+                            FileName = item.fileName,
+                            Status = 1
+                        });
+                    }
+
 
                 }
 
+                string jsonResult = JsonConvert.SerializeObject(allUpdateDocumentErrorManagementViewModel);
+                TempData["rest"] = jsonResult;
 
-                return RedirectToAction("Index");
+                return RedirectToAction("UpdateAllDocumentControlPage");
             }
             catch (Exception)
             {
                 return RedirectToAction("Index");
             }
 
+        }
+
+       
+
+
+        public async Task<IActionResult> UpdateAllDocumentControlPage()
+        {
+            string jsonResult = TempData["rest"] as string;
+
+            List<AllUpdateDocumentErrorManagementViewModel> resultList = JsonConvert.DeserializeObject<List<AllUpdateDocumentErrorManagementViewModel>>(jsonResult);
+
+            var succeeded = resultList.Count(x => x.Status == 1);
+            ViewBag.SucceededCount = succeeded;
+            var failed = resultList.Count(x => x.Status == 0);
+            ViewBag.FailedCount = failed;
+            var total = resultList.Count;
+            ViewBag.TotalCount = total;
+
+            ViewBag.resp = resultList;
+            return View();
         }
 
         //public async Task<IActionResult> Index()

@@ -35,9 +35,11 @@
 
                     <thead class="bg-gray-800">
                         <tr class="fw-semibold fs-6 text-white border-bottom-2 border-gray-300">
-                        <th>No</th>
-                        <th>Dosya Adı</th>
-                        <th class="d-flex justify-content-end">Durum</th>
+                        <th >No</th>
+                        <th >Dosya Adı</th>
+                        <th class="">
+                                <span class="d-flex justify-content-end">Durum</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,9 +84,7 @@
 
 
 <style>
-    #excel_table_wrapper > .dt-buttons {
-        display: none;
-    }
+ 
 
     #excel_table_filter {
         float: left;
@@ -97,5 +97,23 @@
 
 
 
+<script>
+    $(document).ready(function () {
+        $('#excel_table').DataTable({
+            "dom": 'Bfrtip',
+            "pageLength": 3000,
+            "info": false,
+            "ordering": false,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.11.6/i18n/Turkish.json",
+                "search": "",
+                "searchPlaceholder": "İşlem Ara ...",
+                "sInfo": "Toplam _TOTAL_ kayıt arasından _START_ - _END_ arasındaki kayıtlar gösteriliyor",
+                "sInfoFiltered": "(toplam _MAX_ kayıttan süzülmüş)",
+            }
+        });
 
 
+
+    });
+</script>

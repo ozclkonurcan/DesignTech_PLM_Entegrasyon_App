@@ -455,7 +455,7 @@
 								<div class="cursor-pointer symbol symbol-35px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
 									@if (User.Identity.IsAuthenticated)
 									{
-										<span class="rounded-4 badge badge-primary p-3">@User.Identity.Name.Substring(0, 1).ToUpper()</span>
+										<span class="rounded-4 badge badge-primary p-3">@User.Identity.Name.ToUpper()</span>
 									}
 								</div>
 
@@ -535,6 +535,8 @@
 							<img alt="Logo" src="/imgComp/content.png" class="h-40px app-sidebar-logo-default" />
 							<img alt="Logo" src="/imgComp/contentLogo.png" class="h-40px app-sidebar-logo-minimize" />
 						</a>
+
+						<span class="badge badge-light-info">v1.0.0</span>
 
 						<div id="kt_app_sidebar_toggle" class="app-sidebar-toggle btn btn-icon btn-shadow btn-sm btn-color-muted btn-active-color-primary h-30px w-30px position-absolute top-50 start-100 translate-middle rotate active" data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body" data-kt-toggle-name="app-sidebar-minimize">
 							<i class="ki-duotone ki-black-left-line fs-3 rotate-180">

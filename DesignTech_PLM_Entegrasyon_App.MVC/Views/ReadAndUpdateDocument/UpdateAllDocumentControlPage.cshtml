@@ -1,0 +1,192 @@
+﻿@{
+    var index = 1;
+}
+<div class="row gy-5 g-xl-10  h-xl-100">
+
+
+    <div class="col-xl-4">
+        <div class="card card-flush h-xl-100">
+
+            <div class="card-header pt-7">
+                <!--begin::Title-->
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold text-gray-900">Attachment İşlem Detay Ekranı</span>
+                    <span class="text-gray-500 mt-1 fw-semibold fs-6">Toplam kayıt sayısı : @ViewBag.TotalCount</span>
+                </h3>
+                <!--end::Title-->
+
+            </div>
+
+            <div class="card-body">
+                <ul class="nav nav-tabs nav-pills flex-row border-0 flex-md-column me-5 mb-3 mb-md-0 fs-6 min-w-lg-200px" role="tablist">
+                    <li class="nav-item w-100 me-0 mb-md-2" role="presentation">
+                        @* <a class="nav-link w-100 btn btn-flex btn-active-light-success active" data-bs-toggle="tab" href="#kt_vtab_pane_4" aria-selected="false" role="tab" tabindex="-1"> *@
+                        <a class="nav-link w-100 btn btn-flex btn-active-light-success active" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                            <i class="ki-duotone ki-icons/duotune/general/gen001.svg fs-2 text-primary"></i>
+                            <span class="d-flex flex-column align-items-start">
+                                <span class="fs-4 fw-bold">Başarılı @ViewBag.SucceededCount</span>
+                                <span class="fs-7">Attachment işlemi Başarılı Olan dökümanlar</span>
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item w-100 me-0 mb-md-2" role="presentation">
+                        @* <a class="nav-link w-100 btn btn-flex btn-active-light-info" data-bs-toggle="tab" href="#kt_vtab_pane_5" aria-selected="false" role="tab" tabindex="-1"> *@
+                        <a class="nav-link w-100 btn btn-flex btn-active-light-info" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                            <i class="ki-duotone ki-icons/duotune/general/gen003.svg fs-2 text-primary"></i>
+                            <span class="d-flex flex-column align-items-start">
+                                <span class="fs-4 fw-bold">Uygun Değil @ViewBag.FailedCount</span>
+                                <span class="fs-7">Attachment işlemine uygun olamayan dökümanlar</span>
+                            </span>
+                        </a>
+                    </li>
+          
+                </ul>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-xl-8">
+        <div class="card card-flush h-xl-100 hover-scroll-overlay-y" style="height:80vh !important">
+
+            <div class="card-body ">
+
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade  active show" id="kt_vtab_pane_4" role="tabpanel">
+                        @try
+                        {
+
+                            <div class="table-responsive">
+
+                                <table class="table table-hover  align-middle table-row-dashed fs-6 gs-2 gy-2 gx-2 dataTable no-footer" id="stockCodeProcessTableSettings">
+                                    <thead>
+                                        <tr class="text-start text-gray-500 bg-gray-800 fw-bold fs-7 text-uppercase gs-0">
+                                            <th>Sıra No :</th>
+                                            <th>Dosya Adı</th>
+                                            <th>Durum</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fw-semibold text-gray-600 hover-scroll-overlay-y">
+
+                                        @foreach (var item in ViewBag.resp)
+                                        {
+                                            <tr>
+                                                <td>@index</td>
+                                                <td>@item.FileName</td>
+
+
+                                                @if (item.Status == 0)
+                                                {
+                                                    <td><span class="badge badge-light-danger">Uygun değil</span></td>
+                                                }
+                                                else
+                                                {
+                                                    <td><span class="badge badge-light-success">Eşleşmeye uygun</span></td>
+                                                }
+                                            </tr>
+                                            index++;
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            @*   if (ViewBag.successfulUpdatesCount > 0)
+                        {
+
+                        @foreach (var item in ViewBag.successfulUpdates)
+                        {
+                        <span class="badge badge-secondary p-2 m-2">@item</span>
+                        }
+                        }
+                        else
+                        {
+                        <span class="d-flex alert alert-warning w-100">Değer bulunamadı.</span>
+                        } *@
+                        }
+                        catch (Exception ex)
+                        {
+                            <span class="d-flex alert alert-danger">HATA ! @ex.Message</span>
+                        }
+
+                    </div>
+
+                    <div class="tab-pane fade" id="kt_vtab_pane_5" role="tabpanel">
+                        @try
+                        {
+                            @* if (ViewBag.emptyDataFailedUpdatesCount > 0)
+                            {
+
+
+                                @foreach (var item in ViewBag.emptyDataFailedUpdates)
+                                {
+                                    <span class="badge badge-secondary p-2 m-2">@item</span>
+                                }
+
+                            }
+                            else
+                            {
+                                <span class="d-flex alert alert-warning">Değer bulunamadı.</span>
+                            } *@
+                        }
+                        catch (Exception ex)
+                        {
+                            <span class="d-flex alert alert-danger">HATA ! @ex.Message</span>
+                        }
+                    </div>
+
+                    <div class="tab-pane fade" id="kt_vtab_pane_6" role="tabpanel">
+                        @try
+                        {
+                           @*  if (ViewBag.failedUpdatesCount > 0)
+                            {
+
+
+                                @foreach (var item in ViewBag.failedUpdates)
+                                {
+                                    <span class="badge badge-secondary p-2 m-2">@item</span>
+                                }
+
+                            }
+                            else
+                            {
+                                <span class="d-flex alert alert-warning">Değer bulunamadı.</span>
+                            } *@
+                        }
+                        catch (Exception ex)
+                        {
+                            <span class="d-flex alert alert-danger">HATA ! @ex.Message</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#stockCodeProcessTableSettings').DataTable({
+            "pageLength": 3000,
+            "info": false,
+            "ordering": false,
+            "dom": 'Bfrtip',
+            // "dom": '<"top">rt<"bottom"ip><"clear">',
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.11.6/i18n/Turkish.json",
+                "search": "",
+                "searchPlaceholder": "İşlem Ara ...",
+                "sInfo": "Toplam _TOTAL_ kayıt arasından _START_ - _END_ arasındaki kayıtlar gösteriliyor",
+                "sInfoFiltered": "(toplam _MAX_ kayıttan süzülmüş)",
+            }
+        });
+
+
+
+    });
+</script>

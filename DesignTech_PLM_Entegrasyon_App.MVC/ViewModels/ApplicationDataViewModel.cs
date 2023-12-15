@@ -43,5 +43,6 @@
         //HolderToContent
         public string HolderToContent_ClassnamekeyroleAObjectRef { get; set; }
         public long HolderToContent_IdA3A5 { get; set; }
+        public long HolderToContent_IdA3B5 { get; set; }
     }
 }
