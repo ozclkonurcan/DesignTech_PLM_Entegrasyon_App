@@ -33,6 +33,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.ReadAndUpdateDo
         {
             try
             {
+
                 //var catalogValue = _configuration["Catalog"];
 
                 //// WTDocument sorgusu

@@ -94,10 +94,13 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
             try
             {
 
-          
-            currentMonthFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logs", DateTime.Now.ToString("MMMM-yyyy", CultureInfo.InvariantCulture));
-            string dateFormatted = DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
-            logFileName = Path.Combine(currentMonthFolder, dateFormatted + ".json");
+
+                //currentMonthFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logs", DateTime.Now.ToString("MMMM-yyyy", CultureInfo.InvariantCulture));
+                //string dateFormatted = DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+                //logFileName = Path.Combine(currentMonthFolder, dateFormatted + ".json");
+                currentMonthFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logs", "TakvimFile");
+                string dateFormatted = DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+                logFileName = Path.Combine(currentMonthFolder, dateFormatted + ".json");
                 var logObject = new
                 {
                     ExcelDosya = fileName,

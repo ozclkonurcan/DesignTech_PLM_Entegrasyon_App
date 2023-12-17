@@ -15,7 +15,7 @@
         var day =   dateParts.Split('-')[0];
         var month = dateParts.Split('-')[1];
         var year = dateParts.Split('-')[2];
-       
+
         <text>
                 events.push({
                     title: '@System.IO.Path.GetFileNameWithoutExtension(jsonFile)',
@@ -27,13 +27,16 @@
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
+            locale: 'tr',
             events: events,
             eventClick: function (info) {
                 if (info.event.url) {
                     window.location.href = info.event.url;
                     return false; // Linke tıklamadan önce sayfanın değişmesini engeller
                 }
-            }
+            },
+            height: 'auto', 
+            contentHeight: 'auto'
         });
 
         calendar.render();

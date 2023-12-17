@@ -93,7 +93,10 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 
             try {
 
-                string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
+                dateFolder = "TakvimFile";
+
+
+				string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
                 string dateFolderPath = Path.Combine(logsPath, dateFolder);
                 string[] jsonFiles = Directory.GetFiles(dateFolderPath, "*.json");
 
