@@ -45,8 +45,8 @@
 	<div class="page-loader flex-column bg-dark bg-opacity-25" id="loader">
 		<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
 			<span class="spinner-border text-primary" role="status"></span>
-			@* <br>
-			<span class="text-gray-800 fs-6 fw-semibold mt-2" style="display: inline-block;">Loading...</span> *@
+			<br>
+			<span class="text-gray-800 fs-6 fw-semibold mt-2" style="display: inline-block;">Yükleniyor...</span>
 		</div>
 
 	</div>
@@ -552,7 +552,7 @@
 						</div>
 						<!--end::Sidebar toggle-->
 					</div>
-					<span class="badge badge-sm badge-light-primary m-5 fs-7 d-flex justify-content-center">v1.5.7</span>
+					<span class="badge badge-sm badge-light-primary m-5 fs-7 d-flex justify-content-center">v1.6.0</span>
 
 					<!--end::Logo-->
 					<!--begin::sidebar menu-->
@@ -713,6 +713,27 @@
 									</div>
 									<!--end:Menu item-->
 									<!--begin:Menu item-->
+									@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+									{
+
+										<div class="menu-item">
+											<!--begin:Menu link-->
+											<a class="menu-link" href="@Url.Action("User", "Login")">
+												<span class="menu-icon">
+													<i class="ki-duotone ki-user-square fs-2">
+														<span class="path1"></span>
+														<span class="path2"></span>
+														<span class="path3"></span>
+														<span class="path4"></span>
+													</i>
+												</span>
+												<span class="menu-title">Kullanıcı Ayarları</span>
+											</a>
+											<!--end:Menu link-->
+										</div>
+									}
+									<!--end:Menu item-->
+									<!--begin:Menu item-->
 									<div class="menu-item">
 										<!--begin:Menu link-->
 										<a class="menu-link" href="@Url.Action("ViewJsonFiles", "Log")">
@@ -728,7 +749,8 @@
 										</a>
 										<!--end:Menu link-->
 									</div>
-									<!--end:Menu item-->
+									<!--end:Menu item-->	
+								
 									<!--begin:Menu item-->
 									<div class="menu-item" hidden>
 										<!--begin:Menu link-->
@@ -3284,7 +3306,9 @@
 				});
 			});
 
-
+	// $(window).on('load', function() {
+	// $('#loader').hide();
+	// });
 
 	
 

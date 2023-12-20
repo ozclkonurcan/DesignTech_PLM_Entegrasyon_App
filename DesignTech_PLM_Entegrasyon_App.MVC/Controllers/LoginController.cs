@@ -55,7 +55,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 
 				var claims = new List<Claim>
 						{
-						  new Claim(ClaimTypes.Name, user.Username)
+						  new Claim(ClaimTypes.Name, user.Username),
+						  new Claim(ClaimTypes.Role,user.Role),
+						  new Claim("Role",user.Role)
 						};
 
 				var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -104,10 +106,188 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 			//return Json(new { success = true, message = "Çıkış başarılı." });
 
 		}
+		[Authorize(Policy = "Admin")]
+		[HttpGet]
+		public async Task<IActionResult> User()
+		{
+			try
+			{
+			
+
+
+				var response = GetUsersFromJsonFile();
+
+				ViewBag.usersList = response;
+
+		
+				return View();
+			}
+			catch (Exception)
+			{
+			return View();
+
+			}
+
+
+		}
+		[Authorize(Policy = "Admin")]
+		[HttpPost]
+		public async Task<IActionResult> AddUser(User model)
+		{
+			try
+			{
+			
+				if(model != null)
+				{
+					model.Id = Guid.NewGuid();
+					await SaveUsersToJsonFile(model);
+				}
+
+				TempData["SuccessMessage"] = "Kullanıcı başarıyla eklendi";
+				return RedirectToAction("User", "Login");
+			}
+			catch (Exception ex)
+			{
+
+				TempData["ErrorMessage"] = "Kullanıcı ekleme işlemi başarısız. "+ex.Message;
+				return RedirectToAction("User", "Login");
+
+			}
+
+
+		}
+
+        private List<User> GetUsersFromJsonFile()
+        {
+            string userFilePath = "wwwroot/LoginJson/users.json";
+            var json = System.IO.File.ReadAllText(userFilePath);
+            return JsonSerializer.Deserialize<List<User>>(json);
+        }
+
+        private async Task SaveUsersToJsonFile(User newUser)
+        {
+            string userFilePath = "wwwroot/LoginJson/users.json";
+
+            // Dosya var mı kontrol et
+            if (System.IO.File.Exists(userFilePath))
+            {
+                // Dosyayı oku
+                string existingJson = await System.IO.File.ReadAllTextAsync(userFilePath);
+
+                // Json'dan objeye dönüştür
+                List<User> existingUsers = JsonSerializer.Deserialize<List<User>>(existingJson);
+
+                // Aynı kullanıcı var mı kontrol et
+                if (!existingUsers.Any(u => u.Username == newUser.Username))
+                {
+                    // Yeni kullanıcıyı ekle
+                    existingUsers.Add(newUser);
+
+                    // Json'a dönüştür ve dosyaya yaz
+                    var updatedJson = JsonSerializer.Serialize(existingUsers);
+                    await System.IO.File.WriteAllTextAsync(userFilePath, updatedJson);
+                }
+                else
+                {
+                    // Aynı kullanıcı zaten var, işlem yapma
+                    Console.WriteLine("Bu kullanıcı zaten var.");
+                }
+            }
+            else
+            {
+                // Dosya yoksa yeni dosya oluştur ve kullanıcıyı ekle
+                var json = JsonSerializer.Serialize(new List<User> { newUser });
+                await System.IO.File.WriteAllTextAsync(userFilePath, json);
+            }
+        }
+
+
+
+        [Authorize(Policy = "Admin")]
+		[HttpPost]
+		public async Task<JsonResult> UpdateUser()
+		{
+			try
+			{
+
+				return Json("");
+			}
+			catch (Exception)
+			{
+				return Json("");
+
+			}
+
+		}
+
+
+        [HttpPost]
+        [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> RemoveUser(Guid Id)
+        {
+            var userList = GetUsersFromJsonFile();
+
+            var user = userList.FirstOrDefault(x => x.Id == Id);
+
+            if (user != null)
+            {
+                try
+                {
+                    userList.Remove(user);
+
+                    await SaveUsersToJson(userList);
+
+                    TempData["Success"] = "Kullanıcı silindi";
+
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Hata oluştu: " + ex.Message;
+                }
+            }
+
+            return RedirectToAction("User", "Login");
+        }
+        [Authorize(Policy = "Admin")]
+        private async Task SaveUsersToJson(List<User> users)
+        {
+            string filePath = "wwwroot/LoginJson/users.json";
+
+            string json = JsonSerializer.Serialize(users);
+
+            await System.IO.File.WriteAllTextAsync(filePath, json);
+        }
+
+        //[Authorize(Policy = "Admin")]
+        //[HttpPost]
+        //public async Task<IActionResult> RemoveUser(User model)
+        //{
+        //	try
+        //	{
+        //		var userList = GetUsersFromJsonFile();
+
+        //		var user = userList.FirstOrDefault(x => x.Username == model.Username && x.Role == model.Role);
+        //		if (user != null)
+        //		{
+        //			userList.Remove(user);
+
+        //			await SaveUsersToJsonFile(user);
+        //		}
+        //              TempData["SuccessMessage"] = "Kullanıcı başarıyla silindi";
+        //              return RedirectToAction("User", "Login");
+        //          }
+        //	catch (Exception ex)
+        //	{
+        //              TempData["SuccessMessage"] = "Kullanıcı silme işlemi başarısız. "+ex.Message;
+        //              return RedirectToAction("User", "Login");
+
+        //          }
+
+        //}
 
 
 
 
 
-	}
+    }
 }

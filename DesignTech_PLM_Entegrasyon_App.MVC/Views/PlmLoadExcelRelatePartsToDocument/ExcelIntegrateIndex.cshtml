@@ -17,9 +17,12 @@
             </div>
 
             <div class="d-flex align-items-center">
-             
+                <form asp-action="ExcelProcPart" asp-controller="PlmLoadExcelRelatePartsToDocument" method="post">
+                    <input hidden value="@ViewBag.excelfile" name="excelFilePath" id="excelFileName" />
+                    <button class="btn btn-sm btn-success btn-sm ml-auto float-end">PLM IMPORT</button>
+                </form>
 
-                <button onclick="ExcelAktar();"  id="excel_aktar_btn" class="btn btn-sm btn-success btn-sm ml-auto float-end">PLM IMPORT</button>
+                @* <button onclick="ExcelAktar();"  id="excel_aktar_btn" class="btn btn-sm btn-success btn-sm ml-auto float-end">PLM IMPORT</button> *@
             </div>
 
 
@@ -131,8 +134,34 @@
         });
     }
 
+    // function continueWithPost() {
+    //     let formData = $('#excelheadform').serialize();
+    //     $.ajax({
+    //         url: '/PlmLoadExcelRelatePartsToDocument/ExcelProcPart',
+    //         data: { excelFilePath: file },
+    //         dataType: "json",
+    //         success: function (data) {
+    //             if (data.success) {
+    //                 toastr.success("Güncelleme işlemi başarılı");
+    //                 // window.location.href = "Index";
+    //                 window.location.href = '@Url.Action("ExcelProcPart", "PlmLoadExcelRelatePartsToDocument")';
+    //             } else {
+    //                 toastr.info(data.message);
+    //                 // window.location.href = "Index";
+    //                 window.location.href = '@Url.Action("ExcelProcPart", "PlmLoadExcelRelatePartsToDocument")';
+    //             }
+
+    //         },
+    //         error: function (error) {
+    //             toastr.error("Post işlemi sırasında hata oluştu: " + error);
+    //             // window.location.href = "Index";
+    //             window.location.href = '@Url.Action("ExcelProcPart", "PlmLoadExcelRelatePartsToDocument")';
+    //         }
+    //     });
+    // }
+
+
     function continueWithPost() {
-        let formData = $('#excelheadform').serialize();
         $.ajax({
             url: '/PlmLoadExcelRelatePartsToDocument/ExcelProcPart',
             data: { excelFilePath: file },
@@ -141,18 +170,18 @@
                 if (data.success) {
                     toastr.success("Güncelleme işlemi başarılı");
                     // window.location.href = "Index";
-                    window.location.href = '@Url.Action("Index", "PlmLoadExcelRelatePartsToDocument")';
+                    window.location.href = '@Url.Action("ExcelProcPart", "PlmLoadExcelRelatePartsToDocument")';
                 } else {
                     toastr.info(data.message);
                     // window.location.href = "Index";
-                    window.location.href = '@Url.Action("Index", "PlmLoadExcelRelatePartsToDocument")';
+                    window.location.href = '@Url.Action("ExcelProcPart", "PlmLoadExcelRelatePartsToDocument")';
                 }
 
             },
             error: function (error) {
                 toastr.error("Post işlemi sırasında hata oluştu: " + error);
                 // window.location.href = "Index";
-                window.location.href = '@Url.Action("Index", "PlmLoadExcelRelatePartsToDocument")';
+                window.location.href = '@Url.Action("ExcelProcPart", "PlmLoadExcelRelatePartsToDocument")';
             }
         });
     }

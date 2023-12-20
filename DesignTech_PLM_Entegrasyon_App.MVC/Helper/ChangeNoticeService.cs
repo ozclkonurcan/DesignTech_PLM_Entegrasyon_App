@@ -1,7 +1,9 @@
 ﻿
 using Dapper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
+using DesignTech_PLM_Entegrasyon_App.MVC.Services.ApiServices;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System.Data;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -11,22 +13,34 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
     {
         private readonly IConfiguration _configuration;
         private readonly IDbConnection _db;
-
-        public ChangeNoticeService(IConfiguration configuration, IDbConnection db)
+        private readonly IWebHostEnvironment _env;
+        public ChangeNoticeService(IConfiguration configuration, IDbConnection db, IWebHostEnvironment env = null)
         {
             _configuration = configuration;
             _db = db;
+            _env = env;
+        }
+
+        public class postDeneme
+        {
+            public string title { get; set; }
+            public string description { get; set; }
+            public string imageUrl { get; set; }
         }
 
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            try
+            {
+
+        
             var catalogValue = _configuration["Catalog"];
             var connectionString = _configuration.GetConnectionString("Plm");
 
             LogService logService = new LogService(_configuration);
-
-            while (!stoppingToken.IsCancellationRequested)
+                ApiService apiService = new ApiService(_env);
+                while (!stoppingToken.IsCancellationRequested)
             {
                 var sql = $"SELECT [CN_NUMBER], [CHANGE_NOTICE], [STATE], [LastUpdateTimestamp] FROM {catalogValue}.dbo.Change_Notice WHERE [STATE] = 'RESOLVED'";
 
@@ -47,7 +61,15 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
                             new { CN_NUMBER = item.CN_NUMBER, ProcessTimestamp = DateTime.UtcNow, LastUpdateTimestamp = item.LastUpdateTimestamp });
 
                         logService.AddNewLogEntry($"{item.CN_NUMBER} 'ı aktarma İşlemi gerçekleştirildi", null, "Post Edildi", null);
-                    }
+                            var postData = new postDeneme
+                            {
+                                title = "post edildi başlık",
+                                description = "post edildi açıklama",
+                                imageUrl = "post edildi resim",
+                            };
+                            var jsonData = JsonConvert.SerializeObject(postData);
+                            apiService.PostDataAsync("post edildi", jsonData);
+                        }
                     else
                     {
                         // If CN_NUMBER exists, check if LastUpdateTimestamp has changed
@@ -59,6 +81,15 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
                                 new { CN_NUMBER = item.CN_NUMBER, ProcessTimestamp = DateTime.UtcNow, LastUpdateTimestamp = item.LastUpdateTimestamp });
 
                             logService.AddNewLogEntry($"{item.CN_NUMBER} 'ın güncellenmiş tarihi loglandı", null, "Post Edildi", null);
+
+                                var postData = new postDeneme
+                                {
+                                    title = "post edildi başlık",
+                                    description = "post edildi açıklama",
+                                    imageUrl = "post edildi resim",
+                                };
+                                var jsonData = JsonConvert.SerializeObject(postData);
+                                apiService.PostDataAsync("abouts", jsonData);
                         }
                         else
                         {
@@ -69,6 +100,12 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Helper
                 }
 
                 await Task.Delay(10000, stoppingToken);
+            }
+            }
+            catch (Exception ex)
+            {
+                LogService logService = new LogService(_configuration);
+                logService.AddNewLogEntry("Auto Post Aktif edilemedi: " + ex.Message, null, "Auto Post Aktif Değil", null);
             }
         }
 

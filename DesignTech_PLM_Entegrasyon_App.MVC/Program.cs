@@ -2,6 +2,7 @@ using DesignTech_PLM_Entegrasyon_App.MVC.Dtos;
 using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.DapperContext;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
+using DesignTech_PLM_Entegrasyon_App.MVC.Services;
 using DesignTech_PLM_Entegrasyon_App.MVC.Services.SignalR;
 using Humanizer.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -13,16 +14,17 @@ using SqlKata.Compilers;
 using SqlKata.Execution;
 using System.Data;
 using System.Globalization;
+using System.Threading.RateLimiting;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-
 var configuration = builder.Configuration;
 
-
+builder.Services.AddApplicationServices(configuration);
 
 //builder.Services.AddSingleton<IUygulamaDbContextFactory, UygulamaDbContextFactory>();
 
@@ -52,7 +54,13 @@ Log.Logger = new LoggerConfiguration()
 
 
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("Admin", policy => policy.RequireClaim("Role", "Admin"));
+});
+
+
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -91,7 +99,16 @@ builder.Services.AddSession(options =>
 builder.Services.AddTransient<IDbConnection>(_ =>
     new SqlConnection(configuration.GetConnectionString("Plm")));
 
-//builder.Services.AddHostedService<ChangeNoticeService>();
+//try
+//{
+//    builder.Services.AddHostedService<ChangeNoticeService>();
+
+//}
+//catch (InvalidOperationException ex)
+//{
+//    LogService logService = new LogService(configuration);
+//    logService.AddNewLogEntry("Auto Post Aktif edilemedi."+ex.Message, null, "Auto Post Aktif Deðil", null);
+//}
 
 
 //builder.Services.AddCors(options =>
@@ -107,6 +124,35 @@ builder.Services.AddTransient<IDbConnection>(_ =>
 
 //builder.Services.AddHostedService<StatusService>();
 //builder.Services.AddSignalR();
+
+
+
+
+//Ýstek limitleyici gibi birþey ama çalýþtýramadým bunu sonra tekrar deneyeceðim
+//builder.Services.AddRateLimiter(opt =>
+//{
+
+//    opt.AddPolicy("fixed-by-user", httpContext =>
+//    {
+//        // Log politika tetiklendi
+
+//        LogService logService = new LogService(configuration);
+//        var loggedInUsername = httpContext.User.Identity.Name;
+
+//        logService.AddNewLogEntry("Fixed user rate limiter triggered", null, "Limit Aþýmý", loggedInUsername);
+
+
+//        return RateLimitPartition.GetFixedWindowLimiter(
+//            partitionKey: httpContext.User.Identity?.Name?.ToString(),
+//            factory: _ => new FixedWindowRateLimiterOptions
+//            {
+//                PermitLimit = 1,
+//                Window = TimeSpan.FromMinutes(1)
+//            }
+//        );
+//    });
+
+//});
 var app = builder.Build();
 
 //app.MapHub<StatusHub>("/statushub");
@@ -121,6 +167,7 @@ if (!app.Environment.IsDevelopment())
 
 
 //app.UseCors("CorsPolicy");
+//app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

@@ -4,6 +4,7 @@ using DesignTech_PLM_Entegrasyon_App.MVC.ViewModels;
 using ExcelDataReader;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -11,6 +12,7 @@ using Serilog;
 using SqlKata.Execution;
 using System.Data;
 using System.Text.RegularExpressions;
+
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 {
@@ -368,6 +370,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
             public string newNumber { get; set; }
             public string status { get; set; }
         }
+
+        [HttpPost]
         public IActionResult updatePlmExcelFileData(string file)
         {
             var fileName = Directory.GetCurrentDirectory() + "\\wwwroot\\ExcelUpdateStockCode\\" + file;

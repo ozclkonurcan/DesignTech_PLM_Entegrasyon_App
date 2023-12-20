@@ -20,20 +20,50 @@
                 events.push({
                     title: '@System.IO.Path.GetFileNameWithoutExtension(jsonFile)',
                     start: new Date(@year, @month - 1, @day),
-                    url: '@Html.Raw(@Url.Action("ViewLogFile", new { dateFolder = ViewBag.DateFolder, jsonFile = folderName }))'
+                    url: '@Html.Raw(@Url.Action("ViewLogFile", new { dateFolder = ViewBag.DateFolder, jsonFile = folderName }))',
+                    icon: 'fa-calendar'
                 });
         </text>
     }
+
+
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'tr',
             events: events,
-            eventClick: function (info) {
-                if (info.event.url) {
-                    window.location.href = info.event.url;
-                    return false; // Linke tıklamadan önce sayfanın değişmesini engeller
+            dateClick: function (info) {
+                var clickedDate = info.date;
+
+                // Tıklanan tarihe uygun etkinliği bul
+                var clickedEvent = events.find(function (event) {
+                    return new Date(event.start).getTime() === clickedDate.getTime();
+                });
+
+                // Eğer etkinlik bulunduysa
+                if (clickedEvent) {
+                    var eventUrl = clickedEvent.url;
+                    if (eventUrl) {
+                        window.location.href = eventUrl;
+                        return false;
+                    }
                 }
+                // Eğer etkinlik bulunamadıysa, istediğiniz başka bir işlemi gerçekleştirin
+                else {
+                    toastr.info('Bu tarihe ait log kaydı bulunamadı.');
+                }
+            },
+            eventContent: function (arg) {
+                // Etkinlik içeriğini özelleştirmek için kullanılır
+                var title = arg.event.title;
+                var icon = arg.event.extendedProps.icon;
+
+                var content = '<div class="d-flex justify-content-center w-100 h-100"><span class="fs-4">' + title + '</span>';
+
+          
+                content += '</div>';
+
+                return { html: content };
             },
             height: 'auto', 
             contentHeight: 'auto'

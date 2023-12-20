@@ -1,14 +1,1 @@
-[
-  {
-    "Username": "admin",
-    "Password": "a"
-  },
-  {
-    "Username": "user",
-    "Password": "user123"
-  },
-  {
-    "Username": "designtech",
-    "Password": "designtech.!!35"
-  }
-]
+[{"Id":"cd72c4a5-e1d5-4587-9e37-20eae5d3fd94","Username":"designtech","Password":"designtech.!!35","Role":"Admin","IsLoggedIn":false,"LastLoginDate":"0001-01-01T00:00:00","LastLoginTime":"00:00:00"},{"Id":"6792f56e-e4e1-4c68-a299-2593e80100e1","Username":"admin","Password":"a","Role":"Admin","IsLoggedIn":false,"LastLoginDate":"0001-01-01T00:00:00","LastLoginTime":"00:00:00"},{"Id":"fedb0085-8f8c-4254-b409-b6e24dcfbb94","Username":"user123","Password":"user123","Role":"User","IsLoggedIn":false,"LastLoginDate":"0001-01-01T00:00:00","LastLoginTime":"00:00:00"},{"Id":"0d9f898d-ef00-4cd4-b347-477647bd6d9f","Username":"deneme1","Password":"deneme1","Role":"User","IsLoggedIn":false,"LastLoginDate":"0001-01-01T00:00:00","LastLoginTime":"00:00:00"}]

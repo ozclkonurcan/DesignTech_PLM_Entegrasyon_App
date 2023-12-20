@@ -1,9 +1,12 @@
 ﻿using DesignTech_PLM_Entegrasyon_App.MVC.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 {
@@ -193,6 +196,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
                 string sqlScript = @"
             USE [" + catalogValue + @"]
 
+
+
+
             /****** Object:  View [" + catalogValue + @"].[DocumentList]    Script Date: 25.09.2023 12:29:36 ******/
             SET ANSI_NULLS ON
             GO
@@ -272,6 +278,20 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
             select displayName,hierarchyID,classnameA2A2,idA2A2 from " + catalogValue + @".UnitDefinition  where createStampA2 > DATEADD(day, 1,CONVERT(DATETIME, (select createStampA2 from " + catalogValue + @".WTOrganization), 102))
             ;
         ";
+
+
+
+
+//                /****** Object:  View [" + catalogValue + @"].[Change_Notice]    Script Date: 19.12.2023 13:06:43 ******/
+//                SET ANSI_NULLS ON
+//                GO
+//SET QUOTED_IDENTIFIER ON
+//GO
+//CREATE VIEW[" + catalogValue + @"].[Change_Notice] AS
+//SELECT WTChangeOrder2Master.WTCHGORDERNUMBER AS CN_NUMBER, WTChangeOrder2Master.name AS CHANGE_NOTICE, WTChangeOrder2.statestate AS STATE, WTChangeOrder2Master.updateStampA2 AS LastUpdateTimestamp
+//FROM " + catalogValue + @".WTChangeOrder2Master
+//INNER JOIN " + catalogValue + @".WTChangeOrder2 ON WTChangeOrder2Master.idA2A2 = WTChangeOrder2.idA3masterReference
+//GO
 
 
                 //string connectionString = _configuration.GetConnectionString("Plm"); // ConnectionStrings'deki adı buraya ekleyin

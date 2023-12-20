@@ -13,6 +13,7 @@ using Serilog;
 using SqlKata.Execution;
 using System.Data;
 using System.Text.RegularExpressions;
+using static DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel.PlmUpdateStokCodeController;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 {
@@ -281,12 +282,21 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
 
 
         //public IActionResult ExcelProcPart(IFormCollection data)
+        public class excelProcPartErrorManagement
+        {
+            public string value { get; set; }
+            public string status { get; set; }
+        }
+		
         public IActionResult ExcelProcPart(string excelFilePath)
         {
+
             try
             {
-
-
+                List<string> failedUpdates = new List<string>(); 
+                List<string> successfulUpdates = new List<string>();
+                List<string> emptyDataFailedUpdates = new List<string>();
+                List<excelProcPartErrorManagement> stokCodeProcessStatus = new List<excelProcPartErrorManagement>();
                 //string excelFilePath = data["excel"].ToString();
                 var fileName = Directory.GetCurrentDirectory() + "\\wwwroot\\ExcelRelatePartsToDocumentFolder\\" + excelFilePath;
                 DataSet excelData;
@@ -304,6 +314,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                         });
                     }
                 }
+
                 List<GenericPartObject> RecordList = new List<GenericPartObject>();
 
                 foreach (DataRow excelRow in excelData.Tables[0].Rows)
@@ -373,6 +384,12 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                             }
 							
                             logService.AddNewLogEntry(PlmDbPartPRoc.Number + " => " + PlmDbPartPRoc.PartNumber+" ile ilişkilendirildi.", null, "İlişkilendirildi", loggedInUsername);
+							successfulUpdates.Add(PlmDbPartPRoc.Number + " => " + PlmDbPartPRoc.PartNumber);
+							stokCodeProcessStatus.Add(new excelProcPartErrorManagement
+							{
+								value = PlmDbPartPRoc.Number + " => " + PlmDbPartPRoc.PartNumber,
+								status = "İlişkilendirildi"
+                            });
 
                         }
                         else
@@ -380,35 +397,72 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.Excel
                             if (PlmDbPartPRoc.PartNumber == "" || PlmDbPartPRoc.PartNumber == null)
                             {
                                 logService.AddNewLogEntry(PlmDbPartPRoc.Number + " X  Veri Yok  ile ilişkilendirilemedi.", null, "ilişkilendirilemedi", loggedInUsername);
-							}
-							else
-							{
-                            logService.AddNewLogEntry(PlmDbPartPRoc.Number + " X" + PlmDbPartPRoc.PartNumber+ " ile ilişkilendirilemedi.", null, "ilişkilendirilemedi", loggedInUsername);
-							}
+                                failedUpdates.Add(PlmDbPartPRoc.Number + " X  Veri Yok  ile ilişkilendirilemedi.");
+                                stokCodeProcessStatus.Add(new excelProcPartErrorManagement
+                                {
+                                    value = PlmDbPartPRoc.Number + " X  Veri Yok  ile ilişkilendirilemedi.",
+                                    status = "ilişkilendirilemedi"
+                                });
+
+                            }
+                            else
+							{ 
+                            logService.AddNewLogEntry(PlmDbPartPRoc.Number + " X " + PlmDbPartPRoc.PartNumber+ " ile ilişkilendirilemedi.", null, "ilişkilendirilemedi", loggedInUsername);
+                                failedUpdates.Add(PlmDbPartPRoc.Number + " X" + PlmDbPartPRoc.PartNumber);
+                                stokCodeProcessStatus.Add(new excelProcPartErrorManagement
+                                {
+                                    value = PlmDbPartPRoc.Number + " X " + PlmDbPartPRoc.PartNumber,
+                                    status = "ilişkilendirilemedi"
+                                });
+
+                            }
                         }
                     }
 					catch (Exception ex)
 					{
-                        TempData["ErrorMessage"] = "HATA!" + ex.Message;
                         if (PlmDbPartPRoc.PartNumber == "" || PlmDbPartPRoc.PartNumber == null)
                         {
                             logService.AddNewLogEntry(PlmDbPartPRoc.Number + " X  Veri Yok  ile ilişkilendirilemedi.", null, "ilişkilendirilemedi", loggedInUsername);
+                            failedUpdates.Add(PlmDbPartPRoc.Number + " X  Veri Yok  ile ilişkilendirilemedi.");
+                            stokCodeProcessStatus.Add(new excelProcPartErrorManagement
+                            {
+                                value = PlmDbPartPRoc.Number + " X  Veri Yok  ile ilişkilendirilemedi.",
+                                status = "ilişkilendirilemedi"
+                            });
+
                         }
                         else
                         {
                             logService.AddNewLogEntry(PlmDbPartPRoc.Number + " X" + PlmDbPartPRoc.PartNumber + " ile ilişkilendirilemedi.", null, "ilişkilendirilemedi", loggedInUsername);
+							failedUpdates.Add(PlmDbPartPRoc.Number + " X" + PlmDbPartPRoc.PartNumber);
+                            stokCodeProcessStatus.Add(new excelProcPartErrorManagement
+                            {
+                                value = PlmDbPartPRoc.Number + " X" + PlmDbPartPRoc.PartNumber,
+                                status = "ilişkilendirilemedi"
+                            });
+
                         }
                     }
 				
                 }
-
-                return Ok(new { status = true, message = "Data Sync Success" });
+                ViewBag.exceldata = excelData.Tables[0];
+                ViewBag.exceldataCount = excelData.Tables[0].Rows.Count;
+                ViewBag.excelfile = excelFilePath;
+                ViewBag.successfulUpdates = successfulUpdates;
+                ViewBag.successfulUpdatesCount = successfulUpdates.Count;
+                ViewBag.failedUpdates = failedUpdates;
+                ViewBag.failedUpdatesCount = failedUpdates.Count;
+                ViewBag.stokCodeProcessStatus = stokCodeProcessStatus;
+                return View();
+                //return Ok(new { status = true, message = "Data Sync Success" });
                 //return Ok(RecordList);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = "HATA!" + ex.Message;
-                return RedirectToAction("Index");
+
+                return View();
+                //return RedirectToAction("Index");
             }
         }
 

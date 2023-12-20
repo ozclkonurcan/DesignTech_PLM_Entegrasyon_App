@@ -1,0 +1,125 @@
+﻿
+
+<div class="row g-7">
+    <!--begin::Contact groups-->
+    <div class="col-lg-3 col-xl-3">
+
+        <!--begin::Contact group wrapper-->
+        <div class="card card-flush">
+            <!--begin::Card header-->
+            <div class="card-header pt-7" id="kt_chat_contacts_header">
+                <!--begin::Card title-->
+                <div class="card-title">
+                    <h2>Kullanıcı Oluştur</h2>
+                </div>
+                <!--end::Card title-->
+            </div>
+            <!--end::Card header-->
+            <!--begin::Card body-->
+            <div class="card-body pt-5">
+                  <form method="post" asp-action="AddUser" asp-controller="Login">
+                <!--begin::Contact groups-->
+                <div class="d-flex flex-column gap-5">
+                    <!--begin::Contact group-->
+                    <div class="d-flex flex-stack">
+                        <input class="form-control form-control-solid" name="Username" type="text" required />
+                    </div>
+                    <!--begin::Contact group-->
+                    <!--begin::Contact group-->
+                    <div class="d-flex flex-stack">
+                        <input class="form-control form-control-solid" type="password" name="Password" required />
+                    </div>
+                    <!--begin::Contact group-->
+                    <!--begin::Contact group-->
+                    <div class="d-flex flex-stack">
+                        <select class="form-select form-control-solid" name="Role" required>
+                            <option selected>RoleSeçiniz</option>
+                            <option value="Admin">Admin</option>
+                            <option value="User">User</option>
+                        </select>
+                    </div>
+                    <!--begin::Contact group-->
+       
+                </div>
+                <!--end::Contact groups-->
+                <!--begin::Separator-->
+                <div class="separator my-7"></div>
+                <!--begin::Separator-->
+
+                <!--begin::Add new contact-->
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="ki-duotone ki-badge fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>Yeni kullanıcı oluştur
+                </button>
+                <!--end::Add new contact-->
+                </form>
+            </div>
+            <!--end::Card body-->
+        </div>
+        <!--end::Contact group wrapper-->
+    </div>
+    <!--end::Contact groups-->
+    <!--begin::Search-->
+    <div class="col-lg-9 col-xl-9">
+        <!--begin::Contacts-->
+        <div class="card card-flush" id="kt_contacts_list">
+  
+            <!--begin::Card body-->
+            <div class="card-body pt-5" id="kt_contacts_list_body">
+                <!--begin::List-->
+                <div class="scroll-y me-n5 pe-5 h-300px h-xl-auto" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_header, #kt_toolbar, #kt_footer, #kt_contacts_list_header" data-kt-scroll-wrappers="#kt_content, #kt_contacts_list_body" data-kt-scroll-stretch="#kt_contacts_list, #kt_contacts_main" data-kt-scroll-offset="5px" style="max-height: 763px;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th >Kullanıcı Adı</th>
+                                <th>Kullanıcı Role</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @try
+                            {
+
+                            
+                            @foreach (var item in ViewBag.usersList)
+                            {
+                                <tr>
+                                    <div class="separator separator-dashed d-none"></div>
+
+                                    <td >@item.Username</td>
+                                    <td>@item.Role</td>
+                                    <td>
+                                        <form method="post" asp-action="RemoveUser" asp-controller="Login">
+                                            <input name="Id" value="@item.Id" hidden/>
+                                                <button type="submit" class="btn btn-sm btn-light-danger">
+                                                    <i class="ki-duotone ki-trash-square fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                                                </button>
+                                        </form>
+                                    </td>
+                                    <div class="separator separator-dashed d-none"></div>
+
+                                </tr>
+                            }
+                            }
+                            catch (Exception ex)
+                            {
+                                <div class="alert alert-danger">HATA @ex.Message</div>
+                            }
+
+                        </tbody>
+                    </table>
+                 
+                    
+             
+              
+
+
+                </div>
+                <!--end::List-->
+            </div>
+            <!--end::Card body-->
+        </div>
+        <!--end::Contacts-->
+    </div>
+    <!--end::Search-->
+
+</div>
