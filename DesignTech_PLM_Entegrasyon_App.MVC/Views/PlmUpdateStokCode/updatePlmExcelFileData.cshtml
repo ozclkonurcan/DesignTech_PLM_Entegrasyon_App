@@ -82,12 +82,26 @@
                                    
                                     @foreach (var item in ViewBag.stokCodeProcessStatus)
                                     {
-                                       <tr>
-                                           <td>@index</td>
-                                           <td>@item.oldNumber</td>
-                                           <td>@item.newNumber</td>
-                                           <td>@item.status</td>
-                                            </tr>
+
+                                            @if (@item.status.Contains("Güncellendi."))
+                                            {
+                                                <tr class="bg-light-success">
+                                                    <td>@index</td>
+                                                    <td>@item.oldNumber</td>
+                                                    <td>@item.newNumber</td>
+                                                    <td >@item.status</td>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td>@index</td>
+                                                    <td>@item.oldNumber</td>
+                                                    <td>@item.newNumber</td>
+                                                    <td>@item.status</td>
+                                                </tr>
+                                            }
+
                                             index++;
                                         }
 

@@ -24,7 +24,7 @@ builder.Services.AddControllersWithViews();
 
 var configuration = builder.Configuration;
 
-builder.Services.AddApplicationServices(configuration);
+//builder.Services.AddApplicationServices(configuration);
 
 //builder.Services.AddSingleton<IUygulamaDbContextFactory, UygulamaDbContextFactory>();
 

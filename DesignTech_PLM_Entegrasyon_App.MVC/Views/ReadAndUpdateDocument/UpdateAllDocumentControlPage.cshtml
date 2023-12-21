@@ -72,20 +72,33 @@
 
                                         @foreach (var item in ViewBag.resp)
                                         {
+                                            @if (item.Status == 0)
+                                            {
+
                                             <tr>
                                                 <td>@index</td>
                                                 <td>@item.FileName</td>
 
 
-                                                @if (item.Status == 0)
-                                                {
-                                                    <td><span class="badge badge-light-danger">Uygun değil</span></td>
-                                                }
-                                                else
-                                                {
-                                                    <td><span class="badge badge-light-success">Eşleşmeye uygun</span></td>
-                                                }
+                                             
+                                                    <td>Uygun değil</td>
+                                              
                                             </tr>
+                                        }
+                                        else
+                                        {
+
+
+                                                <tr class="bg-light-success">
+                                                    <td>@index</td>
+                                                    <td>@item.FileName</td>
+
+
+
+                                    <td>Eşleşmeye uygun</td>
+
+                                                </tr>
+                                    }
                                             index++;
                                         }
 
