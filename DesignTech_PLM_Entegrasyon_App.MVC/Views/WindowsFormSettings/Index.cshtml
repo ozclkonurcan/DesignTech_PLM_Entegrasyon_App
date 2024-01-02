@@ -1,0 +1,216 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<h1>eman eman eman</h1>
+
+<div class="row">
+
+
+<form asp-action="windowsFormURLSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
+    <input type="text" class="form-control" placeholder="Hedef dosya yolunu ekleyin" alt="Dosya seçiniz" name="jsonFile" />
+
+    <button class="btn btn-info btn-sm float-end m-4">Bağla</button>
+</form>
+
+</div>
+
+
+
+<div class="row g-7">
+    <!--begin::Contact groups-->
+    <div class="col-lg-5 col-xl-5">
+
+        <div class="card h-xl-100">
+            <!--begin::Header-->
+            <div class="card-header position-relative min-h-50px p-0 border-bottom-2">
+                <!--begin::Nav-->
+                <ul class="nav nav-pills nav-pills-custom d-flex position-relative w-100" role="tablist">
+                    <!--begin::Item-->
+                    <li class="nav-item mx-0 p-0 w-50" role="presentation">
+                        <!--begin::Link-->
+                        <a class="nav-link btn btn-color-muted border-0 h-100 px-0 active" data-bs-toggle="pill" id="kt_forms_widget_1_tab_1" href="#kt_forms_widget_1_tab_content_1" aria-selected="true" role="tab">
+                            <!--begin::Subtitle-->
+                            <span class="nav-text fw-bold fs-4 mb-3">
+                                SQL
+                            </span>
+                            <!--end::Subtitle-->
+                            <!--begin::Bullet-->
+                            <span class="bullet-custom position-absolute z-index-2 w-100 h-2px top-100 bottom-n100 bg-primary rounded"></span>
+                            <!--end::Bullet-->
+                        </a>
+                        <!--end::Link-->
+                    </li>
+                    <!--end::Item-->
+                    <!--begin::Item-->
+                    <li class="nav-item mx-0 px-0 w-50" role="presentation">
+                        <!--begin::Link-->
+                        <a class="nav-link btn btn-color-muted border-0 h-100 px-0" data-bs-toggle="pill" id="kt_forms_widget_1_tab_2" href="#kt_forms_widget_1_tab_content_2" aria-selected="false" role="tab" tabindex="-1">
+                            <!--begin::Subtitle-->
+                            <span class="nav-text fw-bold fs-4 mb-3">
+                                API
+                            </span>
+                            <!--end::Subtitle-->
+                            <!--begin::Bullet-->
+                            <span class="bullet-custom position-absolute z-index-2 w-100 h-2px top-100 bottom-n100 bg-primary rounded"></span>
+                            <!--end::Bullet-->
+                        </a>
+                        <!--end::Link-->
+                    </li>
+                    <!--end::Item-->
+                </ul>
+                <!--end::Nav-->
+            </div>
+            <!--end::Header-->
+            <!--begin::Body-->
+            <div class="card-body">
+                <!--begin::Tab Content-->
+                <div class="tab-content">
+                    <!--begin::Tap pane-->
+                    <div class="tab-pane fade active show" id="kt_forms_widget_1_tab_content_1" role="tabpanel" aria-labelledby="kt_forms_widget_1_tab_1">
+                        <form asp-action="windowssFormSQLSettings" asp-controller="WindowsFormSettings" method="post">
+
+      
+                        <!--begin::Row-->
+                        <div class="row mb-7">
+                            <!--begin::Col-->
+                            <div class="col-12 mt-3">
+                                <!--begin::Input group-->
+                                <div class="form-floating">
+                                    <input type="text" class="form-control text-gray-800 fw-bold" placeholder="Catalog" id="Catalog" name="Catalog" "">
+                                    <label for="Catalog">Catalog</label>
+                                </div>
+                                <!--end::Input group-->
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-12 mt-3">
+                                <!--begin::Input group-->
+                                <div class="form-floating">
+                                    <input type="text" class="form-control text-gray-800 fw-bold" placeholder="ServerName" id="ServerName" name="ServerName">
+                                    <label for="ServerName">ServerName</label>
+                                </div>
+                                <!--end::Input group-->
+                            </div>
+                        
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-12 mt-3">
+                                <!--begin::Input group-->
+                                <div class="form-floating">
+                                    <input type="text" class="form-control text-gray-800 fw-bold" placeholder="KullaniciAdi" id="KullaniciAdi" name="KullaniciAdi">
+                                    <label for="KullaniciAdi">KullaniciAdi</label>
+                                </div>
+                                <!--end::Input group-->
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="col-12 mt-3">
+                                <!--begin::Input group-->
+                                <div class="form-floating">
+                                    <input type="password" class="form-control text-gray-800 fw-bold" placeholder="Parola" id="Parola" name="Parola">
+                                    <label for="Parola">Parola</label>
+                                </div>
+                                <!--end::Input group-->
+                            </div>
+                            <!--end::Col-->
+                        
+               
+                        </div>
+                        <!--end::Row-->
+                        <!--begin::Action-->
+                        <div class="d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary fs-3 w-100">Ayarları Kaydet</button>
+                        </div>
+                        <!--end::Action-->
+                        </form>
+                    </div>
+                    <!--end::Tap pane-->
+                    <!--begin::Tap pane-->
+                    <div class="tab-pane fade" id="kt_forms_widget_1_tab_content_2" role="tabpanel" aria-labelledby="kt_forms_widget_1_tab_2">
+                        <form asp-action="windowssFormAPISettings" asp-controller="WindowsFormSettings" method="post">
+                        <!--begin::Row-->
+                        <div class="row mb-7">
+                                <div class="col-12 mt-3">
+                                    <!--begin::Input group-->
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control text-gray-800 fw-bold" placeholder="ApiURL" id="ApiURL" name="ApiURL">
+                                        <label for="ApiURL">ApiURL</label>
+                                    </div>
+                                    <!--end::Input group-->
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <!--begin::Input group-->
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control text-gray-800 fw-bold" placeholder="ApiEndpoint" id="ApiEndpoint" name="ApiEndpoint">
+                                        <label for="ApiEndpoint">ApiEndpoint</label>
+                                    </div>
+                                    <!--end::Input group-->
+                                </div>
+                          
+                        </div>
+                        <!--end::Row-->
+                        <!--begin::Action-->
+                        <div class="d-flex align-items-end mt-3">
+                            <button type="submit" class="btn btn-primary fs-3 w-100">Ayarları Kaydet</button>
+                        </div>
+                        <!--end::Action-->
+                        </form>
+                    </div>
+                    <!--end::Tap pane-->
+                </div>
+                <!--end::Tab Content-->
+            </div>
+            <!--end: Card Body-->
+        </div>
+    </div>
+    <!--end::Contact groups-->
+    <!--begin::Search-->
+    <div class="col-lg-7 col-xl-7">
+        <!--begin::Contacts-->
+        <div class="card card-flush" id="kt_contacts_list">
+
+            <!--begin::Card body-->
+            <div class="card-body pt-5" id="kt_contacts_list_body">
+                <!--begin::List-->
+                <div class="scroll-y me-n5 pe-5 h-300px h-xl-auto" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_header, #kt_toolbar, #kt_footer, #kt_contacts_list_header" data-kt-scroll-wrappers="#kt_content, #kt_contacts_list_body" data-kt-scroll-stretch="#kt_contacts_list, #kt_contacts_main" data-kt-scroll-offset="5px" style="max-height: 763px;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı Adı</th>
+                                <th>Kullanıcı Role</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @try
+                            {
+
+
+                     
+                            }
+                            catch (Exception ex)
+                            {
+                                <div class="alert alert-danger">HATA @ex.Message</div>
+                            }
+
+                        </tbody>
+                    </table>
+
+
+
+
+
+
+                </div>
+                <!--end::List-->
+            </div>
+            <!--end::Card body-->
+        </div>
+        <!--end::Contacts-->
+    </div>
+    <!--end::Search-->
+
+</div>

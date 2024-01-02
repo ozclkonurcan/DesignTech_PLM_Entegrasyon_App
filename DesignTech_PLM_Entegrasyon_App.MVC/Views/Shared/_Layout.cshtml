@@ -734,6 +734,27 @@
 									}
 									<!--end:Menu item-->
 									<!--begin:Menu item-->
+									@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+									{
+
+										<div class="menu-item">
+											<!--begin:Menu link-->
+											<a class="menu-link" href="@Url.Action("Index", "WindowsFormSettings")">
+												<span class="menu-icon">
+													<i class="ki-duotone ki-gear fs-2">
+														<span class="path1"></span>
+														<span class="path2"></span>
+														<span class="path3"></span>
+														<span class="path4"></span>
+													</i>
+												</span>
+												<span class="menu-title">WinForm Ayarları</span>
+											</a>
+											<!--end:Menu link-->
+										</div>
+									}
+									<!--end:Menu item-->
+									<!--begin:Menu item-->
 									<div class="menu-item">
 										<!--begin:Menu link-->
 										<a class="menu-link" href="@Url.Action("ViewJsonFiles", "Log")">
