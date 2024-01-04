@@ -4,7 +4,6 @@
 @{
 }
 
-<h1>eman eman eman</h1>
 
 <div class="row">
 
@@ -21,7 +20,7 @@
 
 <div class="row g-7">
     <!--begin::Contact groups-->
-    <div class="col-lg-5 col-xl-5">
+    <div class="col-lg-4 col-xl-4">
 
         <div class="card h-xl-100">
             <!--begin::Header-->
@@ -168,39 +167,51 @@
     </div>
     <!--end::Contact groups-->
     <!--begin::Search-->
-    <div class="col-lg-7 col-xl-7">
+    <div class="col-lg-8 col-xl-8">
         <!--begin::Contacts-->
         <div class="card card-flush" id="kt_contacts_list">
 
+            <div class="card-header">
+                <div class="d-flex align-items-center mb-1">
+                    <a href="#" class="text-gray-800 text-hover-primary fs-2 fw-bold me-3">Windows Form Gösterge Paneli</a>
+                    @if (ViewBag.ConnectionType)
+                    {
+                        <span class="badge badge-light-success me-auto">Çalışıyor</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-light-danger me-auto">Çalışmıyor</span>
+                    }
+                </div>
+            </div>
             <!--begin::Card body-->
             <div class="card-body pt-5" id="kt_contacts_list_body">
                 <!--begin::List-->
                 <div class="scroll-y me-n5 pe-5 h-300px h-xl-auto" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_header, #kt_toolbar, #kt_footer, #kt_contacts_list_header" data-kt-scroll-wrappers="#kt_content, #kt_contacts_list_body" data-kt-scroll-stretch="#kt_contacts_list, #kt_contacts_main" data-kt-scroll-offset="5px" style="max-height: 763px;">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Kullanıcı Adı</th>
-                                <th>Kullanıcı Role</th>
-                            </tr>
-                        </thead>
+             
 
-                        <tbody>
-                            @try
-                            {
-
-
-                     
-                            }
-                            catch (Exception ex)
-                            {
-                                <div class="alert alert-danger">HATA @ex.Message</div>
-                            }
-
-                        </tbody>
-                    </table>
-
-
-
+                    <span>Catalog: @ViewBag.Catalog</span>
+                    <span>
+                       ServerName: @ViewBag.ServerName
+                    </span>
+                    <span>
+                        KullaniciAdi:
+                        @if (!string.IsNullOrEmpty(ViewBag.KullaniciAdi)){
+                            @ViewBag.KullaniciAdi
+                        }
+                    </span>
+                    <span>
+                        Parola:
+                        @if (!string.IsNullOrEmpty(ViewBag.Parola))
+                        {
+                            @ViewBag.Parola
+                            
+                        }
+                       
+                    </span>
+                    <span>
+                        API: @ViewBag.API
+                    </span>
 
 
 

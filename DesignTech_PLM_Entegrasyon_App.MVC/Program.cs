@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using RabbitMQServiceLibraryFor.MVC;
 using Serilog;
 using SqlKata.Compilers;
 using SqlKata.Execution;
@@ -43,6 +44,8 @@ builder.Services.AddScoped(factory =>
         Connection = new SqlConnection(configuration.GetConnectionString("Plm"))
     };
 });
+
+builder.Services.AddSingleton<RabbitMQService>();
 
 var currentMonthFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logs", DateTime.Now.ToString("MMMM-yyyy", CultureInfo.InvariantCulture));
 var logFileName = Path.Combine(currentMonthFolder, DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) + ".json");

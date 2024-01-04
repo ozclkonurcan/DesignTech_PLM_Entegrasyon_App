@@ -17,7 +17,33 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
         {
             try
             {
-                return View();
+                // appsettings.json dosyasının yolunu al
+                var appSettingsPath = "appsettings.json";
+
+                // appsettings.json dosyasını oku
+                var json = System.IO.File.ReadAllText(appSettingsPath);
+                var jsonObj = JObject.Parse(json);
+
+                // Dosya yolu ve dosya adını al
+                var windowsFormFileUrl = jsonObj["WindowsFormFileUrl"]?.ToString();
+
+            
+                    var targetJson = System.IO.File.ReadAllText(windowsFormFileUrl);
+                    var targetJsonObj = JObject.Parse(targetJson);
+
+                // Değişiklikleri yap
+                ViewBag.Catalog = targetJsonObj["Catalog"].ToString();
+                ViewBag.ServerName = targetJsonObj["ServerName"].ToString();
+                ViewBag.KullaniciAdi = targetJsonObj["KullaniciAdi"].ToString();
+                ViewBag.Parola = targetJsonObj["Parola"].ToString();
+                ViewBag.ApiURL = targetJsonObj["APIConnectionINFO"]["ApiURL"].ToString();
+                ViewBag.ApiEndpoint = targetJsonObj["APIConnectionINFO"]["ApiEndpoint"].ToString();
+                ViewBag.API = targetJsonObj["APIConnectionINFO"]["API"].ToString();
+                ViewBag.ConnectionType = Convert.ToBoolean(targetJsonObj["ConnectionType"]);
+
+                    // View'e geçir
+                    ViewBag.TargetJson = targetJsonObj.ToString();
+                    return View();
             }
             catch (Exception ex)
             {
@@ -123,6 +149,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                     ViewBag.TargetJson = "Hedef dosya bulunamadı.";
                 }
 
+                TempData["SuccessMessage"] = "SQL Ayarları güncellendi.";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -171,6 +198,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                     ViewBag.TargetJson = "Hedef dosya bulunamadı.";
                 }
 
+
+                TempData["SuccessMessage"] = "API Ayarları güncellendi.";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
