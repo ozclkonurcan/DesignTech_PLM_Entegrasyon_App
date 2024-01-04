@@ -5,6 +5,62 @@
 }
 
 
+
+<div class="offcanvas offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="staticBackdrop" aria-labelledby="staticBackdropLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="staticBackdropLabel">Sınıf ayarları</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="row">
+        <div class="col-md-12">
+            <form asp-action="ApiSendDataSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
+                <input type="text" class="form-control" placeholder="Hedef dosya yolunu ekleyin" alt="Dosya seçiniz" name="jsonFile" />
+
+                <button class="btn btn-info btn-sm float-end m-4">Bağla</button>
+            </form>
+        </div>
+
+        <div class="col-md-12 table-responsive">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th hidden>KİMLİK</th>
+                        <th>ADI</th>
+                        <th>VERİTABANI ADI</th>
+                        <th hidden>DURUM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        @foreach (var item in ViewBag.ApiSendDataSettings)
+                        {
+                            @if (@item.IsActive)
+                            {
+                            <tr class="bg-light-success text-success">
+                                <td hidden>@item.ID</td>
+                                <td>@item.Name</td>
+                                <td>@item.SQLName</td>
+                                <td hidden>@item.IsActive</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr class="bg-light-danger text-danger">
+                                    <td hidden>@item.ID</td>
+                                    <td>@item.Name</td>
+                                    <td>@item.SQLName</td>
+                                    <td hidden>@item.IsActive</td>
+                                </tr>
+                            }
+                        }
+                </tbody>
+            </table>
+   
+        </div>
+       </div>
+    </div>
+</div>
 <div class="row">
 
 
@@ -183,6 +239,13 @@
                         <span class="badge badge-light-danger me-auto">Çalışmıyor</span>
                     }
                 </div>
+
+                <div class="d-flex align-items-end mb-1">
+                    <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#staticBackdrop" aria-controls="staticBackdrop">
+                        <i class="ki-solid ki-gear fs-2"></i>
+                    </button>
+                </div>
+
             </div>
             <!--begin::Card body-->
             <div class="card-body pt-5" id="kt_contacts_list_body">
