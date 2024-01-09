@@ -77,6 +77,101 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
             }
         }
 
+        public IActionResult ApiSendDataPartsSettings(string ID, bool IsActive)
+        {
+
+            try
+            {
+
+                // appsettings.json dosyasının yolunu al
+                var appSettingsPath = "appsettings.json";
+
+                // appsettings.json dosyasını oku
+                var json = System.IO.File.ReadAllText(appSettingsPath);
+                var jsonObj = JObject.Parse(json);
+
+                // Dosya yolu ve dosya adını al
+                var ApiSendDataSettingsFolder = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
+
+                // Hedef json dosyasını oku
+                if (!string.IsNullOrEmpty(ApiSendDataSettingsFolder))
+                {
+
+                    var targetJson = System.IO.File.ReadAllText(ApiSendDataSettingsFolder);
+                    var targetJsonObj = JObject.Parse(targetJson);
+
+                    // Gelen ID ile eşleşen objeyi bul
+                    var targetItem = targetJsonObj.SelectToken($"$..[?(@.ID == '{ID}')]");
+
+                    // Eşleşme varsa IsActive değerini güncelle
+                    if (targetItem != null)
+                    {
+                        targetItem["IsActive"] = IsActive;
+                    }
+
+                    // Değişiklikleri kaydet
+                    System.IO.File.WriteAllText(ApiSendDataSettingsFolder, targetJsonObj.ToString());
+
+                }
+                TempData["SuccessMessage"] = "Data parçaları güncellendi.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+
+                TempData["ErrorMessage"] = "Hata! " + ex.Message;
+                return RedirectToAction("Index");
+
+            }
+
+        }
+
+        //public IActionResult ApiSendDataPartsSettings(string ID,bool IsActive)
+        //{
+        //    try
+        //    {
+        //        // appsettings.json dosyasının yolunu al
+        //        var appSettingsPath = "appsettings.json";
+
+        //        // appsettings.json dosyasını oku
+        //        var json = System.IO.File.ReadAllText(appSettingsPath);
+        //        var jsonObj = JObject.Parse(json);
+
+        //        // Dosya yolu ve dosya adını al
+        //        var ApiSendDataSettingsFolder = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
+
+        //        // Hedef json dosyasını oku
+        //        if (!string.IsNullOrEmpty(ApiSendDataSettingsFolder))
+        //        {
+        //            var targetJson = System.IO.File.ReadAllText(ApiSendDataSettingsFolder);
+        //            var targetJsonObj = JObject.Parse(targetJson);
+
+        //            // Değişiklikleri yap
+
+        //            targetJsonObj["IsActive"] = "IsActive";
+
+        //            // Değişiklikleri kaydet
+        //            System.IO.File.WriteAllText(ApiSendDataSettingsFolder, targetJsonObj.ToString());
+        //            System.IO.File.SetAttributes(ApiSendDataSettingsFolder, FileAttributes.Normal);
+        //            // View'e geçir
+        //            ViewBag.TargetJson = targetJsonObj.ToString();
+        //        }
+        //        else
+        //        {
+        //            ViewBag.TargetJson = "Hedef dosya bulunamadı.";
+        //        }
+
+
+        //        TempData["SuccessMessage"] = "Data parçaları güncellendi.";
+        //        return RedirectToAction("Index");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["ErrorMessage"] = "Hata! " + ex.Message;
+        //        return RedirectToAction("Index");
+        //    }
+        //}
+
 
         public IActionResult ApiSendDataSettings(string jsonFile)
         {

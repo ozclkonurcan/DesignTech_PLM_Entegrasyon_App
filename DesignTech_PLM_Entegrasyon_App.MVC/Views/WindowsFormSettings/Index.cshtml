@@ -30,11 +30,19 @@
                         <th>ADI</th>
                         <th>VERİTABANI ADI</th>
                         <th hidden>DURUM</th>
+                        <th>DURUM</th>
                     </tr>
                 </thead>
                 <tbody>
-                        @foreach (var item in ViewBag.ApiSendDataSettings)
+                    @try
                         {
+
+                                @foreach (var item in ViewBag.ApiSendDataSettings)
+                        {
+                            <form asp-action="ApiSendDataPartsSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
+                                        <input type="text" name="ID" value="@item.ID" hidden  />
+
+                            @if (!@item.Name.Contains("idA2A2") && !@item.Name.Contains("idA3masterReference") && !@item.Name.Contains("updateStampA2") && !@item.Name.Contains("statestate")){
                             @if (@item.IsActive)
                             {
                             <tr class="bg-light-success text-success">
@@ -42,7 +50,17 @@
                                 <td>@item.Name</td>
                                 <td>@item.SQLName</td>
                                 <td hidden>@item.IsActive</td>
-                                </tr>
+                                <input type="text" name="IsActive" value="false" hidden />
+                            <td>
+                                        <button type="submit" class="bg-light-success border-0 rounded-2  ">
+                                            <i class="ki-duotone ki-tablet-delete fs-1 text-danger" >
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                </button>
+                            </td>    
+                            </tr>
                             }
                             else
                             {
@@ -51,8 +69,28 @@
                                     <td>@item.Name</td>
                                     <td>@item.SQLName</td>
                                     <td hidden>@item.IsActive</td>
+                                        <input type="text" name="IsActive" value="true" hidden />
+
+                                <td>
+                                        <button type="submit" class="bg-light-danger border-0 rounded-2">
+                                            <i class="ki-duotone ki-tablet-ok fs-1 text-success">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                        </button>
+                                </td>
                                 </tr>
                             }
+                        }
+                            </form>
+                        }
+
+
+                        }
+                        catch (Exception ex)
+                        {
+                            <h3 class="alert alert-light-danger">HATA! : @ex.Message</h3>
                         }
                 </tbody>
             </table>
