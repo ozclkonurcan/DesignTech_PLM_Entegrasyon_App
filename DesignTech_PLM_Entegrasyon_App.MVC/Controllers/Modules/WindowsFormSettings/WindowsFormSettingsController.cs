@@ -1,6 +1,10 @@
-﻿using DesignTech_PLM_Entegrasyon_App.MVC.ViewModels;
+﻿using DesignTech_PLM_Entegrasyon_App.MVC.Services.Rabbitmq;
+using DesignTech_PLM_Entegrasyon_App.MVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Text;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSettings
 {
@@ -8,10 +12,12 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 	{
 
         private readonly IConfiguration _configuration;
+        private readonly IMessageProducer _messageProducer;
 
-        public WindowsFormSettingsController(IConfiguration configuration)
+        public WindowsFormSettingsController(IConfiguration configuration, IMessageProducer messageProducer)
         {
             _configuration = configuration;
+            _messageProducer = messageProducer;
         }
 
         public IActionResult Index()
@@ -51,6 +57,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 
                     wtPartMasterList.Add(wtPartMasterItem);
                 }
+
+    
 
 
                 // Değişiklikleri yap
@@ -295,6 +303,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                         ConnectionStrings = $"Data Source={ServerName};Initial Catalog={Catalog};Integrated Security=True";
                     }
 
+                    // RabbitMQ suncuda olmadığı için bunu kullanamıyoruz yinede dursun ilerde docker falan derken aktif ederiz
+                    //CloudAMQP üzerinden rabbitmq ile yaptık birşeyler ama buda uzak sunucuda ve paralı
+                    // _messageProducer.SendingMessage(ConnectionStrings);
 
                     targetJsonObj["ConnectionStrings"]["Plm"] = ConnectionStrings;
       

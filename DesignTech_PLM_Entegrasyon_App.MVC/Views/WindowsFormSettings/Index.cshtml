@@ -21,6 +21,9 @@
             </form>
         </div>
 
+
+
+
         <div class="col-md-12 table-responsive">
 
             <table class="table">
@@ -99,8 +102,16 @@
        </div>
     </div>
 </div>
-<div class="row">
 
+
+        @try{
+            
+<h1 class="alert alert-info">@ViewBag.rabbitmqTestmessage</h1>
+        }catch(Exception){
+
+        }
+<div class="row">
+    
 
 <form asp-action="windowsFormURLSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
     <input type="text" class="form-control" placeholder="Hedef dosya yolunu ekleyin" alt="Dosya seçiniz" name="jsonFile" />
