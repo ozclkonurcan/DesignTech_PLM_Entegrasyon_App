@@ -591,55 +591,16 @@
 										<!--begin:Menu sub-->
 										<div class="menu-sub menu-sub-accordion">
 										
-											<!--begin:Menu item-->
+										<!--
 											<div class="menu-item">
-												<!--begin:Menu link-->
-												<a class="menu-link" href="@Url.Action("Index", "PlmUploadExcel")">
+												<a class="menu-link" href="@Url.Action("action", "controller")">
 													<span class="menu-bullet">
 														<span class="bullet bullet-dot"></span>
 													</span>
-													<span class="menu-title">Attribute içe aktar</span>
+													<span class="menu-title">menu text</span>
 												</a>
-												<!--end:Menu link-->
 											</div>
-											<!--end:Menu item-->	
-											<!--begin:Menu item-->
-											<div class="menu-item">
-												<!--begin:Menu link-->
-												<a class="menu-link" href="@Url.Action("Index", "PlmLoadExcelRelatePartsToDocument")">
-													<span class="menu-bullet">
-														<span class="bullet bullet-dot"></span>
-													</span>
-													<span class="menu-title">Parçaya döküm ilişkilendir</span>
-												</a>
-												<!--end:Menu link-->
-											</div>
-											<!--end:Menu item-->
-											<!--begin:Menu item-->
-											<div class="menu-item">
-												<!--begin:Menu link-->
-												<a class="menu-link" href="@Url.Action("Index", "PlmUpdateStokCode")">
-													<span class="menu-bullet">
-														<span class="bullet bullet-dot"></span>
-													</span>
-													<span class="menu-title">Stok Kodu Güncelleme</span>
-												</a>
-												<!--end:Menu link-->
-											</div>
-											<!--end:Menu item-->
-											<!--begin:Menu item-->
-											<div class="menu-item">
-												<!--begin:Menu link-->
-												<a class="menu-link" id="dosyaNumberAttachLink">
-													<span class="menu-bullet">
-														<span class="bullet bullet-dot"></span>
-													</span>
-													<span class="menu-title">Dosya/Number Attachment işlemi</span>
-												</a>
-												<!--end:Menu link-->
-											</div>
-											<!--end:Menu item-->
-
+									-->
 									
 
 
@@ -665,7 +626,16 @@
 										<!--begin:Menu sub-->
 										<div class="menu-sub menu-sub-accordion">
 
-										
+											<!--
+													<div class="menu-item">
+														<a class="menu-link" href="@Url.Action("action", "controller")">
+															<span class="menu-bullet">
+																<span class="bullet bullet-dot"></span>
+															</span>
+															<span class="menu-title">menu text</span>
+														</a>
+													</div>
+											-->
 											<!--begin:Menu item-->
 											<div class="menu-item">
 												<!--begin:Menu link-->
@@ -3294,54 +3264,8 @@
 });
 
 
-			// $(window).on('load', function () {
-			// 	$('#loader').hide();
-			// });
-			// $(document).on('turbolinks:request-start', function () {
-			// 	$('#loader').show();
-			// });
 
-			// $(document).on('turbolinks:load', function () {
-			// 	$('#loader').hide();
-			// });
 
-			$('#dosyaNumberAttachLink').on("click", function (e) {
-
-				e.preventDefault();
-
-				Swal.fire({
-					title: "Uyarı !",
-					html: "Tüm PDF dosyaları aynı isme sahip parçalara ataç edilecektir.",
-					icon: "warning",
-					showCancelButton: true,
-					confirmButtonText: "Evet, Devam Et",
-					cancelButtonText: "Hayır, İptal Et",
-					customClass: {
-						confirmButton: "btn btn-primary",
-						cancelButton: "btn btn-danger"
-					}
-				}).then((result) => {
-					if (result.isConfirmed) {
-						window.location.href = "@Url.Action("Index", "ReadAndUpdateDocument")";
-					}
-				});
-			});
-
-	// $(window).on('load', function() {
-	// $('#loader').hide();
-	// });
-
-	
-
-			// $('a').on('click', function () {
-
-			// 	$('#loader').show();
-
-			// 	$(window).on('load', function () {
-			// 		$('#loader').hide();
-			// 	});
-
-			// });
 		});
 
 	</script>

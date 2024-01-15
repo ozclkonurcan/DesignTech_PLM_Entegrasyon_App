@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Controllers\Modules\Excel\" />
+    <Folder Include="Controllers\Modules\ReadAndUpdateDocument\" />
     <Folder Include="Repositories\" />
     <Folder Include="wwwroot\errorFile\" />
     <Folder Include="wwwroot\ExcelUpdateStockCode\" />

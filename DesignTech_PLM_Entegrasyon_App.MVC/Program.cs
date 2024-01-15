@@ -3,6 +3,7 @@ using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.DapperContext;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
 using DesignTech_PLM_Entegrasyon_App.MVC.Services;
+using DesignTech_PLM_Entegrasyon_App.MVC.Services.ApiServices;
 using DesignTech_PLM_Entegrasyon_App.MVC.Services.Rabbitmq;
 using DesignTech_PLM_Entegrasyon_App.MVC.Services.SignalR;
 using Humanizer.Configuration;
@@ -47,6 +48,7 @@ builder.Services.AddScoped(factory =>
 });
 
 builder.Services.AddSingleton<RabbitMQService>();
+builder.Services.AddHttpClient<WindchillApiService>();
 builder.Services.AddScoped<IMessageProducer, MessageProducer>();
 
 var currentMonthFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logs", DateTime.Now.ToString("MMMM-yyyy", CultureInfo.InvariantCulture));

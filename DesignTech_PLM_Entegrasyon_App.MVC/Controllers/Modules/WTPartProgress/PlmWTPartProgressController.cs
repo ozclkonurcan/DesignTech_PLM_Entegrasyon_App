@@ -1,9 +1,13 @@
-﻿using Dapper;
+﻿using Azure;
+using Dapper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models;
+using DesignTech_PLM_Entegrasyon_App.MVC.Models.WindchillApiModel;
+using DesignTech_PLM_Entegrasyon_App.MVC.Services.ApiServices;
 using DesignTech_PLM_Entegrasyon_App.MVC.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
 using System.Data;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WTPartProgress
@@ -14,18 +18,24 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WTPartProgress
         //private readonly DTExcelDbContext _context;
         //private readonly IUygulamaDbContextFactory _dbContextFactory;
         private readonly IConfiguration _configuration;
-
-        public PlmWTPartProgressController( IConfiguration configuration)
-        {
-            _configuration = configuration;
-            //_context = context;
-            //_dbContextFactory = dbContextFactory;
-        }
-        public IActionResult Index(int page = 1, string search = "")
+		private readonly IWebHostEnvironment _env;
+		public PlmWTPartProgressController(IConfiguration configuration, IWebHostEnvironment env = null)
+		{
+			_configuration = configuration;
+            _env = env;
+			//_context = context;
+			//_dbContextFactory = dbContextFactory;
+		}
+		public async Task<IActionResult> Index(int page = 1, string search = "")
         {
             try
             {
-                string connectionString = _configuration.GetConnectionString("Plm");
+                WindchillApiService windchillApiService = new WindchillApiService(_env);
+               var json = await windchillApiService.GetApiData("192.168.1.11", "ProdMgmt/Parts");
+				var response = JsonConvert.DeserializeObject<ProdMgmtParts>(json);
+                
+
+				string connectionString = _configuration.GetConnectionString("Plm");
                 string schema = _configuration["Catalog"];
 
                 using IDbConnection connection = new SqlConnection(connectionString);
