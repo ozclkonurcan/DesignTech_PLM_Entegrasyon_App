@@ -175,7 +175,9 @@
             <div class="card-header">
                 <div class="d-flex align-items-center mb-1">
                     <a href="#" class="text-gray-800 text-hover-primary fs-2 fw-bold me-3">Windows Form Gösterge Paneli</a>
-                    @if (ViewBag.ConnectionType)
+                    @try
+                                {
+                                        @if (ViewBag.ConnectionType)
                     {
                         <span class="badge badge-light-success me-auto">Çalışıyor</span>
                     }
@@ -183,6 +185,12 @@
                     {
                         <span class="badge badge-light-danger me-auto">Çalışmıyor</span>
                     }
+                                }
+                                catch (Exception)
+                                {
+                                     <span class="badge badge-light-info me-auto">Aranıyor...</span>
+                                }
+                
                 </div>
 
                 <div class="d-flex align-items-end mb-1">
@@ -262,7 +270,7 @@
                             <div class="card-body pt-1 scroll-y" style="height:300px">
                                     
                                     <!--begin::Users-->
-                                <div class="fw-bold text-gray-600 mb-5">Total users with this role: @item.SablonDataList.Count(x => x.IsActive == "true")</div>
+                                <div class="fw-bold text-gray-600 mb-5">Aktif edilmiş Attribute sayısı: @item.SablonDataList.Count(x => x.IsActive == "true")</div>
                                 <!--end::Users-->
                                     
                                 <!--begin::Permissions-->
@@ -285,11 +293,21 @@
                             <div class="card-footer flex-wrap pt-0">
 
 
+
+
+                                <form asp-action="apiSablonsSendtToWindowsFormSettings" asp-controller="WindowsFormSettings" method="post">
+
+                                    <input name="ID" value="@item.ID" hidden/>
+                                    <input name="SablonName" value="@item.SablonName" hidden/>
+
                                 @if(item.sablonDataDurumu == "false"){
-                                <button type="button" class="btn btn-light btn-active-light-primary my-1 float-end" >Aktif Et</button>
+                                <button type="submit" class="btn btn-light btn-light-primary my-1 float-end" >Aktif Et</button>
+                                    <input name="sablonDataDurumu" value="true" hidden/>
                                 }else{
-                                <button type="button" class="btn btn-light btn-active-success my-1 float-end" >Aktif</button>
+                                <button type="submit" class="btn btn-light btn-success my-1 float-end" >Aktif</button>
+                                    <input name="sablonDataDurumu" value="false" hidden/>
                                 }
+                                </form>
                             </div>
                             <!--end::Card footer-->
                         </div>
@@ -369,7 +387,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @try
+
+
+                 @*    @try
                         {
 
                                 @foreach (var item in ViewBag.ApiSendDataSettings)
@@ -426,7 +446,7 @@
                         catch (Exception ex)
                         {
                             <h3 class="alert alert-light-danger">HATA! : @ex.Message</h3>
-                        }
+                        } *@
                 </tbody>
             </table>
    
