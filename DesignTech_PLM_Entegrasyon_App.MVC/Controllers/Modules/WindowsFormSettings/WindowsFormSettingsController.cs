@@ -1,14 +1,17 @@
-﻿using DesignTech_PLM_Entegrasyon_App.MVC.Services.Rabbitmq;
+﻿using DesignTech_PLM_Entegrasyon_App.MVC.Models;
+using DesignTech_PLM_Entegrasyon_App.MVC.Services.Rabbitmq;
 using DesignTech_PLM_Entegrasyon_App.MVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 
+
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSettings
 {
-	public class WindowsFormSettingsController : Controller
+    public class WindowsFormSettingsController : Controller
 	{
 
         private readonly IConfiguration _configuration;
@@ -58,7 +61,59 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                     wtPartMasterList.Add(wtPartMasterItem);
                 }
 
-    
+
+
+
+				var WTPartDataSettings = "WTPartDataSettings.json";
+				var json2 = System.IO.File.ReadAllText(WTPartDataSettings);
+				var jsonObj2 = string.IsNullOrEmpty(json2) ? new JObject() : JObject.Parse(json2);
+
+				var sablons = jsonObj2["sablons"] as JArray;
+
+
+                List<SablonViewModel> sablonViewModelList = new List<SablonViewModel>();
+
+                if (sablons != null)
+                {
+                    foreach (var sablon in sablons)
+                    {
+                        var sablonName = sablon["sablonName"]?.ToString();
+                        var ID = sablon["ID"]?.ToString();
+                        var sablonDataDurumu = sablon["sablonDataDurumu"]?.ToString();
+                        var sablonData = sablon["sablonData"] as JArray;
+
+                        SablonViewModel sablonViewModel = new SablonViewModel
+                        {
+                            ID = ID,
+                            SablonName = sablonName,
+                            sablonDataDurumu = sablonDataDurumu,
+                            SablonDataList = new List<WTPartDataSettingsViewModel>()
+                        };
+
+                        if (sablonData != null)
+                        {
+                            foreach (var item in sablonData)
+                            {
+                                WTPartDataSettingsViewModel viewModel = new WTPartDataSettingsViewModel
+                                {
+                                    SablonName = sablonName,
+                                    ID = item["ID"]?.ToString(),
+                                    Name = item["Name"]?.ToString(),
+                                    SQLName = item["SQLName"]?.ToString(),
+                                    IsActive = item["IsActive"]?.ToString()
+                                };
+
+                                sablonViewModel.SablonDataList.Add(viewModel);
+                            }
+                        }
+
+                        sablonViewModelList.Add(sablonViewModel);
+                    }
+                }
+
+                // ViewBag'e sablon verisini atama
+                ViewBag.SablonViewModelList = sablonViewModelList;
+
 
 
                 // Değişiklikleri yap
@@ -382,5 +437,116 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
         }
 
 
-    }
+
+		public IActionResult apiSablonsSendSettings(IFormCollection jsonData)
+		{
+			try
+			{
+				var WTPartDataSettings = "WTPartDataSettings.json";
+				var json = System.IO.File.ReadAllText(WTPartDataSettings);
+				var jsonObj = string.IsNullOrEmpty(json) ? new JObject() : JObject.Parse(json);
+
+				var sablonName = jsonData.FirstOrDefault().Value.ToString();
+                var sablonDataDurumu = "false";
+
+                // Şablon adına sahip olanları kontrol et
+                var existingSablon = jsonObj["sablons"]?
+					.FirstOrDefault(s => s["sablonName"]?.ToString() == sablonName);
+
+				if (existingSablon != null)
+				{
+					// Eğer şablon varsa, mevcut şablonu güncelle
+					existingSablon["ID"] = Guid.NewGuid().ToString();
+                    existingSablon["sablonDataDurumu"] = sablonDataDurumu;
+                    existingSablon["sablonData"] = JArray.FromObject(jsonData.Where(x => x.Key != jsonData.FirstOrDefault().Key && x.Key != "__RequestVerificationToken").Select(item => new
+					{
+						ID = Guid.NewGuid().ToString(),
+						Name = item.Key,
+						SQLName = item.Key,
+						IsActive = item.Value.ToString()
+					}).ToList());
+				}
+				else
+				{
+					// Şablon yoksa, yeni bir şablon oluştur
+					var newTemplate = new
+					{
+						ID = Guid.NewGuid().ToString(),
+                        sablonDataDurumu = sablonDataDurumu,
+                        sablonName = sablonName,
+						sablonData = jsonData.Where(x => x.Key != jsonData.FirstOrDefault().Key && x.Key != "__RequestVerificationToken").Select(item => new
+						{
+							ID = Guid.NewGuid().ToString(),
+							Name = item.Key,
+							SQLName = item.Key,
+							IsActive = item.Value.ToString()
+						}).ToList()
+					};
+
+					// Eski veriye yeni veriyi ekle
+					if (jsonObj["sablons"] == null)
+					{
+						jsonObj["sablons"] = new JArray();
+					}
+
+					(jsonObj["sablons"] as JArray).Add(JObject.FromObject(newTemplate));
+				}
+
+				// Dosyaya yaz
+				System.IO.File.WriteAllText(WTPartDataSettings, JsonConvert.SerializeObject(jsonObj, Formatting.Indented));
+
+				return RedirectToAction("Index");
+			}
+			catch (Exception)
+			{
+				return RedirectToAction("Index");
+			}
+		}
+
+
+
+
+		//    public IActionResult apiSablonsSendSettings(IFormCollection jsonData)
+		//    {
+		//        try
+		//        {
+		//var WTPartDataSettings = "WTPartDataSettings.json";
+		//var json = System.IO.File.ReadAllText(WTPartDataSettings);
+		//var jsonObj = JObject.Parse(json);
+
+
+
+
+		//var newTemplate = new
+		//{
+		//	ID = Guid.NewGuid().ToString(),
+		//	sablonName = jsonData.FirstOrDefault().Value.ToString(),
+		//	sablonData = jsonData.Where(x => x.Key != jsonData.FirstOrDefault().Key).Select(item => new
+		//	{
+		//		ID = Guid.NewGuid().ToString(),
+		//		Name = item.Key,
+		//		SQLName = item.Key,
+		//		IsActive = item.Value.ToString()
+		//	}).ToList()
+		//};
+
+		//// Eski veriye yeni veriyi ekle
+		//var sablons = jsonObj["sablons"] as JArray;
+		//sablons.Add(JObject.FromObject(newTemplate));
+
+		//// Dosyaya yaz
+		//System.IO.File.WriteAllText(WTPartDataSettings, JsonConvert.SerializeObject(jsonObj, Formatting.Indented));
+
+
+		//return RedirectToAction("Index");
+		//        }
+		//        catch (Exception)
+		//        {
+		//        return RedirectToAction("Index");
+		//        }
+
+		//    }
+
+
+	}
 }

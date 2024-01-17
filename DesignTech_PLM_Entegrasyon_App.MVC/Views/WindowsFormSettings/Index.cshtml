@@ -1,115 +1,14 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    var sablonList = ViewBag.SablonViewModelList  as List<SablonViewModel>;
 }
 
+<button  type="button" class="btn btn-primary btn-sm m-4" data-bs-target="#carouselExampleAutoplaying" data-bs-slide-to="0">Bağlantı Ayarları</button>
+<button type="button" class="btn btn-primary btn-sm m-4" data-bs-target="#carouselExampleAutoplaying" data-bs-slide-to="1">Şablon Ayarları</button>
 
+<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="false" >
+  <div class="carousel-inner" >
+    <div class="carousel-item active" >
 
-<div class="offcanvas offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="staticBackdrop" aria-labelledby="staticBackdropLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="staticBackdropLabel">Sınıf ayarları</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-        <div class="row">
-        <div class="col-md-12">
-            <form asp-action="ApiSendDataSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
-                <input type="text" class="form-control" placeholder="Hedef dosya yolunu ekleyin" alt="Dosya seçiniz" name="jsonFile" />
-
-                <button class="btn btn-info btn-sm float-end m-4">Bağla</button>
-            </form>
-        </div>
-
-
-
-
-        <div class="col-md-12 table-responsive">
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th hidden>KİMLİK</th>
-                        <th>ADI</th>
-                        <th>VERİTABANI ADI</th>
-                        <th hidden>DURUM</th>
-                        <th>DURUM</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @try
-                        {
-
-                                @foreach (var item in ViewBag.ApiSendDataSettings)
-                        {
-                            <form asp-action="ApiSendDataPartsSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
-                                        <input type="text" name="ID" value="@item.ID" hidden  />
-
-                            @if (!@item.Name.Contains("idA2A2") && !@item.Name.Contains("idA3masterReference") && !@item.Name.Contains("updateStampA2") && !@item.Name.Contains("statestate")){
-                            @if (@item.IsActive)
-                            {
-                            <tr class="bg-light-success text-success">
-                                <td hidden>@item.ID</td>
-                                <td>@item.Name</td>
-                                <td>@item.SQLName</td>
-                                <td hidden>@item.IsActive</td>
-                                <input type="text" name="IsActive" value="false" hidden />
-                            <td>
-                                        <button type="submit" class="bg-light-success border-0 rounded-2  ">
-                                            <i class="ki-duotone ki-tablet-delete fs-1 text-danger" >
-                                                <span class="path1"></span>
-                                                <span class="path2"></span>
-                                                <span class="path3"></span>
-                                            </i>
-                                </button>
-                            </td>    
-                            </tr>
-                            }
-                            else
-                            {
-                                <tr class="bg-light-danger text-danger">
-                                    <td hidden>@item.ID</td>
-                                    <td>@item.Name</td>
-                                    <td>@item.SQLName</td>
-                                    <td hidden>@item.IsActive</td>
-                                        <input type="text" name="IsActive" value="true" hidden />
-
-                                <td>
-                                        <button type="submit" class="bg-light-danger border-0 rounded-2">
-                                            <i class="ki-duotone ki-tablet-ok fs-1 text-success">
-                                                <span class="path1"></span>
-                                                <span class="path2"></span>
-                                                <span class="path3"></span>
-                                            </i>
-                                        </button>
-                                </td>
-                                </tr>
-                            }
-                        }
-                            </form>
-                        }
-
-
-                        }
-                        catch (Exception ex)
-                        {
-                            <h3 class="alert alert-light-danger">HATA! : @ex.Message</h3>
-                        }
-                </tbody>
-            </table>
-   
-        </div>
-       </div>
-    </div>
-</div>
-
-
-        @try{
-            
-<h1 class="alert alert-info">@ViewBag.rabbitmqTestmessage</h1>
-        }catch(Exception){
-
-        }
 <div class="row">
     
 
@@ -120,10 +19,7 @@
 </form>
 
 </div>
-
-
-
-<div class="row g-7">
+ <div class="row g-7">
     <!--begin::Contact groups-->
     <div class="col-lg-4 col-xl-4">
 
@@ -337,3 +233,1403 @@
     <!--end::Search-->
 
 </div>
+
+
+
+    </div>
+    <div class="carousel-item">
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-5 g-xl-9">
+
+     @if (sablonList != null)
+            {
+                 foreach (var item in sablonList)
+                {
+                    <!--begin::Col-->
+                    <div class="col-md-4">
+                        <!--begin::Card-->
+                        <div class="card card-flush h-md-100">
+                            <!--begin::Card header-->
+                            <div class="card-header">
+                                <!--begin::Card title-->
+                                <div class="card-title">
+                                    <h2>@item.SablonName</h2>
+                                </div>
+                                <!--end::Card title-->
+                            </div>
+                            <!--end::Card header-->
+
+                            <!--begin::Card body-->
+                            <div class="card-body pt-1 scroll-y" style="height:300px">
+                                    
+                                    <!--begin::Users-->
+                                <div class="fw-bold text-gray-600 mb-5">Total users with this role: @item.SablonDataList.Count(x => x.IsActive == "true")</div>
+                                <!--end::Users-->
+                                    
+                                <!--begin::Permissions-->
+                                <div class="d-flex flex-column text-gray-600">
+                                    @foreach (var item2 in item.SablonDataList)
+                                        {
+                                            if(item2.IsActive == "true")
+                                            {
+                                            <div class="d-flex align-items-center py-2"><span class="bullet bg-primary me-3"></span> @item2.Name</div>
+                                            }
+                                        }
+                  
+
+                                </div>
+                                <!--end::Permissions-->
+                            </div>
+                            <!--end::Card body-->
+
+                            <!--begin::Card footer-->
+                            <div class="card-footer flex-wrap pt-0">
+
+
+                                @if(item.sablonDataDurumu == "false"){
+                                <button type="button" class="btn btn-light btn-active-light-primary my-1 float-end" >Aktif Et</button>
+                                }else{
+                                <button type="button" class="btn btn-light btn-active-success my-1 float-end" >Aktif</button>
+                                }
+                            </div>
+                            <!--end::Card footer-->
+                        </div>
+                        <!--end::Card-->
+                    </div>
+                    <!--end::Col-->
+                }
+                }
+
+    
+    <!--begin::Add new card-->
+    <div class="ol-md-4">
+        <!--begin::Card-->
+        <div class="card h-md-100">
+            <!--begin::Card body-->
+            <div class="card-body d-flex flex-center">
+                <!--begin::Button-->
+                <button type="button" class="btn btn-clear d-flex flex-column flex-center" data-bs-toggle="modal" data-bs-target="#kt_modal_add_role">
+                    <!--begin::Illustration-->
+                    <img src="/metronic8/demo39/assets/media/illustrations/sketchy-1/4.png" alt="" class="mw-100 mh-150px mb-7">                      
+                    <!--end::Illustration-->
+
+                    <!--begin::Label-->
+                    <div class="fw-bold fs-3 text-gray-600 text-hover-primary">Yeni Role Oluştur</div>
+                    <!--end::Label-->
+                </button>
+                <!--begin::Button-->
+            </div>
+            <!--begin::Card body-->
+        </div>
+        <!--begin::Card-->
+    </div>
+    <!--begin::Add new card-->
+</div>
+
+
+
+    </div>
+
+  </div>
+ 
+</div>
+
+
+
+
+
+
+<div class="offcanvas offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="staticBackdrop" aria-labelledby="staticBackdropLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="staticBackdropLabel">Sınıf ayarları</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="row">
+        <div class="col-md-12">
+            <form asp-action="ApiSendDataSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
+                <input type="text" class="form-control" placeholder="Hedef dosya yolunu ekleyin" alt="Dosya seçiniz" name="jsonFile" />
+
+                <button class="btn btn-info btn-sm float-end m-4">Bağla</button>
+            </form>
+        </div>
+
+
+
+
+        <div class="col-md-12 table-responsive">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th hidden>KİMLİK</th>
+                        <th>ADI</th>
+                        <th>VERİTABANI ADI</th>
+                        <th hidden>DURUM</th>
+                        <th>DURUM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @try
+                        {
+
+                                @foreach (var item in ViewBag.ApiSendDataSettings)
+                        {
+                            <form asp-action="ApiSendDataPartsSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
+                                        <input type="text" name="ID" value="@item.ID" hidden  />
+
+                            @if (!@item.Name.Contains("idA2A2") && !@item.Name.Contains("idA3masterReference") && !@item.Name.Contains("updateStampA2") && !@item.Name.Contains("statestate")){
+                            @if (@item.IsActive)
+                            {
+                            <tr class="bg-light-success text-success">
+                                <td hidden>@item.ID</td>
+                                <td>@item.Name</td>
+                                <td>@item.SQLName</td>
+                                <td hidden>@item.IsActive</td>
+                                <input type="text" name="IsActive" value="false" hidden />
+                            <td>
+                                        <button type="submit" class="bg-light-success border-0 rounded-2  ">
+                                            <i class="ki-duotone ki-tablet-delete fs-1 text-danger" >
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                </button>
+                            </td>    
+                            </tr>
+                            }
+                            else
+                            {
+                                <tr class="bg-light-danger text-danger">
+                                    <td hidden>@item.ID</td>
+                                    <td>@item.Name</td>
+                                    <td>@item.SQLName</td>
+                                    <td hidden>@item.IsActive</td>
+                                        <input type="text" name="IsActive" value="true" hidden />
+
+                                <td>
+                                        <button type="submit" class="bg-light-danger border-0 rounded-2">
+                                            <i class="ki-duotone ki-tablet-ok fs-1 text-success">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                        </button>
+                                </td>
+                                </tr>
+                            }
+                        }
+                            </form>
+                        }
+
+
+                        }
+                        catch (Exception ex)
+                        {
+                            <h3 class="alert alert-light-danger">HATA! : @ex.Message</h3>
+                        }
+                </tbody>
+            </table>
+   
+        </div>
+       </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        			<!--begin::Modals-->
+									<!--begin::Modal - Add role-->
+									<div class="modal fade" id="kt_modal_add_role" tabindex="-1" aria-hidden="true">
+										<!--begin::Modal dialog-->
+										<div class="modal-dialog modal-dialog-centered mw-750px">
+											<!--begin::Modal content-->
+											<div class="modal-content">
+												<!--begin::Modal header-->
+												<div class="modal-header">
+													<!--begin::Modal title-->
+													<h2 class="fw-bold">Rol Oluştur</h2>
+													<!--end::Modal title-->
+													<!--begin::Close-->
+													<div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
+														<i class="ki-duotone ki-cross fs-1">
+															<span class="path1"></span>
+															<span class="path2"></span>
+														</i>
+													</div>
+													<!--end::Close-->
+												</div>
+												<!--end::Modal header-->
+												<!--begin::Modal body-->
+												<div class="modal-body scroll-y mx-lg-5 my-7">
+													<!--begin::Form-->
+													<form method="post" asp-action="apiSablonsSendSettings" asp-controller="WindowsFormSettings" enctype="multipart/form-data" class="form">
+														<!--begin::Scroll-->
+														<div class="d-flex flex-column scroll-y me-n7 pe-7" id="kt_modal_add_role_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_role_header" data-kt-scroll-wrappers="#kt_modal_add_role_scroll" data-kt-scroll-offset="300px">
+															<!--begin::Input group-->
+															<div class="fv-row mb-10">
+																<!--begin::Label-->
+																<label class="fs-5 fw-bold form-label mb-2">
+																	<span class="required">Rol adı</span>
+																</label>
+																<!--end::Label-->
+																<!--begin::Input-->
+																<input class="form-control form-control-solid" placeholder="Rol adının giriniz" name="role_name" />
+																<!--end::Input-->
+															</div>
+															<!--end::Input group-->
+															<!--begin::Permissions-->
+															<div class="fv-row">
+																<!--begin::Label-->
+																<label class="fs-5 fw-bold form-label mb-2">Api Yönetimi</label>
+																<!--end::Label-->
+																<!--begin::Table wrapper-->
+																<div class="table-responsive">
+																	<!--begin::Table-->
+																	<table class="table align-middle table-row-dashed fs-6 gy-5">
+																		<!--begin::Table body-->
+																		<tbody class="text-gray-600 fw-semibold">
+																			<!--begin::Table row-->
+																			<tr>
+																				<td class="text-gray-800">Hepsini Aktar
+																				<span class="ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-html="true" data-bs-content="Allows a full access to the system">
+																					<i class="ki-duotone ki-information fs-7">
+																						<span class="path1"></span>
+																						<span class="path2"></span>
+																						<span class="path3"></span>
+																					</i>
+																				</span></td>
+																				<td>
+																					<!--begin::Checkbox-->
+																					<label class="form-check form-check-custom form-check-solid me-9">
+																						<input class="form-check-input" type="checkbox" value="" id="kt_roles_select_all" />
+																						<span class="form-check-label" for="kt_roles_select_all">Hepsini seç</span>
+																					</label>
+																					<!--end::Checkbox-->
+																				</td>
+																			</tr>
+																			<!--end::Table row-->
+																	
+<!-- CreatedOn -->
+<tr>
+    <td class="text-gray-800">CreatedOn</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="CreatedOn" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="CreatedOn" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- ID -->
+<tr>
+    <td class="text-gray-800">ID</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="ID" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="ID" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- Repeat the above block for each column -->
+<!-- LastModified -->
+<tr>
+    <td class="text-gray-800">LastModified</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="LastModified" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="LastModified" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- AlternateNumber -->
+<tr>
+    <td class="text-gray-800">AlternateNumber</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="AlternateNumber" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="AlternateNumber" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- AssemblyModeValue -->
+<tr>
+    <td class="text-gray-800">AssemblyModeValue</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="AssemblyModeValue" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="AssemblyModeValue" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- AssemblyModeDisplay -->
+<tr>
+    <td class="text-gray-800">AssemblyModeDisplay</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="AssemblyModeDisplay" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="AssemblyModeDisplay" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- CADName -->
+<tr>
+    <td class="text-gray-800">CADName</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="CADName" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="CADName" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- CabinetName -->
+<tr>
+    <td class="text-gray-800">CabinetName</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="CabinetName" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="CabinetName" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- CheckOutStatus -->
+<tr>
+    <td class="text-gray-800">CheckOutStatus</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="CheckOutStatus" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="CheckOutStatus" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- CheckoutState -->
+<tr>
+    <td class="text-gray-800">CheckoutState</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="CheckoutState" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="CheckoutState" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- Comments -->
+<tr>
+    <td class="text-gray-800">Comments</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="Comments" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="Comments" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- ComponentType -->
+<tr>
+    <td class="text-gray-800">ComponentType</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="ComponentType" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="ComponentType" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- ConfigurableModuleValue -->
+<tr>
+    <td class="text-gray-800">ConfigurableModuleValue</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="ConfigurableModuleValue" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="ConfigurableModuleValue" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- ConfigurableModuleDisplay -->
+<tr>
+    <td class="text-gray-800">ConfigurableModuleDisplay</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="ConfigurableModuleDisplay" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="ConfigurableModuleDisplay" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- CreatedBy -->
+<tr>
+    <td class="text-gray-800">CreatedBy</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="CreatedBy" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="CreatedBy" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+
+<!-- DefaultTraceCodeValue -->
+<tr>
+    <td class="text-gray-800">DefaultTraceCodeValue</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="DefaultTraceCodeValue" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="DefaultTraceCodeValue" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+					<!-- DefaultTraceCodeValue -->
+<tr>
+    <td class="text-gray-800">DefaultTraceCodeDisplay</td>
+    <td>
+        <div class="d-flex">
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="true" name="DefaultTraceCodeDisplay" checked />
+                <span class="form-check-label">Aktif</span>
+            </label>
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                <input class="form-check-input" type="radio" value="false" name="DefaultTraceCodeDisplay" />
+                <span class="form-check-label">Pasif</span>
+            </label>
+        </div>
+    </td>
+</tr>
+						<!-- DefaultUnitValue -->
+<tr>
+  <td class="text-gray-800">DefaultUnitValue</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="DefaultUnitValue" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="DefaultUnitValue" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- DefaultUnitDisplay -->
+<tr>
+  <td class="text-gray-800">DefaultUnitDisplay</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="DefaultUnitDisplay" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="DefaultUnitDisplay" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- DenemeNX -->
+<tr>
+  <td class="text-gray-800">DenemeNX</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="DenemeNX" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="DenemeNX" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- Description -->
+<tr>
+  <td class="text-gray-800">Description</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Description" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Description" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- EndItem -->
+<tr>
+  <td class="text-gray-800">EndItem</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="EndItem" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="EndItem" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- FolderLocation -->
+<tr>
+  <td class="text-gray-800">FolderLocation</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="FolderLocation" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="FolderLocation" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- FolderName -->
+<tr>
+  <td class="text-gray-800">FolderName</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="FolderName" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="FolderName" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- GatheringPart -->
+<tr>
+  <td class="text-gray-800">GatheringPart</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="GatheringPart" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="GatheringPart" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- GeneralStatus -->
+<tr>
+  <td class="text-gray-800">GeneralStatus</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type
+="radio" value="true" name="GeneralStatus" checked />
+<span class="form-check-label">Aktif</span>
+</label>
+<label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+<input class="form-check-input" type="radio" value="false" name="GeneralStatus" />
+<span class="form-check-label">Pasif</span>
+</label>
+</div>
+
+  </td>
+</tr>
+<!-- Identity -->
+<tr>
+  <td class="text-gray-800">Identity</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Identity" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Identity" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- KaleKod -->
+<tr>
+  <td class="text-gray-800">KaleKod</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="KaleKod" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="KaleKod" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- Kaleargenumber -->
+<tr>
+  <td class="text-gray-800">Kaleargenumber</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Kaleargenumber" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Kaleargenumber" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- Latest -->
+<tr>
+  <td class="text-gray-800">Latest</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Latest" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Latest" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- Length -->
+<tr>
+  <td class="text-gray-800">Length</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Length" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Length" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- LifeCycleTemplateName -->
+<tr>
+  <td class="text-gray-800">LifeCycleTemplateName</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="LifeCycleTemplateName" checked />
+        <span class="form-check-label">Aktif
+</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="LifeCycleTemplateName" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- Material -->
+<tr>
+  <td class="text-gray-800">Material</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Material" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Material" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- ModifiedBy -->
+<tr>
+  <td class="text-gray-800">ModifiedBy</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="ModifiedBy" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="ModifiedBy" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- NAME10 -->
+<tr>
+  <td class="text-gray-800">NAME10</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="NAME10" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="NAME10" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- NAME20 -->
+<tr>
+  <td class="text-gray-800">NAME20</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="NAME20" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="NAME20" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- NAME201_PTCC_MultipleAliasAttributeValues -->
+<tr>
+  <td class="text-gray-800">NAME201_PTCC_MultipleAliasAttributeValues</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="NAME201_PTCC_MultipleAliasAttributeValues" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="NAME201_PTCC_MultipleAliasAttributeValues" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- NAME201 -->
+<tr>
+  <td class="text-gray-800">NAME201</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="NAME201" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="NAME201" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+<!-- NAME -->
+<tr>
+  <td class="text-gray-800">Name</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Name" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Name" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- NAME30 -->
+<tr>
+  <td class="text-gray-800">NAME30</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="NAME30" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="NAME30" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+							<!-- OEMPartSourcingStatus -->
+<tr>
+  <td class="text-gray-800">OEMPartSourcingStatus</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="OEMPartSourcingStatus" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="OEMPartSourcingStatus" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- Number -->
+<tr>
+  <td class="text-gray-800">Number</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Number" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Number" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- ObjectType -->
+<tr>
+  <td class="text-gray-800">ObjectType</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="ObjectType" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="ObjectType" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- OrganizationReference -->
+<tr>
+  <td class="text-gray-800">OrganizationReference</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="OrganizationReference" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="OrganizationReference" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- PARCAADI -->
+<tr>
+  <td class="text-gray-800">PARCAADI</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="PARCAADI" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="PARCAADI" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- PTCWMNAME -->
+<tr>
+  <td class="text-gray-800">PTCWMNAME</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="PTCWMNAME" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="PTCWMNAME" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- PhantomManufacturingPart -->
+<tr>
+  <td class="text-gray-800">PhantomManufacturingPart</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="PhantomManufacturingPart" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="PhantomManufacturingPart" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- Revision -->
+<tr>
+  <td class="text-gray-800">Revision</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Revision" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Revision" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- SourceValue -->
+<tr>
+  <td class="text-gray-800">SourceValue</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="SourceValue" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="SourceValue" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- SourceDisplay -->
+<tr>
+  <td class="text-gray-800">SourceDisplay</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="SourceDisplay" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="SourceDisplay" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- SourceDuplicate -->
+<tr>
+  <td class="text-gray-800">SourceDuplicate</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="SourceDuplicate" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="SourceDuplicate" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- Standard -->
+<tr>
+  <td class="text-gray-800">Standard</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Standard" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Standard" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- StateValue -->
+<tr>
+  <td class="text-gray-800">StateValue</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="StateValue" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="StateValue" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- StateDisplay -->
+<tr>
+  <td class="text-gray-800">StateDisplay</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="StateDisplay" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="StateDisplay" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>			
+				<!-- Supersedes -->
+<tr>
+  <td class="text-gray-800">Supersedes</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Supersedes" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Supersedes" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- Supplier -->
+<tr>
+  <td class="text-gray-800">Supplier</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Supplier" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Supplier" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- Thickness -->
+<tr>
+  <td class="text-gray-800">Thickness</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Thickness" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Thickness" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- TypeIconPath -->
+<tr>
+  <td class="text-gray-800">TypeIconPath</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="TypeIconPath" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="TypeIconPath" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- TypeIconTooltip -->
+<tr>
+  <td class="text-gray-800">TypeIconTooltip</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="TypeIconTooltip" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="TypeIconTooltip" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- Version -->
+<tr>
+  <td class="text-gray-800">Version</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="Version" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="Version" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- VersionID -->
+<tr>
+  <td class="text-gray-800">VersionID</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="VersionID" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="VersionID" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- View -->
+<tr>
+  <td class="text-gray-800">View</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="View" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="View" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- WorkInProgressStateValue -->
+<tr>
+  <td class="text-gray-800">WorkInProgressStateValue</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="WorkInProgressStateValue" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="WorkInProgressStateValue" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+
+<!-- WorkInProgressStateDisplay -->
+<tr>
+  <td class="text-gray-800">WorkInProgressStateDisplay</td>
+  <td>
+    <div class="d-flex ">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="WorkInProgressStateDisplay"   checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="WorkInProgressStateDisplay"  />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+														</tbody>
+																		<!--end::Table body-->
+																	</table>
+																	<!--end::Table-->
+																</div>
+																<!--end::Table wrapper-->
+															</div>
+															<!--end::Permissions-->
+														</div>
+														<!--end::Scroll-->
+														<!--begin::Actions-->
+														<div class="text-center pt-15">
+																<button type="reset" class="btn btn-light me-3"  data-bs-dismiss="modal" aria-label="Close" >İptal</button>
+															<button type="submit" class="btn btn-primary" >
+																<span class="indicator-label">Oluştur</span>
+																<span class="indicator-progress">Lütfen bekleyin...
+																<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+															</button>
+														</div>
+														<!--end::Actions-->
+													</form>
+													<!--end::Form-->
+												</div>
+												<!--end::Modal body-->
+											</div>
+											<!--end::Modal content-->
+										</div>
+										<!--end::Modal dialog-->
+									</div>
+									<!--end::Modal - Add role-->
+				
+									<!--end::Modals-->
