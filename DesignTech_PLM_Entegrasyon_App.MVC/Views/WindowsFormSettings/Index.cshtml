@@ -257,12 +257,33 @@
                         <!--begin::Card-->
                         <div class="card card-flush h-md-100">
                             <!--begin::Card header-->
-                            <div class="card-header">
-                                <!--begin::Card title-->
+                            <div class="card-header  ribbon ribbon-top ribbon-vertical">
+                                           <!--begin::Card title-->
                                 <div class="card-title">
                                     <h2>@item.SablonName</h2>
                                 </div>
                                 <!--end::Card title-->
+                                <form asp-action="apiSablonsRemoveSettings" asp-controller="WindowsFormSettings" method="post">
+
+                                    <input name="ID" value="@item.ID" hidden />
+                                @if(item.sablonDataDurumu == "false"){
+
+                                        <div class="ribbon-label bg-danger">
+                                            <button type="submit" class="bg-transparent border-0">
+                                            <i class="ki-solid ki-trash text-inverse-danger fs-1"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                          <div class="ribbon-label bg-secondary">
+                                               <button type="submit" class="bg-transparent border-0" disabled>
+                                            <i class="ki-solid ki-trash text-inverse-secondary fs-1"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                </form>
+                         
                             </div>
                             <!--end::Card header-->
 
@@ -389,7 +410,7 @@
                 <tbody>
 
 
-                 @*    @try
+                    @try
                         {
 
                                 @foreach (var item in ViewBag.ApiSendDataSettings)
@@ -446,7 +467,7 @@
                         catch (Exception ex)
                         {
                             <h3 class="alert alert-light-danger">HATA! : @ex.Message</h3>
-                        } *@
+                        }
                 </tbody>
             </table>
    
