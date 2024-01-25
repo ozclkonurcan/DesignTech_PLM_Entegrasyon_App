@@ -3349,6 +3349,7 @@
 	<script src="/assets/plugins/custom/datatables/datatables.bundle.js"></script>
 	<!-- end::Vendors Javascript -->
 	<!-- begin::Custom Javascript (used for this page only) -->
+
 	<script src="/assets/js/custom/apps/calendar/calendar.js"></script>
 	<script src="/assets/js/widgets.bundle.js"></script>
 	<script src="/assets/js/custom/widgets.js"></script>
@@ -3359,15 +3360,19 @@
 	<script src="/assets/js/custom/utilities/modals/users-search.js"></script>
 	<script src="/assets/js/custom/authentication/sign-up/general.js"></script>
 	<!-- Sonradan Eklediklerim -->
-	<script src="/assets/js/custom/apps/ecommerce/sales/listing.js"></script>
 
+	<script src="/assets/js/custom/apps/ecommerce/sales/listing.js"></script>
 
 	<script src="/assets/js/custom/apps/user-management/roles/list/add.js"></script>
 	<script src="/assets/js/custom/apps/user-management/roles/list/update-role.js"></script>
 
 
+	<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+	<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
+
 	<!-- end::Custom Javascript -->
-	@await RenderSectionAsync("Scripts", required: false)
+	@RenderSection("Scripts", required: false)
 
 </body>
 <!--end::Body-->

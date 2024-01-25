@@ -1,12 +1,17 @@
-﻿using DesignTech_PLM_Entegrasyon_App.MVC.Models;
-using DesignTech_PLM_Entegrasyon_App.MVC.Services.Rabbitmq;
+﻿using Dapper;
+using DesignTech_PLM_Entegrasyon_App.MVC.Dtos;
+using DesignTech_PLM_Entegrasyon_App.MVC.Models;
+using DesignTech_PLM_Entegrasyon_App.MVC.Models.LogTable;
+using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
 using DesignTech_PLM_Entegrasyon_App.MVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+
+using System.Data;
 using System.Text;
+
 
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSettings
@@ -15,15 +20,16 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 	{
 
         private readonly IConfiguration _configuration;
-        private readonly IMessageProducer _messageProducer;
+        //private readonly IMessageProducer _messageProducer;
 
-        public WindowsFormSettingsController(IConfiguration configuration, IMessageProducer messageProducer)
+        public WindowsFormSettingsController(IConfiguration configuration)
         {
             _configuration = configuration;
-            _messageProducer = messageProducer;
         }
 
-        public IActionResult Index()
+
+
+        public async Task<IActionResult> Index()
         {
             try
             {
@@ -45,9 +51,46 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                     var targetJsonObj2 = JObject.Parse(targetJson2);
 
 
+                string connectionString = _configuration.GetConnectionString("Plm");
+                string schema = _configuration["Catalog"];
+
+                using IDbConnection connection = new SqlConnection(connectionString);
+
+                // Sorguları optimize edin ve sadece gerekli sütunları çekin
+                var Change_Notice_LogTableList = connection.Query<Change_Notice_LogTable>($"SELECT * FROM {schema}.Change_Notice_LogTable").OrderByDescending(x => x.ProcessTimestamp).ToList();
+
+                if(Change_Notice_LogTableList is not null)
+                {
+                    ViewBag.Change_Notice_LogTableList = Change_Notice_LogTableList;
+                    ViewBag.Change_Notice_LogTableListCount = Change_Notice_LogTableList.Count();
+                }
+
+
+                //var timer = new Timer(x =>
+                //{
+                //    using (var connection = new SqlConnection(connectionString))
+                //    {
+                //        var data = //veritabanından verileri çek
+
+                //        dataHub.SendData(Change_Notice_LogTableList);
+                //    }
+                //}, null, 0, 5000);
+
+                //using IDbConnection connection = _dbConnectionFactory.CreateOpenConnection();
+
+                //const string sql = """
+                //    SELECT u.idA2A2, u.name, u.WTPartNumber, u.updateStampA2, u.ProcessTimestamp
+                //    FROM Change_Notice_LogTable u 
+                //    """;
+
+                //Change_Notice_LogTable changeNoticeLogTableList = await connection.QueryFirstOrDefault(sql);
+
+                //var changeNoticeLogTableList = _changeNoticeContext.Change_Notice_LogTable.ToList();
+
+
+
 
                 var wtPartMasterList = new List<WTPartMasterItemViewModel>();
-
                 try
                 {
                     foreach (var item in targetJsonObj2["WTPartMaster"])

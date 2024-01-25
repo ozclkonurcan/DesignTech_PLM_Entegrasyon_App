@@ -1,5 +1,4 @@
-﻿using DesignTech_PLM_Entegrasyon_App.MVC.Models.LogTable;
-using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
+﻿using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Dtos

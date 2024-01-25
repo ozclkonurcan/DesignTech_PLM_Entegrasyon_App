@@ -1,5 +1,6 @@
 ﻿@{
     var sablonList = ViewBag.SablonViewModelList  as List<SablonViewModel>;
+    var sayac = 1;
 }
 
 <button  type="button" class="btn btn-primary btn-sm m-4" data-bs-target="#carouselExampleAutoplaying" data-bs-slide-to="0">Bağlantı Ayarları</button>
@@ -21,7 +22,7 @@
 </div>
  <div class="row g-7">
     <!--begin::Contact groups-->
-    <div class="col-lg-4 col-xl-4">
+    <div class="col-lg-4 col-xl-4 ">
 
         <div class="card h-xl-100">
             <!--begin::Header-->
@@ -174,7 +175,10 @@
 
             <div class="card-header">
                 <div class="d-flex align-items-center mb-1">
-                    <a href="#" class="text-gray-800 text-hover-primary fs-2 fw-bold me-3">Windows Form Gösterge Paneli</a>
+                    <a href="#" class="text-gray-800 text-hover-primary fs-2 fw-bold me-3">Windows Form Gösterge Paneli 
+                                </a>
+
+                           
                     @try
                                 {
                                         @if (ViewBag.ConnectionType)
@@ -200,10 +204,14 @@
                 </div>
 
             </div>
+          
             <!--begin::Card body-->
-            <div class="card-body pt-5" id="kt_contacts_list_body">
+            <div class="card-body pt-5 " id="kt_contacts_list_body">
+                       <p>
+                                    Toplam kayıt sayısı : <strong id="dataCount"></strong>
+                                </p>
                 <!--begin::List-->
-                <div class="scroll-y me-n5 pe-5 h-300px h-xl-auto" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_header, #kt_toolbar, #kt_footer, #kt_contacts_list_header" data-kt-scroll-wrappers="#kt_content, #kt_contacts_list_body" data-kt-scroll-stretch="#kt_contacts_list, #kt_contacts_main" data-kt-scroll-offset="5px" style="max-height: 763px;">
+                <div hidden class="scroll-y me-n5 pe-5 h-300px h-xl-auto" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_header, #kt_toolbar, #kt_footer, #kt_contacts_list_header" data-kt-scroll-wrappers="#kt_content, #kt_contacts_list_body" data-kt-scroll-stretch="#kt_contacts_list, #kt_contacts_main" data-kt-scroll-offset="5px" style="max-height: 763px;">
              
 
                     <span>Catalog: @ViewBag.Catalog</span>
@@ -233,6 +241,48 @@
 
                 </div>
                 <!--end::List-->
+
+                <div class="table-responsive scroll-y me-n5 pe-5 h-300px">
+                    <p>Bağlantı durumu <strong id="constatus"></strong></p>
+                <table class="table table-bordered table-hover ">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Adı</th>
+            <th>Numarası</th>
+            <th>İşlem Tarihi</th>
+            </tr>
+    </thead>
+    <tbody id="dataTableBody" >
+@* 
+        @try
+                                        {
+
+                                        
+                                        @if(ViewBag.Change_Notice_LogTableList is not null)
+                                        {
+                                            
+                                        @foreach (var item in ViewBag.Change_Notice_LogTableList)
+        {
+            <tr>
+                <td>@sayac</td>
+                <td class="w-50">@item.name</td>
+                <td class="w-25">@item.WTPartNumber</td>
+                <td class="">@item.ProcessTimestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                </tr>
+                sayac++;
+        }
+                                        }
+                                        }
+                                        catch (Exception)
+                                        {
+                                            
+                                        } *@
+
+    </tbody>
+</table>
+
+                </div>
             </div>
             <!--end::Card body-->
         </div>
@@ -475,23 +525,6 @@
        </div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1674,3 +1707,61 @@
 									<!--end::Modal - Add role-->
 				
 									<!--end::Modals-->
+
+
+<!-- #region SignalR Settings -->
+
+@section Scripts {
+        <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script type="text/javascript">
+$(document).ready(() => {
+    var connection = new signalR.HubConnectionBuilder().withUrl("/FormDataListHub").build();
+    $("#constatus").text(connection.state);
+
+    connection.on("ReceiveFormData", (data) => {
+        // Güncel verileri kullanarak sayfayı güncelle
+
+        updateTable(data);
+    });
+
+    connection.on("ReceiveFormDataCount", (count) => {
+        // Toplam kayıt sayısını güncelle
+        updateCount(count);
+    });
+
+    connection.start().then(() => {
+        $("#constatus").text(connection.state);
+    }).catch((err) => {
+        console.log(err);
+    });
+
+    // Veri güncelleme işlemini belirli bir aralıkta sürdürme
+    setInterval(() => {
+        connection.invoke("SendFormData");
+        connection.invoke("SendFormDataCount");
+    }, 1000);
+});
+
+function updateTable(data) {
+    // Tabloyu güncelleme işlemleri burada yapılabilir
+    // Örneğin, jQuery ile:
+    $('#dataTableBody').empty();
+    $.each(data, function (index, item) {
+
+        var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+        $('#dataTableBody').append('<tr><td>' + (index + 1) + '</td><td class="w-50">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="">' + formattedTimestamp + '</td></tr>');
+    });
+}
+
+function updateCount(count) {
+    // Toplam kayıt sayısını güncelleme işlemleri burada yapılabilir
+    $('#dataCount').text(count);
+}
+
+    </script>
+}
+
+
+<!-- #endregion -->

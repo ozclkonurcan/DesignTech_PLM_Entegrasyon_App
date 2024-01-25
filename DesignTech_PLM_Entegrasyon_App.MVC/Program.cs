@@ -1,5 +1,6 @@
 using DesignTech_PLM_Entegrasyon_App.MVC.Dtos;
 using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
+using DesignTech_PLM_Entegrasyon_App.MVC.Hubs;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.DapperContext;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
 using DesignTech_PLM_Entegrasyon_App.MVC.Services;
@@ -8,10 +9,10 @@ using DesignTech_PLM_Entegrasyon_App.MVC.Services.Rabbitmq;
 using DesignTech_PLM_Entegrasyon_App.MVC.Services.SignalR;
 using Humanizer.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using RabbitMQServiceLibraryFor.MVC;
 using Serilog;
 using SqlKata.Compilers;
 using SqlKata.Execution;
@@ -22,12 +23,33 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var configuration = builder.Configuration;
 
-//builder.Services.AddApplicationServices(configuration);
+
+
+builder.Services.AddApplicationServices(configuration);
+
+
+
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("CorsPolicy", builder =>
+    {
+        builder
+        .AllowAnyHeader()
+        .SetIsOriginAllowed((host) => true)
+        .AllowCredentials();
+    });
+});
+builder.Services.AddSignalR();
+
+
 
 //builder.Services.AddSingleton<IUygulamaDbContextFactory, UygulamaDbContextFactory>();
 
@@ -47,9 +69,9 @@ builder.Services.AddScoped(factory =>
     };
 });
 
-builder.Services.AddSingleton<RabbitMQService>();
+//builder.Services.AddSingleton<RabbitMQService>();
 builder.Services.AddHttpClient<WindchillApiService>();
-builder.Services.AddScoped<IMessageProducer, MessageProducer>();
+//builder.Services.AddScoped<IMessageProducer, MessageProducer>();
 
 var currentMonthFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logs", DateTime.Now.ToString("MMMM-yyyy", CultureInfo.InvariantCulture));
 var logFileName = Path.Combine(currentMonthFolder, DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) + ".json");
@@ -67,7 +89,7 @@ builder.Services.AddAuthorization(opt =>
 });
 
 
-
+builder.Services.AddApplicationServices(builder.Configuration);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -162,6 +184,13 @@ builder.Services.AddTransient<IDbConnection>(_ =>
 //});
 var app = builder.Build();
 
+Host.CreateDefaultBuilder(args)
+     .ConfigureWebHostDefaults(webBuilder =>
+     {
+         webBuilder.UseStartup<Startup>();
+         webBuilder.UseUrls("http://localhost:5002");
+     }).Build();
+
 //app.MapHub<StatusHub>("/statushub");
 
 // Configure the HTTP request pipeline.
@@ -175,11 +204,13 @@ if (!app.Environment.IsDevelopment())
 
 //app.UseCors("CorsPolicy");
 //app.UseRateLimiter();
-
+app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
+
+
+
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -189,4 +220,5 @@ app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.MapHub<FormDataListHub>("/FormDataListHub");
 app.Run();

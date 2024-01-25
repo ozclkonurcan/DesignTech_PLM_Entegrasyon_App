@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AB418731-E765-4709-A560-22970E89BAFB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DesignTech_PLM_Entegrasyon_App.Domain</RootNamespace>
+    <AssemblyName>DesignTech_PLM_Entegrasyon_App.Domain</AssemblyName>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entities\ApplicationData.cs" />
+    <Compile Include="Entities\BooleanDefinition.cs" />
+    <Compile Include="Entities\BooleanValue.cs" />
+    <Compile Include="Entities\ConnectionStringModel.cs" />
+    <Compile Include="Entities\CustomLogEventLevel.cs" />
+    <Compile Include="Entities\CustomLogEventLevelExtensions.cs" />
+    <Compile Include="Entities\DapperContext\Context.cs" />
+    <Compile Include="Entities\EPMDocument.cs" />
+    <Compile Include="Entities\EPMDocumentMaster.cs" />
+    <Compile Include="Entities\ErrorViewModel.cs" />
+    <Compile Include="Entities\ExcelTemplate\ExcelFileModel.cs" />
+    <Compile Include="Entities\ExcelTemplate\ExcelFileTemplate.cs" />
+    <Compile Include="Entities\ExcelTemplate\ExcelUpdateStockCodeFileTemp.cs" />
+    <Compile Include="Entities\FloatDefinition.cs" />
+    <Compile Include="Entities\FloatValue.cs" />
+    <Compile Include="Entities\GenericPartObject.cs" />
+    <Compile Include="Entities\HolderToContent.cs" />
+    <Compile Include="Entities\id_sequence.cs" />
+    <Compile Include="Entities\IntegerDefinition.cs" />
+    <Compile Include="Entities\IntegerValue.cs" />
+    <Compile Include="Entities\Login\User.cs" />
+    <Compile Include="Entities\Log\LogEntry.cs" />
+    <Compile Include="Entities\PDMLinkProduct.cs" />
+    <Compile Include="Entities\PhaseLink.cs" />
+    <Compile Include="Entities\PhaseTemplate.cs" />
+    <Compile Include="Entities\SablonViewModel.cs" />
+    <Compile Include="Entities\SignalR\ChangeNoticeRepository.cs" />
+    <Compile Include="Entities\SignalR\StatusHub.cs" />
+    <Compile Include="Entities\SignalR\WTChangeOrder2Master.cs" />
+    <Compile Include="Entities\StringDefinition.cs" />
+    <Compile Include="Entities\StringValue.cs" />
+    <Compile Include="Entities\SubFolder.cs" />
+    <Compile Include="Entities\TimestampDefinition.cs" />
+    <Compile Include="Entities\TimestampValue.cs" />
+    <Compile Include="Entities\UnitDefinition.cs" />
+    <Compile Include="Entities\UnitValue.cs" />
+    <Compile Include="Entities\Views\DocumentList.cs" />
+    <Compile Include="Entities\Views\EPMDocNumberList.cs" />
+    <Compile Include="Entities\Views\IntegrationDefinitionList.cs" />
+    <Compile Include="Entities\Views\WTDocList.cs" />
+    <Compile Include="Entities\Views\WTPartNoList.cs" />
+    <Compile Include="Entities\WindchillApiModel\ProdMgmtParts.cs" />
+    <Compile Include="Entities\WTDocument.cs" />
+    <Compile Include="Entities\WTDocumentMaster.cs" />
+    <Compile Include="Entities\WTPart.cs" />
+    <Compile Include="Entities\WTPartAlternateHistory.cs" />
+    <Compile Include="Entities\WTPartAlternateLink.cs" />
+    <Compile Include="Entities\WTPartDataSettingsViewModel.cs" />
+    <Compile Include="Entities\WTPartDescribeLink.cs" />
+    <Compile Include="Entities\WTPartMaster.cs" />
+    <Compile Include="Entities\WTUser.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
