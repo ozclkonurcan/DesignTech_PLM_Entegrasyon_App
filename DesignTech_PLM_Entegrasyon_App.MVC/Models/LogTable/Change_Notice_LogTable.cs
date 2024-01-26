@@ -79,5 +79,6 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Models.LogTable
         public string? WTPartNumber { get; set; }
         public DateTime? updateStampA2 { get; set; }
         public DateTime? ProcessTimestamp { get; set; }
+
     }
 }

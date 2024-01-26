@@ -1,4 +1,6 @@
 ﻿using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
+using DesignTech_PLM_Entegrasyon_App.MVC.Models;
+using DesignTech_PLM_Entegrasyon_App.MVC.Repository;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Services
 {
@@ -9,7 +11,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Services
             try
             {
                 services.AddHostedService<ChangeNoticeService>();
-            }
+
+
+			}
             catch (Exception ex)
             {
                 LogService logService = new LogService(configuration);

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.LogTable;
+using DesignTech_PLM_Entegrasyon_App.MVC.Repository;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -11,11 +12,12 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Hubs
     {
 		private readonly IConfiguration _configuration;
 		private readonly IHttpClientFactory _httpClientFactory;
-
-		public FormDataListHub(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+		private readonly IGenericRepository<Change_Notice_LogTable> _change_Notice_LogTable;
+		public FormDataListHub(IHttpClientFactory httpClientFactory, IConfiguration configuration, IGenericRepository<Change_Notice_LogTable> change_Notice_LogTable = null)
 		{
 			_httpClientFactory = httpClientFactory;
 			_configuration = configuration;
+			_change_Notice_LogTable = change_Notice_LogTable;
 		}
 
 		public async Task SendFormDataCount()
@@ -24,13 +26,14 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Hubs
 			{
 
 		
-			string connectionString = _configuration.GetConnectionString("Plm");
+			//string connectionString = _configuration.GetConnectionString("Plm");
+			//using IDbConnection connection = new SqlConnection(connectionString);
 			string schema = _configuration["Catalog"];
 
-			using IDbConnection connection = new SqlConnection(connectionString);
 
 			// Sorguları optimize edin ve sadece gerekli sütunları çekin
-			var Change_Notice_LogTableList = connection.Query<Change_Notice_LogTable>($"SELECT * FROM {schema}.Change_Notice_LogTable").OrderByDescending(x => x.ProcessTimestamp).ToList();
+			//var Change_Notice_LogTableList = connection.Query<Change_Notice_LogTable>($"SELECT * FROM {schema}.Change_Notice_LogTable").OrderByDescending(x => x.ProcessTimestamp).ToList();
+			var Change_Notice_LogTableList = (await _change_Notice_LogTable.GetAll(schema+ ".Change_Notice_LogTable")).OrderByDescending(x => x.ProcessTimestamp).ToList();
 
 			if (Change_Notice_LogTableList is not null)
 			{
@@ -50,14 +53,19 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Hubs
 			{
 
 			
-			string connectionString = _configuration.GetConnectionString("Plm");
+			//string connectionString = _configuration.GetConnectionString("Plm");
+			//using IDbConnection connection = new SqlConnection(connectionString);
 			string schema = _configuration["Catalog"];
 
-			using IDbConnection connection = new SqlConnection(connectionString);
 
-			// Sorguları optimize edin ve sadece gerekli sütunları çekin
-			var Change_Notice_LogTableList = connection.Query<Change_Notice_LogTable>($"SELECT * FROM {schema}.Change_Notice_LogTable").OrderByDescending(x => x.ProcessTimestamp).ToList();
-
+				// Sorguları optimize edin ve sadece gerekli sütunları çekin
+				//var Change_Notice_LogTableList = connection.Query<Change_Notice_LogTable>($"SELECT * FROM {schema}.Change_Notice_LogTable").OrderByDescending(x => x.ProcessTimestamp).ToList();
+				var Change_Notice_LogTableList = (await _change_Notice_LogTable.GetAll(schema + ".Change_Notice_LogTable")).OrderByDescending(x => x.ProcessTimestamp).ToList();
+				Change_Notice_LogTableList.ForEach(log =>
+				{
+					log.ProcessTimestamp = Convert.ToDateTime(log.ProcessTimestamp).AddHours(3);
+				});
+				var durumTakip = false;
 			if (Change_Notice_LogTableList is not null)
 			{
 				var value = Change_Notice_LogTableList;

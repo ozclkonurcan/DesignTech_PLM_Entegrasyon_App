@@ -1,8 +1,10 @@
+using DesignTech_PLM_Entegrasyon_App.MVC.Data;
 using DesignTech_PLM_Entegrasyon_App.MVC.Dtos;
 using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Hubs;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.DapperContext;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
+using DesignTech_PLM_Entegrasyon_App.MVC.Repository;
 using DesignTech_PLM_Entegrasyon_App.MVC.Services;
 using DesignTech_PLM_Entegrasyon_App.MVC.Services.ApiServices;
 using DesignTech_PLM_Entegrasyon_App.MVC.Services.Rabbitmq;
@@ -90,6 +92,11 @@ builder.Services.AddAuthorization(opt =>
 
 
 builder.Services.AddApplicationServices(builder.Configuration);
+
+
+builder.Services.AddTransient<IDapperContext, DapperContext>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -182,6 +189,8 @@ builder.Services.AddTransient<IDbConnection>(_ =>
 //    });
 
 //});
+
+
 var app = builder.Build();
 
 Host.CreateDefaultBuilder(args)
@@ -208,7 +217,6 @@ app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
 
 
 app.UseSession();
