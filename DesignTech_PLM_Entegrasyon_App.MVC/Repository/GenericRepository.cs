@@ -17,7 +17,26 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Repository
 				string query = $"SELECT * FROM {tableName}";
 				return await connection.QueryAsync<T>(query);
 			}
-		}		
+		}
+
+		public async Task<IEnumerable<T>> GetPageData(string tableName, int pageNumber, int pageSize)
+		{
+			try
+			{
+				using (var connection = _context.CreateConnection())
+				{
+					string query = $"SELECT * FROM {tableName} ORDER BY ProcessTimestamp OFFSET {(pageNumber - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
+					return await connection.QueryAsync<T>(query);
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+				throw;
+			}
+		}
+
+
 		public async Task<IEnumerable<T>> GetAllWithWhere(string tableName, DynamicParameters parameters)
 		{
 			using (var connection = _context.CreateConnection())
@@ -97,5 +116,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Repository
 				}
 			}
 		}
+
+	
 	}
 }

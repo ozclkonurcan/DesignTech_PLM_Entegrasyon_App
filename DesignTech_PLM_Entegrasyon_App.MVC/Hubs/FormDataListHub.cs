@@ -81,6 +81,51 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Hubs
 		}
 
 
+		// Scroll kaydırıldığında verileri göstermeye çalışacaz
+		 public async Task SendInitialFormData(int pageSize)
+    {
+        try
+        {
+            string schema = _configuration["Catalog"];
+            var initialData = (await _change_Notice_LogTable.GetPageData(schema + ".Change_Notice_LogTable", 1, pageSize)).OrderByDescending(x => x.ProcessTimestamp).ToList();
+
+            var formattedData = FormatData(initialData);
+            await Clients.All.SendAsync("ReceiveInitialFormData", formattedData);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public async Task SendAdditionalFormData(int pageNumber, int pageSize)
+    {
+        try
+        {
+            string schema = _configuration["Catalog"];
+            var additionalData = (await _change_Notice_LogTable.GetPageData(schema + ".Change_Notice_LogTable", pageNumber, pageSize)).OrderByDescending(x => x.ProcessTimestamp).ToList();
+
+            var formattedData = FormatData(additionalData);
+            await Clients.All.SendAsync("ReceiveAdditionalFormData", formattedData);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private List<Change_Notice_LogTable> FormatData(List<Change_Notice_LogTable> data)
+    {
+        // Verilerinizi uygun bir ViewModel'e dönüştürme işlemini burada gerçekleştirin.
+        // Örneğin, bu kodu kullanabilirsiniz:
+        // var formattedData = data.Select(item => new ChangeNoticeLogTableViewModel { ... }).ToList();
+        // return formattedData;
+
+        // Eğer ViewModel kullanmıyorsanız, direkt olarak data'yı gönderebilirsiniz.
+        return data;
+    }
+		// Scroll kaydırıldığında verileri göstermeye çalışacaz
+
 
 	}
 }

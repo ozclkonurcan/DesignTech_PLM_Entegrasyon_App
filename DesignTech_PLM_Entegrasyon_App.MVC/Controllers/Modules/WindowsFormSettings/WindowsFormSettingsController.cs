@@ -3,6 +3,7 @@ using DesignTech_PLM_Entegrasyon_App.MVC.Dtos;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.LogTable;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
+using DesignTech_PLM_Entegrasyon_App.MVC.Repository;
 using DesignTech_PLM_Entegrasyon_App.MVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -20,16 +21,21 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 	{
 
         private readonly IConfiguration _configuration;
-        //private readonly IMessageProducer _messageProducer;
 
-        public WindowsFormSettingsController(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+       
+        private readonly IGenericRepository<Change_Notice_LogTable> _logTableRepository;
+
+		//private readonly IMessageProducer _messageProducer;
+
+		public WindowsFormSettingsController(IConfiguration configuration, IGenericRepository<Change_Notice_LogTable> logTableRepository)
+		{
+			_configuration = configuration;
+			_logTableRepository = logTableRepository;
+		}
 
 
 
-        public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index()
         {
             try
             {
@@ -51,13 +57,13 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                     var targetJsonObj2 = JObject.Parse(targetJson2);
 
 
-                string connectionString = _configuration.GetConnectionString("Plm");
+                //string connectionString = _configuration.GetConnectionString("Plm");
+                //using IDbConnection connection = new SqlConnection(connectionString);
                 string schema = _configuration["Catalog"];
 
-                using IDbConnection connection = new SqlConnection(connectionString);
 
                 // Sorguları optimize edin ve sadece gerekli sütunları çekin
-                var Change_Notice_LogTableList = connection.Query<Change_Notice_LogTable>($"SELECT * FROM {schema}.Change_Notice_LogTable").OrderByDescending(x => x.ProcessTimestamp).ToList();
+                var Change_Notice_LogTableList = (await _logTableRepository.GetAll(schema+".Change_Notice_LogTable")).OrderByDescending(x => x.ProcessTimestamp).ToList();
 
                 if(Change_Notice_LogTableList is not null)
                 {

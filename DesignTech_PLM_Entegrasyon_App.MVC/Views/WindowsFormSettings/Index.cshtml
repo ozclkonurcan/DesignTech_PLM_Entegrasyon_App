@@ -248,12 +248,13 @@
     <thead>
         <tr>
             <th>No</th>
+            <th>Durum</th>
             <th>Adı</th>
             <th>Numarası</th>
             <th>İşlem Tarihi</th>
             </tr>
     </thead>
-    <tbody id="dataTableBody" >
+    <tbody id="dataTableBody" class="fs-8" >
 @* 
         @try
                                         {
@@ -1475,6 +1476,23 @@
 
 <!-- StateValue -->
 <tr>
+  <td class="text-gray-800">State</td>
+  <td>
+    <div class="d-flex">
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="true" name="State" checked />
+        <span class="form-check-label">Aktif</span>
+      </label>
+      <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+        <input class="form-check-input" type="radio" value="false" name="State" />
+        <span class="form-check-label">Pasif</span>
+      </label>
+    </div>
+  </td>
+</tr>
+@* 
+<!-- StateValue -->
+<tr>
   <td class="text-gray-800">StateValue</td>
   <td>
     <div class="d-flex">
@@ -1506,7 +1524,7 @@
     </div>
   </td>
 </tr>			
-				<!-- Supersedes -->
+				<!-- Supersedes --> *@
 <tr>
   <td class="text-gray-800">Supersedes</td>
   <td>
@@ -1753,7 +1771,7 @@ function updateTable(data) {
 
         var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
-        $('#dataTableBody').append('<tr><td>' + (index + 1) + '</td><td class="w-50">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="">' + formattedTimestamp + '</td></tr>');
+        $('#dataTableBody').append('<tr><td >' + (index + 1) + '</td><td>' + item.statestate + '</td><td class="w-50">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
     });
 }
 
@@ -1768,4 +1786,60 @@ function updateCount(count) {
 }
 
 
+
 <!-- #endregion -->
+
+<!-- #region scroll kaydırıldıkca verileri yükleyeceğiz veriden tasarruf için kod denedenecek -->
+
+@* @section Scripts {
+    <script type="text/javascript">
+        $(document).ready(() => {
+            var connection = new signalR.HubConnectionBuilder().withUrl("/FormDataListHub").build();
+            $("#constatus").text(connection.state);
+
+            connection.on("ReceiveInitialFormData", (data) => {
+                updateTable(data);
+            });
+
+            connection.on("ReceiveAdditionalFormData", (data) => {
+                appendDataToTable(data);
+            });
+
+            connection.start().then(() => {
+                $("#constatus").text(connection.state);
+                connection.invoke("SendInitialFormData", 15); // Başlangıçta ilk 15 kaydı yükle
+            }).catch((err) => {
+                console.log(err);
+            });
+
+            var pageNumber = 2; // İlk yüklenen sayfanın numarası
+            var pageSize = 15;
+
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                    connection.invoke("SendAdditionalFormData", pageNumber, pageSize);
+                    pageNumber++;
+                }
+            });
+
+            function updateTable(data) {
+                $('#dataTableBody').empty();
+                $.each(data, function (index, item) {
+                    var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                    $('#dataTableBody').append('<tr><td>' + (index + 1) + '</td><td class="w-50">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="">' + formattedTimestamp + '</td></tr>');
+                });
+            }
+
+            function appendDataToTable(data) {
+                $.each(data, function (index, item) {
+                    var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                    $('#dataTableBody').append('<tr><td>' + (index + 1) + '</td><td class="w-50">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="">' + formattedTimestamp + '</td></tr>');
+                });
+            }
+        });
+    </script>
+}
+ *@
+
+<!-- #endregion -->
+        
