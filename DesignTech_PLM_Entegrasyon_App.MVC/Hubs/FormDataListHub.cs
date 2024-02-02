@@ -4,6 +4,7 @@ using DesignTech_PLM_Entegrasyon_App.MVC.Repository;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System.Data;
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Hubs
@@ -70,7 +71,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Hubs
 			{
 				var value = Change_Notice_LogTableList;
 				await Clients.All.SendAsync("ReceiveFormData", value);
-			}
+					
+				}
 			}
 			catch (Exception)
 			{
@@ -81,49 +83,75 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Hubs
 		}
 
 
+		public async Task SendWorkStatus()
+		{
+			try
+			{
+				var appSettingsPath = "appsettings.json";
+
+				// appsettings.json dosyasını oku
+				var json = System.IO.File.ReadAllText(appSettingsPath);
+				var jsonObj = JObject.Parse(json);
+				// Dosya yolu ve dosya adını al
+				var windowsFormFileUrl = jsonObj["WindowsFormFileUrl"]?.ToString();
+				var targetJson = System.IO.File.ReadAllText(windowsFormFileUrl);
+				var targetJsonObj = JObject.Parse(targetJson);
+
+
+				bool connectionType = Convert.ToBoolean(targetJsonObj["ConnectionType"]);
+				await Clients.All.SendAsync("ReceiveWorkStatus", connectionType);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+
+
+
 		// Scroll kaydırıldığında verileri göstermeye çalışacaz
-		 public async Task SendInitialFormData(int pageSize)
-    {
-        try
-        {
-            string schema = _configuration["Catalog"];
-            var initialData = (await _change_Notice_LogTable.GetPageData(schema + ".Change_Notice_LogTable", 1, pageSize)).OrderByDescending(x => x.ProcessTimestamp).ToList();
+		 //public async Task SendInitialFormData(int pageSize)
+   // {
+   //     try
+   //     {
+   //         string schema = _configuration["Catalog"];
+   //         var initialData = (await _change_Notice_LogTable.GetPageData(schema + ".Change_Notice_LogTable", 1, pageSize)).OrderByDescending(x => x.ProcessTimestamp).ToList();
 
-            var formattedData = FormatData(initialData);
-            await Clients.All.SendAsync("ReceiveInitialFormData", formattedData);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
+   //         var formattedData = FormatData(initialData);
+   //         await Clients.All.SendAsync("ReceiveInitialFormData", formattedData);
+   //     }
+   //     catch (Exception ex)
+   //     {
+   //         Console.WriteLine(ex.Message);
+   //     }
+   // }
 
-    public async Task SendAdditionalFormData(int pageNumber, int pageSize)
-    {
-        try
-        {
-            string schema = _configuration["Catalog"];
-            var additionalData = (await _change_Notice_LogTable.GetPageData(schema + ".Change_Notice_LogTable", pageNumber, pageSize)).OrderByDescending(x => x.ProcessTimestamp).ToList();
+   // public async Task SendAdditionalFormData(int pageNumber, int pageSize)
+   // {
+   //     try
+   //     {
+   //         string schema = _configuration["Catalog"];
+   //         var additionalData = (await _change_Notice_LogTable.GetPageData(schema + ".Change_Notice_LogTable", pageNumber, pageSize)).OrderByDescending(x => x.ProcessTimestamp).ToList();
 
-            var formattedData = FormatData(additionalData);
-            await Clients.All.SendAsync("ReceiveAdditionalFormData", formattedData);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
+   //         var formattedData = FormatData(additionalData);
+   //         await Clients.All.SendAsync("ReceiveAdditionalFormData", formattedData);
+   //     }
+   //     catch (Exception ex)
+   //     {
+   //         Console.WriteLine(ex.Message);
+   //     }
+   // }
 
-    private List<Change_Notice_LogTable> FormatData(List<Change_Notice_LogTable> data)
-    {
-        // Verilerinizi uygun bir ViewModel'e dönüştürme işlemini burada gerçekleştirin.
-        // Örneğin, bu kodu kullanabilirsiniz:
-        // var formattedData = data.Select(item => new ChangeNoticeLogTableViewModel { ... }).ToList();
-        // return formattedData;
+   // private List<Change_Notice_LogTable> FormatData(List<Change_Notice_LogTable> data)
+   // {
+   //     // Verilerinizi uygun bir ViewModel'e dönüştürme işlemini burada gerçekleştirin.
+   //     // Örneğin, bu kodu kullanabilirsiniz:
+   //     // var formattedData = data.Select(item => new ChangeNoticeLogTableViewModel { ... }).ToList();
+   //     // return formattedData;
 
-        // Eğer ViewModel kullanmıyorsanız, direkt olarak data'yı gönderebilirsiniz.
-        return data;
-    }
+   //     // Eğer ViewModel kullanmıyorsanız, direkt olarak data'yı gönderebilirsiniz.
+   //     return data;
+   // }
 		// Scroll kaydırıldığında verileri göstermeye çalışacaz
 
 

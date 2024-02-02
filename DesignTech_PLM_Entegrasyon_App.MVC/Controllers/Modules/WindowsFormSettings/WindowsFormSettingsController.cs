@@ -39,155 +39,58 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
         {
             try
             {
-                // appsettings.json dosyasının yolunu al
-                var appSettingsPath = "appsettings.json";
 
-                // appsettings.json dosyasını oku
-                var json = System.IO.File.ReadAllText(appSettingsPath);
-                var jsonObj = JObject.Parse(json);
-
-                // Dosya yolu ve dosya adını al
-                var windowsFormFileUrl = jsonObj["WindowsFormFileUrl"]?.ToString();
-                var windowsFormFileUrl2 = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
-
-            
-                    var targetJson = System.IO.File.ReadAllText(windowsFormFileUrl);
-                    var targetJson2 = System.IO.File.ReadAllText(windowsFormFileUrl2);
-                    var targetJsonObj = JObject.Parse(targetJson);
-                    var targetJsonObj2 = JObject.Parse(targetJson2);
-
-
-                //string connectionString = _configuration.GetConnectionString("Plm");
-                //using IDbConnection connection = new SqlConnection(connectionString);
-                string schema = _configuration["Catalog"];
-
-
-                // Sorguları optimize edin ve sadece gerekli sütunları çekin
-                var Change_Notice_LogTableList = (await _logTableRepository.GetAll(schema+".Change_Notice_LogTable")).OrderByDescending(x => x.ProcessTimestamp).ToList();
-
-                if(Change_Notice_LogTableList is not null)
-                {
-                    ViewBag.Change_Notice_LogTableList = Change_Notice_LogTableList;
-                    ViewBag.Change_Notice_LogTableListCount = Change_Notice_LogTableList.Count();
-                }
-
-
-                //var timer = new Timer(x =>
-                //{
-                //    using (var connection = new SqlConnection(connectionString))
-                //    {
-                //        var data = //veritabanından verileri çek
-
-                //        dataHub.SendData(Change_Notice_LogTableList);
-                //    }
-                //}, null, 0, 5000);
-
-                //using IDbConnection connection = _dbConnectionFactory.CreateOpenConnection();
-
-                //const string sql = """
-                //    SELECT u.idA2A2, u.name, u.WTPartNumber, u.updateStampA2, u.ProcessTimestamp
-                //    FROM Change_Notice_LogTable u 
-                //    """;
-
-                //Change_Notice_LogTable changeNoticeLogTableList = await connection.QueryFirstOrDefault(sql);
-
-                //var changeNoticeLogTableList = _changeNoticeContext.Change_Notice_LogTable.ToList();
-
-
-
-
-                var wtPartMasterList = new List<WTPartMasterItemViewModel>();
-                try
-                {
-                    foreach (var item in targetJsonObj2["WTPartMaster"])
-                    {
-                        var wtPartMasterItem = new WTPartMasterItemViewModel
-                        {
-                            ID = item.Value<string>("ID"),
-                            Name = item.Value<string>("Name"),
-                            SQLName = item.Value<string>("SQLName"),
-                            IsActive = item.Value<bool>("IsActive")
-                        };
-
-                        wtPartMasterList.Add(wtPartMasterItem);
-                    }
-                }
-                catch (Exception)
-                {
-
-                }
-                
-
-
-
-
-                var WTPartDataSettings = "WTPartDataSettings.json";
+				var WTPartDataSettings = "WTPartDataSettings.json";
 				var json2 = System.IO.File.ReadAllText(WTPartDataSettings);
 				var jsonObj2 = string.IsNullOrEmpty(json2) ? new JObject() : JObject.Parse(json2);
 
 				var sablons = jsonObj2["sablons"] as JArray;
 
 
-                List<SablonViewModel> sablonViewModelList = new List<SablonViewModel>();
+				List<SablonViewModel> sablonViewModelList = new List<SablonViewModel>();
 
-                if (sablons != null)
-                {
-                    foreach (var sablon in sablons)
-                    {
-                        var sablonName = sablon["sablonName"]?.ToString();
-                        var ID = sablon["ID"]?.ToString();
-                        var sablonDataDurumu = sablon["sablonDataDurumu"]?.ToString();
-                        var sablonData = sablon["sablonData"] as JArray;
+				if (sablons != null)
+				{
+					foreach (var sablon in sablons)
+					{
+						var sablonName = sablon["sablonName"]?.ToString();
+						var ID = sablon["ID"]?.ToString();
+						var sablonDataDurumu = sablon["sablonDataDurumu"]?.ToString();
+						var sablonData = sablon["sablonData"] as JArray;
 
-                        SablonViewModel sablonViewModel = new SablonViewModel
-                        {
-                            ID = ID,
-                            SablonName = sablonName,
-                            sablonDataDurumu = sablonDataDurumu,
-                            SablonDataList = new List<WTPartDataSettingsViewModel>()
-                        };
+						SablonViewModel sablonViewModel = new SablonViewModel
+						{
+							ID = ID,
+							SablonName = sablonName,
+							sablonDataDurumu = sablonDataDurumu,
+							SablonDataList = new List<WTPartDataSettingsViewModel>()
+						};
 
-                        if (sablonData != null)
-                        {
-                            foreach (var item in sablonData)
-                            {
-                                WTPartDataSettingsViewModel viewModel = new WTPartDataSettingsViewModel
-                                {
-                                    SablonName = sablonName,
-                                    ID = item["ID"]?.ToString(),
-                                    Name = item["Name"]?.ToString(),
-                                    SQLName = item["SQLName"]?.ToString(),
-                                    IsActive = item["IsActive"]?.ToString()
-                                };
+						if (sablonData != null)
+						{
+							foreach (var item in sablonData)
+							{
+								WTPartDataSettingsViewModel viewModel = new WTPartDataSettingsViewModel
+								{
+									SablonName = sablonName,
+									ID = item["ID"]?.ToString(),
+									Name = item["Name"]?.ToString(),
+									SQLName = item["SQLName"]?.ToString(),
+									IsActive = item["IsActive"]?.ToString()
+								};
 
-                                sablonViewModel.SablonDataList.Add(viewModel);
-                            }
-                        }
+								sablonViewModel.SablonDataList.Add(viewModel);
+							}
+						}
 
-                        sablonViewModelList.Add(sablonViewModel);
-                    }
-                }
+						sablonViewModelList.Add(sablonViewModel);
+					}
+				}
 
-                // ViewBag'e sablon verisini atama
-                ViewBag.SablonViewModelList = sablonViewModelList;
+				// ViewBag'e sablon verisini atama
+				ViewBag.SablonViewModelList = sablonViewModelList;
 
-
-
-                // Değişiklikleri yap
-                ViewBag.Catalog = targetJsonObj["Catalog"].ToString();
-                ViewBag.ServerName = targetJsonObj["ServerName"].ToString();
-                ViewBag.KullaniciAdi = targetJsonObj["KullaniciAdi"].ToString();
-                ViewBag.Parola = targetJsonObj["Parola"].ToString();
-                ViewBag.ApiURL = targetJsonObj["APIConnectionINFO"]["ApiURL"].ToString();
-                ViewBag.ApiEndpoint = targetJsonObj["APIConnectionINFO"]["ApiEndpoint"].ToString();
-                ViewBag.API = targetJsonObj["APIConnectionINFO"]["API"].ToString();
-                ViewBag.ConnectionType = Convert.ToBoolean(targetJsonObj["ConnectionType"]);
-
-                ViewBag.ApiSendDataSettings = wtPartMasterList;
-
-                    // View'e geçir
-                    ViewBag.TargetJson = targetJsonObj.ToString();
-                    return View();
+				return View();
             }
             catch (Exception ex)
             {
@@ -197,7 +100,95 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
             }
         }
 
-        public IActionResult ApiSendDataPartsSettings(string ID, bool IsActive)
+
+        public async Task<IActionResult> ProdMgmt()
+        {
+            try
+            {
+				// appsettings.json dosyasının yolunu al
+				var appSettingsPath = "appsettings.json";
+
+				// appsettings.json dosyasını oku
+				var json = System.IO.File.ReadAllText(appSettingsPath);
+				var jsonObj = JObject.Parse(json);
+
+				// Dosya yolu ve dosya adını al
+				var windowsFormFileUrl = jsonObj["WindowsFormFileUrl"]?.ToString();
+				var windowsFormFileUrl2 = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
+
+
+				var targetJson = System.IO.File.ReadAllText(windowsFormFileUrl);
+				var targetJson2 = System.IO.File.ReadAllText(windowsFormFileUrl2);
+				var targetJsonObj = JObject.Parse(targetJson);
+				var targetJsonObj2 = JObject.Parse(targetJson2);
+
+
+				//string connectionString = _configuration.GetConnectionString("Plm");
+				//using IDbConnection connection = new SqlConnection(connectionString);
+				string schema = _configuration["Catalog"];
+
+
+				// Sorguları optimize edin ve sadece gerekli sütunları çekin
+				var Change_Notice_LogTableList = (await _logTableRepository.GetAll(schema + ".Change_Notice_LogTable")).OrderByDescending(x => x.ProcessTimestamp).ToList();
+
+				if (Change_Notice_LogTableList is not null)
+				{
+					ViewBag.Change_Notice_LogTableList = Change_Notice_LogTableList;
+					ViewBag.Change_Notice_LogTableListCount = Change_Notice_LogTableList.Count();
+				}
+
+
+
+				var wtPartMasterList = new List<WTPartMasterItemViewModel>();
+				try
+				{
+					foreach (var item in targetJsonObj2["WTPartMaster"])
+					{
+						var wtPartMasterItem = new WTPartMasterItemViewModel
+						{
+							ID = item.Value<string>("ID"),
+							Name = item.Value<string>("Name"),
+							SQLName = item.Value<string>("SQLName"),
+							IsActive = item.Value<bool>("IsActive")
+						};
+
+						wtPartMasterList.Add(wtPartMasterItem);
+					}
+				}
+				catch (Exception)
+				{
+
+				}
+
+
+				// Değişiklikleri yap
+				ViewBag.Catalog = targetJsonObj["Catalog"].ToString();
+				ViewBag.ServerName = targetJsonObj["ServerName"].ToString();
+				ViewBag.KullaniciAdi = targetJsonObj["KullaniciAdi"].ToString();
+				ViewBag.Parola = targetJsonObj["Parola"].ToString();
+				ViewBag.ApiURL = targetJsonObj["APIConnectionINFO"]["ApiURL"].ToString();
+				ViewBag.ApiEndpoint = targetJsonObj["APIConnectionINFO"]["ApiEndpoint"].ToString();
+				ViewBag.API = targetJsonObj["APIConnectionINFO"]["API"].ToString();
+
+				ViewBag.ApiSendDataSettings = wtPartMasterList;
+
+				// View'e geçir
+				ViewBag.TargetJson = targetJsonObj.ToString();
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Hata!" + ex.Message;
+                return View();
+            }
+        }
+
+
+
+
+
+
+		public IActionResult ApiSendDataPartsSettings(string ID, bool IsActive)
         {
 
             try
