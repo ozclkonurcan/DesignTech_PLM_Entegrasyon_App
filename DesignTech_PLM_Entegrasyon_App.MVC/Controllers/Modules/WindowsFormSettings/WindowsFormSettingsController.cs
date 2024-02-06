@@ -142,8 +142,11 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 				var wtPartMasterList = new List<WTPartMasterItemViewModel>();
 				try
 				{
-					foreach (var item in targetJsonObj2["WTPartMaster"])
+					foreach (var item2 in targetJsonObj2.Properties())
 					{
+					foreach (var item in item2.Value)
+						{
+
 						var wtPartMasterItem = new WTPartMasterItemViewModel
 						{
 							ID = item.Value<string>("ID"),
@@ -153,6 +156,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 						};
 
 						wtPartMasterList.Add(wtPartMasterItem);
+						}
 					}
 				}
 				catch (Exception)
@@ -495,16 +499,20 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 				var jsonObj = string.IsNullOrEmpty(json) ? new JObject() : JObject.Parse(json);
 
 				var sablonName = jsonData.FirstOrDefault().Value.ToString();
+                var sourceApi = jsonData["source_Api"].ToString();
+                var yapilacakIslem = jsonData["yapilacakIslem"].ToString();
                 var sablonDataDurumu = "false";
 
                 // Şablon adına sahip olanları kontrol et
                 var existingSablon = jsonObj["sablons"]?
-					.FirstOrDefault(s => s["sablonName"]?.ToString() == sablonName);
+					.FirstOrDefault(s => s["sablonName"]?.ToString() == sablonName || (s["Source_Api"]?.ToString() == sourceApi && s["yapilacakIslem"]?.ToString() == yapilacakIslem));
 
 				if (existingSablon != null)
 				{
 					// Eğer şablon varsa, mevcut şablonu güncelle
 					existingSablon["ID"] = Guid.NewGuid().ToString();
+					existingSablon["Source_Api"] = sourceApi;
+					existingSablon["State"] = yapilacakIslem;
                     existingSablon["sablonDataDurumu"] = sablonDataDurumu;
                     existingSablon["sablonData"] = JArray.FromObject(jsonData.Where(x => x.Key != jsonData.FirstOrDefault().Key && x.Key != "__RequestVerificationToken").Select(item => new
 					{
@@ -513,6 +521,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 						SQLName = item.Key,
 						IsActive = item.Value.ToString()
 					}).ToList());
+
+					TempData["SuccessMessage"] = "Şablon güncelleştirildi";
 				}
 				else
 				{
@@ -520,6 +530,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 					var newTemplate = new
 					{
 						ID = Guid.NewGuid().ToString(),
+                        Source_Api = sourceApi,
+                        State = yapilacakIslem,
                         sablonDataDurumu = sablonDataDurumu,
                         sablonName = sablonName,
 						sablonData = jsonData.Where(x => x.Key != jsonData.FirstOrDefault().Key && x.Key != "__RequestVerificationToken").Select(item => new
@@ -538,6 +550,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 					}
 
 					(jsonObj["sablons"] as JArray).Add(JObject.FromObject(newTemplate));
+                    TempData["SuccessMessage"] = "Şablon oluşturuldu";
 				}
 
 				// Dosyaya yaz
@@ -599,6 +612,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                 var json = System.IO.File.ReadAllText(WTPartDataSettings);
                 var jsonObj = string.IsNullOrEmpty(json) ? new JObject() : JObject.Parse(json);
 
+                var state = "";
+                var source_Api = "";
                 var sablons = jsonObj["sablons"] as JArray;
 
                 if (sablons != null)
@@ -612,18 +627,20 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                         {
                             // Update sablonDataDurumu based on the provided value
                             sablon["sablonDataDurumu"] = sablonDataDurumu;
+                            source_Api = sablon["Source_Api"]?.ToString();
+                            state = sablon["State"]?.ToString();
 
-                            // If setting it to true, set other sablonDataDurumu values to false
-                            if (sablonDataDurumu.ToLower() == "true")
-                            {
-                                foreach (var otherSablon in sablons)
-                                {
-                                    if (otherSablon != sablon)
-                                    {
-                                        otherSablon["sablonDataDurumu"] = "false";
-                                    }
-                                }
-                            }
+                            //// If setting it to true, set other sablonDataDurumu values to false
+                            //if (sablonDataDurumu.ToLower() == "true")
+                            //{
+                            //    foreach (var otherSablon in sablons)
+                            //    {
+                            //        if (otherSablon != sablon)
+                            //        {
+                            //            otherSablon["sablonDataDurumu"] = "false";
+                            //        }
+                            //    }
+                            //}
 
                             // Save the changes back to the JSON file
                             System.IO.File.WriteAllText(WTPartDataSettings, jsonObj.ToString());
@@ -631,7 +648,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                             var sablonData = sablon["sablonData"] as JArray;
 
                             // Call ApiSendDataPartsSettings to update IsActive
-                            ApiSendDataPartsSettings(ID, sablonData);
+                            ApiSendDataPartsSettings(ID, sablonData, source_Api,state, SablonName, sablonDataDurumu);
 
                             TempData["SuccessMessage"] = SablonName + " adlı şablon aktif edildi.";
                             break; // Exit the loop once the update is done
@@ -650,164 +667,336 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
          
 
 
-        public IActionResult ApiSendDataPartsSettings(string ID, JArray sablonData)
+        public IActionResult ApiSendDataPartsSettings(string ID, JArray sablonData,string source_Api,string state,string sablonName, string sablonDataDurumu)
         {
-            try
-            {
-                // appsettings.json dosyasının yolunu al
-                var appSettingsPath = "appsettings.json";
 
-                // appsettings.json dosyasını oku
-                var json = System.IO.File.ReadAllText(appSettingsPath);
-                var jsonObj = JObject.Parse(json);
+			try
+			{
+				// appsettings.json dosyasının yolunu al
+				var appSettingsPath = "appsettings.json";
 
-                // Dosya yolu ve dosya adını al
-                var ApiSendDataSettingsFolder = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
+				// appsettings.json dosyasını oku
+				var json = System.IO.File.ReadAllText(appSettingsPath);
+				var jsonObj = JObject.Parse(json);
 
-                // Hedef json dosyasını oku
-                if (!string.IsNullOrEmpty(ApiSendDataSettingsFolder))
-                {
-                    var targetJson = System.IO.File.ReadAllText(ApiSendDataSettingsFolder);
-                    var targetJsonObj = JObject.Parse(targetJson);
+				// Dosya yolu ve dosya adını al
+				var ApiSendDataSettingsFolder = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
 
-                    // Eşleşen ID'yi bul
-                    var targetItem = targetJsonObj["WTPartMaster"]?.FirstOrDefault(t => t["ID"]?.ToString() == ID);
+				// Hedef json dosyasını oku
+				if (!string.IsNullOrEmpty(ApiSendDataSettingsFolder))
+				{
+					var targetJson = System.IO.File.ReadAllText(ApiSendDataSettingsFolder);
+					var targetJsonObj = JObject.Parse(targetJson);
 
-                    if (targetItem != null)
-                    {
-                        // Eğer eşleşen öğe varsa, sablonData ile değiştir
-                        targetItem["WTPartMaster"] = sablonData;
-                    }
-                    else
-                    {
-                        // Eşleşen öğe yoksa, WTPartMaster dizisini komple değiştir
-                        targetJsonObj["WTPartMaster"] = sablonData;
-                    }
+					// Eşleşen ID'yi bul
+					var targetItem = targetJsonObj["WTPartMaster"]?.FirstOrDefault(t => t["ID"]?.ToString() == ID);
 
-                    // Değişiklikleri kaydet
-                    System.IO.File.WriteAllText(ApiSendDataSettingsFolder, targetJsonObj.ToString());
-                }
+					if (targetItem != null)
+					{
+						// Eğer eşleşen öğe varsa, sablonData ile değiştir
+						var wtPartMasterArray = targetItem[sablonName] as JArray;
 
-                TempData["SuccessMessage"] = "Data parçaları güncellendi.";
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Hata! {ex.Message}";
-                return RedirectToAction("Index");
-            }
-        }
+						targetItem["source_Api"] = source_Api; // Eklenen kısım
+						targetItem["state"] = state; // Eklenen kısım
+						targetItem["sablonDataDurumu"] = sablonDataDurumu; // Eklenen kısım
 
+						if (wtPartMasterArray != null)
+						{
+							if (sablonDataDurumu.ToLower() == "true")
+							{
+								//var filteredSablonData = sablonData
+								//	.Where(item =>
+								//		item["IsActive"]?.ToString() != state &&
+								//		item["IsActive"]?.ToString() != source_Api
+								//	).ToList();
 
+								//wtPartMasterArray.ReplaceAll(filteredSablonData);
+								wtPartMasterArray.Clear();
+							}
+							else if (sablonDataDurumu.ToLower() == "false")
+							{
+								// sablonDataDurumu false ise, WTPartMaster dizisini temizle
+								wtPartMasterArray.Clear();
+							}
+						}
+					}
+					else
+					{
+						var filteredSablonData = sablonData
+							.Where(item =>
+								item["IsActive"]?.ToString() != state &&
+								item["IsActive"]?.ToString() != source_Api
+							).ToList();
 
-        //public IActionResult ApiSendDataPartsSettings(string ID, JArray sablonData)
-        //{
-        //    try
-        //    {
-        //        // appsettings.json dosyasının yolunu al
-        //        var appSettingsPath = "appsettings.json";
+						// Eşleşen öğe yoksa, WTPartMaster dizisini komple değiştir
+						var newTargetItem = new JObject();
+						newTargetItem["source_Api"] = source_Api; // Eklenen kısım
+						newTargetItem["state"] = state; // Eklenen kısım
+						newTargetItem["sablonDataDurumu"] = sablonDataDurumu; // Eklenen kısım
 
-        //        // appsettings.json dosyasını oku
-        //        var json = System.IO.File.ReadAllText(appSettingsPath);
-        //        var jsonObj = JObject.Parse(json);
+						if (sablonDataDurumu.ToLower() == "true")
+						{
+							//newTargetItem["WTPartMaster"] = JArray.FromObject(filteredSablonData);
+						}
+						else if (sablonDataDurumu.ToLower() == "false")
+						{
+							// sablonDataDurumu false ise, WTPartMaster dizisini temizle
+							//newTargetItem["WTPartMaster"] = new JArray();
+						}
 
-        //        // Dosya yolu ve dosya adını al
-        //        var ApiSendDataSettingsFolder = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
+						var wtPartMasterArray = new JArray();
+						wtPartMasterArray.Add(newTargetItem);
 
-        //        // Hedef json dosyasını oku
-        //        if (!string.IsNullOrEmpty(ApiSendDataSettingsFolder))
-        //        {
-        //            var targetJson = System.IO.File.ReadAllText(ApiSendDataSettingsFolder);
-        //            var targetJsonObj = JObject.Parse(targetJson);
+						targetJsonObj[sablonName] = wtPartMasterArray;
+					}
 
-        //            // Eşleşen ID'yi bul
-        //            var targetItem = targetJsonObj["WTPartMaster"]?.FirstOrDefault(t => t["ID"]?.ToString() == ID);
+					// Değişiklikleri kaydet
+					System.IO.File.WriteAllText(ApiSendDataSettingsFolder, targetJsonObj.ToString());
+				}
 
-        //            if (targetItem != null)
-        //            {
-        //                // Eğer eşleşen öğe varsa, sablonData'yı güncelle
-        //                targetItem["WTPartMaster"] = sablonData;
-        //            }
-        //            else
-        //            {
-        //                // Eşleşen öğe yoksa yeni bir öğe oluştur ve sablonData'yı ekle
-        //                var newTargetItem = new JObject();
-        //                //newTargetItem["ID"] = ID;
-        //                //newTargetItem["WTPartMaster"] = sablonData;
-
-        //                // Önceki kayıtları temizle ve yeni öğeyi ekle
-        //                //targetJsonObj["WTPartMaster"] = new JArray(sablonData);
-
-        //                if (targetJsonObj["WTPartMaster"] == null)
-        //                {
-        //                    targetJsonObj["WTPartMaster"] = new JArray(sablonData);
-        //                }
-        //                else
-        //                {
-        //                    // WTPartMaster dizisi varsa sadece yeni öğeyi ekle
-        //                    ((JArray)targetJsonObj["WTPartMaster"]).Add(sablonData);
-        //                }
-        //            }
-
-        //            // Değişiklikleri kaydet
-        //            System.IO.File.WriteAllText(ApiSendDataSettingsFolder, targetJsonObj.ToString());
-        //        }
-
-        //        TempData["SuccessMessage"] = "Data parçaları güncellendi.";
-        //        return RedirectToAction("Index");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        TempData["ErrorMessage"] = $"Hata! {ex.Message}";
-        //        return RedirectToAction("Index");
-        //    }
-        //}
+				TempData["SuccessMessage"] = "Data parçaları güncellendi.";
+				return RedirectToAction("Index");
+			}
+			catch (Exception ex)
+			{
+				TempData["ErrorMessage"] = $"Hata! {ex.Message}";
+				return RedirectToAction("Index");
+			}
 
 
+			//try
+			//{
+			//	// appsettings.json dosyasının yolunu al
+			//	var appSettingsPath = "appsettings.json";
+
+			//	// appsettings.json dosyasını oku
+			//	var json = System.IO.File.ReadAllText(appSettingsPath);
+			//	var jsonObj = JObject.Parse(json);
+
+			//	// Dosya yolu ve dosya adını al
+			//	var ApiSendDataSettingsFolder = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
+
+			//	// Hedef json dosyasını oku
+			//	if (!string.IsNullOrEmpty(ApiSendDataSettingsFolder))
+			//	{
+			//		var targetJson = System.IO.File.ReadAllText(ApiSendDataSettingsFolder);
+			//		var targetJsonObj = JObject.Parse(targetJson);
+
+			//		// Eşleşen ID'yi bul
+			//		var targetItem = targetJsonObj["WTPartMaster"]?.FirstOrDefault(t => t["ID"]?.ToString() == ID);
+
+			//		if (targetItem != null)
+			//		{
+			//			// Eğer eşleşen öğe varsa, sablonData ile değiştir
+			//			var wtPartMasterArray = targetItem[sablonName] as JArray;
+
+			//			targetItem["source_Api"] = source_Api; // Eklenen kısım
+			//			targetItem["state"] = state; // Eklenen kısım
+			//			targetItem["sablonDataDurumu"] = sablonDataDurumu; // Eklenen kısım
+
+			//			if (wtPartMasterArray != null)
+			//			{
+			//				var filteredSablonData = sablonData
+			//					.Where(item =>
+			//						item["IsActive"]?.ToString() != state &&
+			//						item["IsActive"]?.ToString() != source_Api
+			//					).ToList();
+
+			//				wtPartMasterArray.ReplaceAll(filteredSablonData);
+			//			}
+			//		}
+			//		else
+			//		{
+			//			var filteredSablonData = sablonData
+			//				.Where(item =>
+			//					item["IsActive"]?.ToString() != state &&
+			//					item["IsActive"]?.ToString() != source_Api
+			//				).ToList();
+
+			//			// Eşleşen öğe yoksa, WTPartMaster dizisini komple değiştir
+			//			var newTargetItem = new JObject();
+			//			newTargetItem["source_Api"] = source_Api; // Eklenen kısım
+			//			newTargetItem["state"] = state; // Eklenen kısım
+			//			targetItem["sablonDataDurumu"] = sablonDataDurumu; // Eklenen kısım
+			//			newTargetItem["WTPartMaster"] = JArray.FromObject(filteredSablonData);
+
+			//			var wtPartMasterArray = new JArray();
+			//			wtPartMasterArray.Add(newTargetItem);
+
+			//			targetJsonObj[sablonName] = wtPartMasterArray;
+			//		}
+
+			//		// Değişiklikleri kaydet
+			//		System.IO.File.WriteAllText(ApiSendDataSettingsFolder, targetJsonObj.ToString());
+			//	}
+
+			//	TempData["SuccessMessage"] = "Data parçaları güncellendi.";
+			//	return RedirectToAction("Index");
+			//}
+			//catch (Exception ex)
+			//{
+			//	TempData["ErrorMessage"] = $"Hata! {ex.Message}";
+			//	return RedirectToAction("Index");
+			//}
+
+
+			//try
+			//{
+			//    // appsettings.json dosyasının yolunu al
+			//    var appSettingsPath = "appsettings.json";
+
+			//    // appsettings.json dosyasını oku
+			//    var json = System.IO.File.ReadAllText(appSettingsPath);
+			//    var jsonObj = JObject.Parse(json);
+
+			//    // Dosya yolu ve dosya adını al
+			//    var ApiSendDataSettingsFolder = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
+
+			//    // Hedef json dosyasını oku
+			//    if (!string.IsNullOrEmpty(ApiSendDataSettingsFolder))
+			//    {
+			//        var targetJson = System.IO.File.ReadAllText(ApiSendDataSettingsFolder);
+			//        var targetJsonObj = JObject.Parse(targetJson);
+
+			//        // Eşleşen ID'yi bul
+			//        var targetItem = targetJsonObj["WTPartMaster"]?.FirstOrDefault(t => t["ID"]?.ToString() == ID);
+
+			//        if (targetItem != null)
+			//        {
+			//            // Eğer eşleşen öğe varsa, sablonData ile değiştir
+
+			//            targetItem["WTPartMaster"] = sablonData;
+			//        }
+			//        else
+			//        {
+			//            // Eşleşen öğe yoksa, WTPartMaster dizisini komple değiştir
+			//            targetJsonObj["WTPartMaster"] = sablonData;
+			//        }
+
+			//        // Değişiklikleri kaydet
+			//        System.IO.File.WriteAllText(ApiSendDataSettingsFolder, targetJsonObj.ToString());
+			//    }
+
+			//    TempData["SuccessMessage"] = "Data parçaları güncellendi.";
+			//    return RedirectToAction("Index");
+			//}
+			//catch (Exception ex)
+			//{
+			//    TempData["ErrorMessage"] = $"Hata! {ex.Message}";
+			//    return RedirectToAction("Index");
+			//}
+		}
 
 
 
-        //    public IActionResult apiSablonsSendSettings(IFormCollection jsonData)
-        //    {
-        //        try
-        //        {
-        //var WTPartDataSettings = "WTPartDataSettings.json";
-        //var json = System.IO.File.ReadAllText(WTPartDataSettings);
-        //var jsonObj = JObject.Parse(json);
+		//public IActionResult ApiSendDataPartsSettings(string ID, JArray sablonData)
+		//{
+		//    try
+		//    {
+		//        // appsettings.json dosyasının yolunu al
+		//        var appSettingsPath = "appsettings.json";
+
+		//        // appsettings.json dosyasını oku
+		//        var json = System.IO.File.ReadAllText(appSettingsPath);
+		//        var jsonObj = JObject.Parse(json);
+
+		//        // Dosya yolu ve dosya adını al
+		//        var ApiSendDataSettingsFolder = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
+
+		//        // Hedef json dosyasını oku
+		//        if (!string.IsNullOrEmpty(ApiSendDataSettingsFolder))
+		//        {
+		//            var targetJson = System.IO.File.ReadAllText(ApiSendDataSettingsFolder);
+		//            var targetJsonObj = JObject.Parse(targetJson);
+
+		//            // Eşleşen ID'yi bul
+		//            var targetItem = targetJsonObj["WTPartMaster"]?.FirstOrDefault(t => t["ID"]?.ToString() == ID);
+
+		//            if (targetItem != null)
+		//            {
+		//                // Eğer eşleşen öğe varsa, sablonData'yı güncelle
+		//                targetItem["WTPartMaster"] = sablonData;
+		//            }
+		//            else
+		//            {
+		//                // Eşleşen öğe yoksa yeni bir öğe oluştur ve sablonData'yı ekle
+		//                var newTargetItem = new JObject();
+		//                //newTargetItem["ID"] = ID;
+		//                //newTargetItem["WTPartMaster"] = sablonData;
+
+		//                // Önceki kayıtları temizle ve yeni öğeyi ekle
+		//                //targetJsonObj["WTPartMaster"] = new JArray(sablonData);
+
+		//                if (targetJsonObj["WTPartMaster"] == null)
+		//                {
+		//                    targetJsonObj["WTPartMaster"] = new JArray(sablonData);
+		//                }
+		//                else
+		//                {
+		//                    // WTPartMaster dizisi varsa sadece yeni öğeyi ekle
+		//                    ((JArray)targetJsonObj["WTPartMaster"]).Add(sablonData);
+		//                }
+		//            }
+
+		//            // Değişiklikleri kaydet
+		//            System.IO.File.WriteAllText(ApiSendDataSettingsFolder, targetJsonObj.ToString());
+		//        }
+
+		//        TempData["SuccessMessage"] = "Data parçaları güncellendi.";
+		//        return RedirectToAction("Index");
+		//    }
+		//    catch (Exception ex)
+		//    {
+		//        TempData["ErrorMessage"] = $"Hata! {ex.Message}";
+		//        return RedirectToAction("Index");
+		//    }
+		//}
 
 
 
 
-        //var newTemplate = new
-        //{
-        //	ID = Guid.NewGuid().ToString(),
-        //	sablonName = jsonData.FirstOrDefault().Value.ToString(),
-        //	sablonData = jsonData.Where(x => x.Key != jsonData.FirstOrDefault().Key).Select(item => new
-        //	{
-        //		ID = Guid.NewGuid().ToString(),
-        //		Name = item.Key,
-        //		SQLName = item.Key,
-        //		IsActive = item.Value.ToString()
-        //	}).ToList()
-        //};
 
-        //// Eski veriye yeni veriyi ekle
-        //var sablons = jsonObj["sablons"] as JArray;
-        //sablons.Add(JObject.FromObject(newTemplate));
-
-        //// Dosyaya yaz
-        //System.IO.File.WriteAllText(WTPartDataSettings, JsonConvert.SerializeObject(jsonObj, Formatting.Indented));
+		//    public IActionResult apiSablonsSendSettings(IFormCollection jsonData)
+		//    {
+		//        try
+		//        {
+		//var WTPartDataSettings = "WTPartDataSettings.json";
+		//var json = System.IO.File.ReadAllText(WTPartDataSettings);
+		//var jsonObj = JObject.Parse(json);
 
 
-        //return RedirectToAction("Index");
-        //        }
-        //        catch (Exception)
-        //        {
-        //        return RedirectToAction("Index");
-        //        }
-
-        //    }
 
 
-    }
+		//var newTemplate = new
+		//{
+		//	ID = Guid.NewGuid().ToString(),
+		//	sablonName = jsonData.FirstOrDefault().Value.ToString(),
+		//	sablonData = jsonData.Where(x => x.Key != jsonData.FirstOrDefault().Key).Select(item => new
+		//	{
+		//		ID = Guid.NewGuid().ToString(),
+		//		Name = item.Key,
+		//		SQLName = item.Key,
+		//		IsActive = item.Value.ToString()
+		//	}).ToList()
+		//};
+
+		//// Eski veriye yeni veriyi ekle
+		//var sablons = jsonObj["sablons"] as JArray;
+		//sablons.Add(JObject.FromObject(newTemplate));
+
+		//// Dosyaya yaz
+		//System.IO.File.WriteAllText(WTPartDataSettings, JsonConvert.SerializeObject(jsonObj, Formatting.Indented));
+
+
+		//return RedirectToAction("Index");
+		//        }
+		//        catch (Exception)
+		//        {
+		//        return RedirectToAction("Index");
+		//        }
+
+		//    }
+
+
+	}
 }

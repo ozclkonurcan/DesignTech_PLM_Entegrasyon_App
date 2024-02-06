@@ -220,6 +220,7 @@
     <thead>
         <tr>
             <th>No</th>
+            <th>Version</th>
             <th>Durum</th>
             <th>Adı</th>
             <th>Numarası</th>
@@ -1519,7 +1520,7 @@ function updateTable(data) {
 
         var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
-        $('#dataTableBody').append('<tr><td >' + (index + 1) + '</td><td>' + item.statestate + '</td><td class="w-50">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+        $('#dataTableBody').append('<tr><td >' + (index + 1) + '</td><td class="" >' + item.version + '</td><td>' + item.statestate + '</td><td class="w-25">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
     });
 }
 
