@@ -288,21 +288,7 @@ function updateTable(api) {
     row += `
       <tr>
         <td class="text-gray-800">${field}</td>
-        <td>
-          <div class="d-flex">
 
-            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
-              <input class="form-check-input" type="radio" value="true" name="${field}" checked>
-              <span class="form-check-label">Aktif</span>
-            </label>
-
-            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
-              <input class="form-check-input" type="radio" value="false" name="${field}">
-              <span class="form-check-label">Pasif</span>
-            </label>
-
-          </div>
-        </td>
       </tr>
     `;
 
@@ -316,3 +302,21 @@ document.querySelector("select").addEventListener("change", e => {
   const api = e.target.value;  
   updateTable(api);
 });                                    </script>
+
+
+@* 
+          <td>
+          <div class="d-flex">
+
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+              <input class="form-check-input" type="radio" value="true" name="${field}" checked>
+              <span class="form-check-label">Aktif</span>
+            </label>
+
+            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+              <input class="form-check-input" type="radio" value="false" name="${field}">
+              <span class="form-check-label">Pasif</span>
+            </label>
+
+          </div>
+        </td> *@
