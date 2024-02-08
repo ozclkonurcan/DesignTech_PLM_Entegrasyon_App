@@ -647,10 +647,10 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                             // Get sablonData values
                             var sablonData = sablon["sablonData"] as JArray;
 
-                            // Call ApiSendDataPartsSettings to update IsActive
-                            ApiSendDataPartsSettings(ID, sablonData, source_Api,state, SablonName, sablonDataDurumu);
+							// Call ApiSendDataPartsSettings to update IsActive
+							ApiSendDataPartsSettings(ID, sablonData, source_Api, state, SablonName, sablonDataDurumu);
 
-                            TempData["SuccessMessage"] = SablonName + " adlı şablon aktif edildi.";
+							TempData["SuccessMessage"] = SablonName + " adlı şablon aktif edildi.";
                             break; // Exit the loop once the update is done
                         }
                     }
@@ -704,13 +704,13 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 						{
 							if (sablonDataDurumu.ToLower() == "true")
 							{
-								//var filteredSablonData = sablonData
-								//	.Where(item =>
-								//		item["IsActive"]?.ToString() != state &&
-								//		item["IsActive"]?.ToString() != source_Api
-								//	).ToList();
+								var filteredSablonData = sablonData
+									.Where(item =>
+										item["IsActive"]?.ToString() != state &&
+										item["IsActive"]?.ToString() != source_Api
+									).ToList();
 
-								//wtPartMasterArray.ReplaceAll(filteredSablonData);
+								wtPartMasterArray.ReplaceAll(filteredSablonData);
 								wtPartMasterArray.Clear();
 							}
 							else if (sablonDataDurumu.ToLower() == "false")
@@ -741,7 +741,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 						else if (sablonDataDurumu.ToLower() == "false")
 						{
 							// sablonDataDurumu false ise, WTPartMaster dizisini temizle
-							//newTargetItem["WTPartMaster"] = new JArray();
+							newTargetItem["WTPartMaster"] = new JArray();
 						}
 
 						var wtPartMasterArray = new JArray();

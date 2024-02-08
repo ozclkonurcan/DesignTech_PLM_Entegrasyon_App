@@ -58,10 +58,10 @@
                                 <div class="d-flex flex-column text-gray-600">
                                     @foreach (var item2 in item.SablonDataList)
                                         {
-                                            if(item2.IsActive == "true")
+                                             if(item2.IsActive == "true")
                                             {
                                             <div class="d-flex align-items-center py-2"><span class="bullet bg-primary me-3"></span> @item2.Name</div>
-                                            }
+                                            } 
                                         }
                   
 
@@ -174,11 +174,11 @@
 																<!--begin::Input-->
 																<select class="form-control form-control-solid" name="source_Api">
                                                                     <option value="">Kaynak Api Seç</option>
-                                                                    <option value="CADDocumentMgmt">PTC CAD Document Management Domain</option>
+                                                                    <option value="CADDocumentMgmt/CADDocuments('OR:wt.epm.EPMDocument:">PTC CAD Document Management Domain</option>
                                                                     <option value="ChangeMgmt/ChangeNotices">PTC Change Management Domain - ChangeNotices</option>
                                                                     <option value="DocMgmt">PTC Document Management Domain</option>
                                                                     <option value="MfgProcMgmt">PTC Manufacturing Process Management domain</option>
-                                                                    <option value="ProdMgmt/Parts">PTC Product Management Domain - Parts</option>
+                                                                    <option value="ProdMgmt/Parts('OR:wt.part.WTPart:">PTC Product Management Domain - Parts</option>
                                                                 </select>
 																<!--end::Input-->
 															</div>
@@ -209,7 +209,7 @@
 																<div class="table-responsive">
 																	<table class="table align-middle table-row-dashed fs-6 gy-5">
                                                                         <tbody class="text-gray-600 fw-semibold" id="ptcWindchillApiClassList">
-                                                                            </tbody>
+                                                                        </tbody>
                                                                         </table>
 																</div>
 																<!--end::Table wrapper-->
@@ -227,6 +227,11 @@
 															</button>
 														</div>
 														<!--end::Actions-->
+
+
+
+
+
 													</form>
 													<!--end::Form-->
 												</div>
@@ -243,24 +248,10 @@
 
 
 
-
+	@section scripts {
                                                                 <script>
-//                                                                     const fields = {
-//   CADDocumentMgmt: [
-//     "field1", "field2", "field3"
-//   ],
-//   ChangeMgmt: [
-//     "field4", "field5", "field6" 
-//   ],
-//   ProdMgmt: [
-//     "CreatedOn", 
-//     "ID",
-//     "LastModified",
-//     "AlternateNumber",
-//     "AssemblyModeValue",
-//   ]
-// }
 
+                                                                    $(document).ready(function () { 
 
   let fields;
 
@@ -287,8 +278,9 @@ function updateTable(api) {
 
     row += `
       <tr>
-        <td class="text-gray-800">${field}</td>
-
+        <td class="text-gray-800">${field}
+           <input class="form-check-input" type="radio" value="true" name="${field}" checked hidden>
+           </td>
       </tr>
     `;
 
@@ -298,10 +290,15 @@ function updateTable(api) {
 
 }
 
+
+
 document.querySelector("select").addEventListener("change", e => {
   const api = e.target.value;  
   updateTable(api);
-});                                    </script>
+});                
+});
+</script>
+}
 
 
 @* 
