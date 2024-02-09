@@ -185,6 +185,91 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                 TempData["ErrorMessage"] = "Hata!" + ex.Message;
                 return View();
             }
+        } 
+		public async Task<IActionResult> CADDocumentMgmt()
+        {
+            try
+            {
+				// appsettings.json dosyasının yolunu al
+				var appSettingsPath = "appsettings.json";
+
+				// appsettings.json dosyasını oku
+				var json = System.IO.File.ReadAllText(appSettingsPath);
+				var jsonObj = JObject.Parse(json);
+
+				// Dosya yolu ve dosya adını al
+				var windowsFormFileUrl = jsonObj["WindowsFormFileUrl"]?.ToString();
+				var windowsFormFileUrl2 = jsonObj["ApiSendDataSettingsFolder"]?.ToString();
+
+
+				var targetJson = System.IO.File.ReadAllText(windowsFormFileUrl);
+				var targetJson2 = System.IO.File.ReadAllText(windowsFormFileUrl2);
+				var targetJsonObj = JObject.Parse(targetJson);
+				var targetJsonObj2 = JObject.Parse(targetJson2);
+
+
+				//string connectionString = _configuration.GetConnectionString("Plm");
+				//using IDbConnection connection = new SqlConnection(connectionString);
+				string schema = _configuration["Catalog"];
+
+
+				// Sorguları optimize edin ve sadece gerekli sütunları çekin
+				var Change_Notice_LogTableList = (await _logTableRepository.GetAll(schema + ".Change_Notice_LogTable")).OrderByDescending(x => x.ProcessTimestamp).ToList();
+
+				if (Change_Notice_LogTableList is not null)
+				{
+					ViewBag.Change_Notice_LogTableList = Change_Notice_LogTableList;
+					ViewBag.Change_Notice_LogTableListCount = Change_Notice_LogTableList.Count();
+				}
+
+
+
+				var wtPartMasterList = new List<WTPartMasterItemViewModel>();
+				try
+				{
+					foreach (var item2 in targetJsonObj2.Properties())
+					{
+					foreach (var item in item2.Value)
+						{
+
+						var wtPartMasterItem = new WTPartMasterItemViewModel
+						{
+							ID = item.Value<string>("ID"),
+							Name = item.Value<string>("Name"),
+							SQLName = item.Value<string>("SQLName"),
+							IsActive = item.Value<bool>("IsActive")
+						};
+
+						wtPartMasterList.Add(wtPartMasterItem);
+						}
+					}
+				}
+				catch (Exception)
+				{
+
+				}
+
+
+				// Değişiklikleri yap
+				ViewBag.Catalog = targetJsonObj["Catalog"].ToString();
+				ViewBag.ServerName = targetJsonObj["ServerName"].ToString();
+				ViewBag.KullaniciAdi = targetJsonObj["KullaniciAdi"].ToString();
+				ViewBag.Parola = targetJsonObj["Parola"].ToString();
+				ViewBag.ApiURL = targetJsonObj["APIConnectionINFO"]["ApiURL"].ToString();
+				ViewBag.ApiEndpoint = targetJsonObj["APIConnectionINFO"]["ApiEndpoint"].ToString();
+				ViewBag.API = targetJsonObj["APIConnectionINFO"]["API"].ToString();
+
+				ViewBag.ApiSendDataSettings = wtPartMasterList;
+
+				// View'e geçir
+				ViewBag.TargetJson = targetJsonObj.ToString();
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Hata!" + ex.Message;
+                return View();
+            }
         }
 
 

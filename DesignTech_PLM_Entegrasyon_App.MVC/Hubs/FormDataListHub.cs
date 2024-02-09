@@ -38,9 +38,22 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Hubs
 
 			if (Change_Notice_LogTableList is not null)
 			{
-				var value = Change_Notice_LogTableList.Count();
-				await Clients.All.SendAsync("ReceiveFormDataCount",value);
-			}
+
+				
+
+					var value = Change_Notice_LogTableList;
+					var epmDocuments = value.Where(item => item.VersionID.Contains("EPMDocument")).ToList();
+					var wtParts = value.Where(item => item.VersionID.Contains("WTPart")).ToList();
+					if (epmDocuments.Any())
+					{
+						await Clients.All.SendAsync("EPMDocumentFormDataCount", epmDocuments.Count);
+					}
+					if (wtParts.Any())
+					{
+						await Clients.All.SendAsync("ReceiveFormDataCount", wtParts.Count);
+					}
+					//await Clients.All.SendAsync("ReceiveFormDataCount",value);
+				}
 			}
 			catch (Exception)
 			{
@@ -69,8 +82,18 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Hubs
 				var durumTakip = false;
 			if (Change_Notice_LogTableList is not null)
 			{
-				var value = Change_Notice_LogTableList;
-				await Clients.All.SendAsync("ReceiveFormData", value);
+					var value = Change_Notice_LogTableList;
+					var epmDocuments = value.Where(item => item.VersionID.Contains("EPMDocument")).ToList();
+					var wtParts = value.Where(item => item.VersionID.Contains("WTPart")).ToList();
+					if (epmDocuments.Any())
+					{
+						await Clients.All.SendAsync("EPMDocumentFormData", epmDocuments);
+					}
+					if (wtParts.Any())
+					{
+						await Clients.All.SendAsync("ReceiveFormData", wtParts);
+					}
+				
 					
 				}
 			}

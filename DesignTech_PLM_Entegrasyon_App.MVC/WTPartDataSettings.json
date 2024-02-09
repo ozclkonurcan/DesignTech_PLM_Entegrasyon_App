@@ -4,7 +4,7 @@
       "ID": "eab420f2-db50-44c6-abe1-18c45e84d73b",
       "Source_Api": "ProdMgmt/Parts('OR:wt.part.WTPart:",
       "State": "RELEASED",
-      "sablonDataDurumu": "false",
+      "sablonDataDurumu": "true",
       "sablonName": "PARTS - RELEASED",
       "sablonData": [
         {
@@ -415,7 +415,7 @@
       "ID": "73e7d7d8-672c-4047-b665-86eb818c61a8",
       "Source_Api": "ProdMgmt/Parts('OR:wt.part.WTPart:",
       "State": "CANCELLED",
-      "sablonDataDurumu": "false",
+      "sablonDataDurumu": "true",
       "sablonName": "PARTS - CANCELLED",
       "sablonData": [
         {

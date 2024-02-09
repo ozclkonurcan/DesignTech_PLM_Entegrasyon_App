@@ -82,10 +82,10 @@
                                     <input name="SablonName" value="@item.SablonName" hidden/>
 
                                 @if(item.sablonDataDurumu == "false"){
-                                <button type="submit" class="btn btn-light btn-light-primary my-1 float-end" >Aktif Et</button>
+                                <button type="submit" class="btn btn-light btn-light-success my-1 float-end" >Aktif Et</button>
                                     <input name="sablonDataDurumu" value="true" hidden/>
                                 }else{
-                                <button type="submit" class="btn btn-light btn-success my-1 float-end" >Aktif</button>
+                                <button type="submit" class="btn btn-light btn-primary my-1 float-end" >İptal Et</button>
                                     <input name="sablonDataDurumu" value="false" hidden/>
                                 }
                                 </form>
@@ -174,10 +174,8 @@
 																<!--begin::Input-->
 																<select class="form-control form-control-solid" name="source_Api">
                                                                     <option value="">Kaynak Api Seç</option>
-                                                                    <option value="CADDocumentMgmt/CADDocuments('OR:wt.epm.EPMDocument:">PTC CAD Document Management Domain</option>
-                                                                    <option value="ChangeMgmt/ChangeNotices">PTC Change Management Domain - ChangeNotices</option>
-                                                                    <option value="DocMgmt">PTC Document Management Domain</option>
-                                                                    <option value="MfgProcMgmt">PTC Manufacturing Process Management domain</option>
+                                                                    <option value="CADDocumentMgmt/CADDocuments('OR:wt.epm.EPMDocument:">PTC CAD Document Management Domain - CADDocuments</option>
+                                                                  
                                                                     <option value="ProdMgmt/Parts('OR:wt.part.WTPart:">PTC Product Management Domain - Parts</option>
                                                                 </select>
 																<!--end::Input-->
