@@ -2,6 +2,7 @@ using DesignTech_PLM_Entegrasyon_App.MVC.Data;
 using DesignTech_PLM_Entegrasyon_App.MVC.Dtos;
 using DesignTech_PLM_Entegrasyon_App.MVC.Helper;
 using DesignTech_PLM_Entegrasyon_App.MVC.Hubs;
+using DesignTech_PLM_Entegrasyon_App.MVC.Middleware;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.DapperContext;
 using DesignTech_PLM_Entegrasyon_App.MVC.Models.SignalR;
 using DesignTech_PLM_Entegrasyon_App.MVC.Repository;
@@ -214,6 +215,10 @@ if (!app.Environment.IsDevelopment())
 //app.UseCors("CorsPolicy");
 //app.UseRateLimiter();
 app.UseCors("CorsPolicy");
+
+//app.UseMiddleware<LogMiddleware>();
+//app.UseMiddleware<ErrorMiddleware>();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
