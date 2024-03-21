@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 using System.Data;
 using System.Text;
-
+using System.Web;
 
 
 namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSettings
@@ -24,18 +24,20 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 
        
         private readonly IGenericRepository<Change_Notice_LogTable> _logTableRepository;
+        private readonly IWebHostEnvironment _environment;
 
-		//private readonly IMessageProducer _messageProducer;
+        //private readonly IMessageProducer _messageProducer;
 
-		public WindowsFormSettingsController(IConfiguration configuration, IGenericRepository<Change_Notice_LogTable> logTableRepository)
-		{
-			_configuration = configuration;
-			_logTableRepository = logTableRepository;
-		}
+        public WindowsFormSettingsController(IConfiguration configuration, IGenericRepository<Change_Notice_LogTable> logTableRepository, IWebHostEnvironment environment)
+        {
+            _configuration = configuration;
+            _logTableRepository = logTableRepository;
+            _environment = environment;
+        }
 
 
 
-		public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             try
             {
@@ -414,53 +416,118 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                 return RedirectToAction("Index");
             }
         }
-    
-      public IActionResult windowsFormURLSettings(string jsonFile)
-        {
-            try
-            {
-                if (jsonFile != null && jsonFile.Length > 0)
-                {
-                 
-                    // appsettings.json dosyasını oku
-                    var appSettingsPath = "appsettings.json";
-                    var json = System.IO.File.ReadAllText(appSettingsPath);
-                    var jsonObj = JObject.Parse(json);
 
-                    // Eğer WindowsFormFileUrl zaten varsa güncelle, yoksa ekle
-                    if (jsonObj["WindowsFormFileUrl"] == null)
-                    {
-                        jsonObj.Add("WindowsFormFileUrl", jsonFile);
-                    }
-                    else
-                    {
-                        jsonObj["WindowsFormFileUrl"] = jsonFile;
-                    }
+		#region windowsFormURLSettings
 
-                    // Değişiklikleri kaydet
-                    System.IO.File.WriteAllText(appSettingsPath, jsonObj.ToString());
+		//public IActionResult windowsFormURLSettings(IFormFile jsonFile)
+		//{
+		//    try
+		//    {
 
-                    // Başarılı mesajı
-                    TempData["SuccessMessage"] = "appsettings.json dosyası güncellendi. Dosya Yolu: " + jsonFile;
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Hata! Dosya seçimi yapılmadı.";
-                }
-
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Hata! " + ex.Message;
-                return RedirectToAction("Index");
-            }
-        }
-    
-    
+		//        if (jsonFile != null && jsonFile.Length > 0)
+		//        {
+		//            // appsettings.json dosyasını oku
+		//            var appSettingsPath = "appsettings.json";
+		//            var json = System.IO.File.ReadAllText(appSettingsPath);
+		//            var jsonObj = JObject.Parse(json);
 
 
-        public IActionResult windowssFormSQLSettings(string Catalog, string ServerName, string KullaniciAdi,string Parola,string ConnectionStrings)
+		//            // Dosya adını almak için
+		//            var fileName = jsonFile.FileName;
+
+		//            // Dosya yolunu belirlemek için (sunucuya kaydetmeden)
+		//            var fullFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Configuration", fileName);
+		//            //var fullFilePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", fileName);
+
+		//            // Eğer WindowsFormFileUrl zaten varsa güncelle, yoksa ekle
+		//            if (jsonObj["WindowsFormFileUrl"] == null)
+		//            {
+		//                jsonObj.Add("WindowsFormFileUrl", fullFilePath);
+		//            }
+		//            else
+		//            {
+		//                jsonObj["WindowsFormFileUrl"] = fullFilePath;
+		//            }
+
+
+
+		//            // Değişiklikleri kaydet
+		//            System.IO.File.WriteAllText(appSettingsPath.ToString(), jsonObj.ToString());
+
+
+
+		//            // Başarılı mesajı
+		//            TempData["SuccessMessage"] = "appsettings.json dosyası güncellendi. Dosya Yolu: " + fullFilePath;
+		//        }
+		//        else
+		//        {
+		//            // Hata mesajı
+		//            TempData["ErrorMessage"] = "Hata! Dosya seçimi yapılmadı.";
+		//        }
+
+		//        // Index sayfasına yönlendir
+		//        return RedirectToAction("Index");
+		//    }
+		//    catch (Exception ex)
+		//    {
+		//        // Hata mesajı
+		//        TempData["ErrorMessage"] = "Hata! " + ex.Message;
+
+		//        // Index sayfasına yönlendir
+		//        return RedirectToAction("Index");
+		//    }
+		//}
+
+
+
+		public IActionResult windowsFormURLSettings(string jsonFile)
+		{
+			try
+			{
+				if (jsonFile != null && jsonFile.Length > 0)
+				{
+
+					// appsettings.json dosyasını oku
+					var appSettingsPath = "appsettings.json";
+					var json = System.IO.File.ReadAllText(appSettingsPath);
+					var jsonObj = JObject.Parse(json);
+
+					// Eğer WindowsFormFileUrl zaten varsa güncelle, yoksa ekle
+					if (jsonObj["WindowsFormFileUrl"] == null)
+					{
+						jsonObj.Add("WindowsFormFileUrl", jsonFile);
+					}
+					else
+					{
+						jsonObj["WindowsFormFileUrl"] = jsonFile;
+					}
+
+					// Değişiklikleri kaydet
+					System.IO.File.WriteAllText(appSettingsPath, jsonObj.ToString());
+
+					// Başarılı mesajı
+					TempData["SuccessMessage"] = "appsettings.json dosyası güncellendi. Dosya Yolu: " + jsonFile;
+				}
+				else
+				{
+					TempData["ErrorMessage"] = "Hata! Dosya seçimi yapılmadı.";
+				}
+
+				return RedirectToAction("Index");
+			}
+			catch (Exception ex)
+			{
+				TempData["ErrorMessage"] = "Hata! " + ex.Message;
+				return RedirectToAction("Index");
+			}
+		}
+
+
+		#endregion
+
+
+
+		public IActionResult windowssFormSQLSettings(string Catalog, string ServerName, string KullaniciAdi,string Parola,string ConnectionStrings)
         {
             try
             {

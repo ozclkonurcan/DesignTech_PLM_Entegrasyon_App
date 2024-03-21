@@ -4,7 +4,16 @@
 }
 
 <h1>Şablon Ayarları</h1>
+<div class="row" >
 
+
+    <form asp-action="ApiSendDataSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
+        <input type="text" class="form-control" placeholder="Hedef dosya yolunu ekleyin ---> ( Configuration / ApiSendDataSettings.json )" alt="Dosya seçiniz" name="jsonFile" />
+
+    <button class="btn btn-info btn-sm float-end m-4">Bağla</button>
+</form>
+
+</div>
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-5 g-xl-9">
 
