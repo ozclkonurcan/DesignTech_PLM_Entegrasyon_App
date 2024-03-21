@@ -418,7 +418,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
         }
 
 		#region windowsFormURLSettings
-
+		 
 		//public IActionResult windowsFormURLSettings(IFormFile jsonFile)
 		//{
 		//    try
