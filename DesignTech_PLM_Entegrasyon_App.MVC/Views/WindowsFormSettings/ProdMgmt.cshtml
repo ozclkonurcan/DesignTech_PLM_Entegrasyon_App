@@ -221,23 +221,177 @@
                 </div>
                 <!--end::List-->
 
-                <div class="table-responsive scroll-y me-n5 pe-5 h-425px">
-                    <p>Bağlantı durumu <strong id="constatus"></strong></p>
-                <table class="table table-bordered table-hover ">
-    <thead>
-        <tr>
-            <th>No</th>
-            <th>Version</th>
-            <th>Durum</th>
-            <th>Adı</th>
-            <th>Numarası</th>
-            <th>İşlem Tarihi</th>
-            </tr>
-    </thead>
-    <tbody id="dataTableBody" class="fs-8" ></tbody>
-</table>
 
+                <div class="card-body pt-6">
+                    <!--begin::Nav-->
+                    <ul class="nav nav-pills nav-pills-custom mb-3" role="tablist">
+                        <!--begin::Item-->
+                        <li class="nav-item mb-3 me-3 me-lg-6" role="presentation">
+                            <!--begin::Link-->
+                            <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden w-100  pb-2 active" id="kt_stats_widget_16_tab_link_1" data-bs-toggle="pill" href="#kt_stats_widget_16_tab_1" aria-selected="true" role="tab">
+                            
+                                <!--begin::Title-->
+                                <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">
+                                    PARTS - RELEASED -
+                                    <span id="dataCountReleased">0</span>
+                                </span>
+                                <!--end::Title-->
+                                <!--begin::Bullet-->
+                                <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                                <!--end::Bullet-->
+                            </a>
+                            <!--end::Link-->
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="nav-item mb-3 me-3 me-lg-6" role="presentation">
+                            <!--begin::Link-->
+                            <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden w-100  pb-2" id="kt_stats_widget_16_tab_link_2" data-bs-toggle="pill" href="#kt_stats_widget_16_tab_2" aria-selected="false" role="tab" tabindex="-1">
+
+                                <!--begin::Title-->
+                                <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">
+                                    PARTS - INWORK -
+                                    <span id="dataCountInwork">0</span>
+                                </span>
+                                <!--end::Title-->
+                                <!--begin::Bullet-->
+                                <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                                <!--end::Bullet-->
+                            </a>
+                            <!--end::Link-->
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="nav-item mb-3 me-3 me-lg-6" role="presentation">
+                            <!--begin::Link-->
+                            <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden w-100  pb-2" id="kt_stats_widget_16_tab_link_3" data-bs-toggle="pill" href="#kt_stats_widget_16_tab_3" aria-selected="false" role="tab" tabindex="-1">
+                    
+                                <!--begin::Title-->
+                                <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">
+                                    PARTS - CANCELLED -
+                                    <span id="dataCountCancelled">0</span>
+                                </span>
+                                <!--end::Title-->
+                                <!--begin::Bullet-->
+                                <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                                <!--end::Bullet-->
+                            </a>
+                            <!--end::Link-->
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="nav-item mb-3 me-3 me-lg-6" role="presentation">
+                            <!--begin::Link-->
+                            <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden w-100  pb-2" id="kt_stats_widget_16_tab_link_4" data-bs-toggle="pill" href="#kt_stats_widget_16_tab_4" aria-selected="false" role="tab" tabindex="-1">
+
+                                <!--begin::Title-->
+                                <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">
+                                    PARTS - ALTERNATE -
+                                    <span id="dataCountAlternate">0</span>
+                                </span>
+                                <!--end::Title-->
+                                <!--begin::Bullet-->
+                                <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                                <!--end::Bullet-->
+                            </a>
+                            <!--end::Link-->
+                        </li>
+                        <!--end::Item-->
+
+                    </ul>
+                    <!--end::Nav-->
+                    <!--begin::Tab Content-->
+                    <div class="tab-content">
+
+                        <!--begin::Tap pane-->
+                        <div class="tab-pane fade active show" id="kt_stats_widget_16_tab_1" role="tabpanel" aria-labelledby="kt_stats_widget_16_tab_link_1">
+                            <!--begin::Table container-->
+                            <div class="table-responsive scroll-y me-n5 pe-5 h-425px">
+                                <p>Bağlantı durumu <strong id="constatus"></strong></p>
+                                <table class="table table-bordered table-hover ">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Version</th>
+                                            <th>Durum</th>
+                                            <th>Adı</th>
+                                            <th>Numarası</th>
+                                            <th>İşlem Tarihi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dataTableBodyRELEASED" class="fs-8"></tbody>
+                                </table>
+
+                            </div>
+                            <!--end::Table container-->
+                        </div>
+                        <!--end::Tap pane-->
+                        <!--begin::Tap pane-->
+                        <div class="tab-pane fade" id="kt_stats_widget_16_tab_2" role="tabpanel" aria-labelledby="kt_stats_widget_16_tab_link_2">
+                            <!--begin::Table container-->
+                            <!--end::Table container-->
+                        </div>
+                        <!--end::Tap pane-->
+
+                                                      <!--begin::Tap pane-->
+                        <div class="tab-pane fade" id="kt_stats_widget_16_tab_3" role="tabpanel" aria-labelledby="kt_stats_widget_16_tab_link_3">
+                            <!--begin::Table container-->
+                            <div class="table-responsive scroll-y me-n5 pe-5 h-425px">
+                                <p>Bağlantı durumu <strong id="constatus"></strong></p>
+                                <table class="table table-bordered table-hover ">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Version</th>
+                                            <th>Durum</th>
+                                            <th>Adı</th>
+                                            <th>Numarası</th>
+                                            <th>İşlem Tarihi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dataTableBodyCANCELLED" class="fs-8"></tbody>
+                                </table>
+
+                            </div>
+                            <!--end::Table container-->
+                        </div>
+                        <!--end::Tap pane-->
+                        <!--begin::Tap pane-->
+                        <div class="tab-pane fade" id="kt_stats_widget_16_tab_4" role="tabpanel" aria-labelledby="kt_stats_widget_16_tab_link_4">
+                            <!--begin::Table container-->
+                            <div class="table-responsive scroll-y me-n5 pe-5 h-425px">
+                                <p>Bağlantı durumu <strong id="constatus"></strong></p>
+                                <table class="table table-bordered table-hover ">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Kod</th>
+                                            <th>Durum</th>
+                                            <th>Adı</th>
+                                            <th>Numarası</th>
+                                            <th>İşlem Tarihi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dataTableBodyAlternatePart" class="fs-8"></tbody>
+                                </table>
+
+                            </div>
+                            <!--end::Table container-->
+                        </div>
+                        <!--end::Tap pane-->
+                    </div>
+                    <!--end::Tab Content-->
+           
+                    </div>
+                    <!--end::Tab Content-->
+
+
+       
+            </div>
+            <!--end::Tab Content-->
                 </div>
+
+
             </div>
             <!--end::Card body-->
         </div>
@@ -1510,11 +1664,41 @@ $(document).ready(() => {
 
     connection.on("ReceiveFormData", (data) => {
         // Güncel verileri kullanarak sayfayı güncelle
+                const releasedData = data.filter(x => x.statestate === "RELEASED");
+                const cancelledData = data.filter(x => x.statestate === "CANCELLED");
+                const inworkedData = data.filter(x => x.statestate === "INWORK");
 
-        updateTable(data);
+
+
+
+                // Farklı fonksiyonlara yönlendir
+                if (releasedData.length > 0) {
+                     releasedUpdateTable(releasedData);
+                    updateCountRELEASED(releasedData.length);
+
+                }
+                if (cancelledData.length > 0) {
+                    cancelledUpdateTable(cancelledData);
+                    updateCountCANCELLED(cancelledData.length);
+
+                }
     });
+            connection.on("AlternatePartsFormData", (data) => {
+        // Güncel verileri kullanarak sayfayı güncelle
+                
+
+                // Farklı fonksiyonlara yönlendir
+                if (data.length > 0) {
+                     alternatePartsUpdateTable(data);
+                    updateCounAlternate(data.length);
+                }
+            });
+    
 
     connection.on("ReceiveFormDataCount", (count) => {
+        
+
+      
         // Toplam kayıt sayısını güncelle
         updateCount(count);
     });
@@ -1542,18 +1726,39 @@ $(document).ready(() => {
 
 
 
-function updateTable(data) {
+        function releasedUpdateTable(data) {
     // Tabloyu güncelleme işlemleri burada yapılabilir
     // Örneğin, jQuery ile:
-    $('#dataTableBody').empty();
+            $('#dataTableBodyRELEASED').empty();
     $.each(data, function (index, item) {
 
         var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
-        $('#dataTableBody').append('<tr><td >' + (index + 1) + '</td><td class="" >' + item.version + '</td><td>' + item.statestate + '</td><td class="w-25">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+        $('#dataTableBodyRELEASED').append('<tr><td >' + (index + 1) + '</td><td class="" >' + item.version + '</td><td>' + item.statestate + '</td><td class="w-25">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
     });
 }
+        function cancelledUpdateTable(data) {
+            // Tabloyu güncelleme işlemleri burada yapılabilir
+            // Örneğin, jQuery ile:
+            $('#dataTableBodyCANCELLED').empty();
+            $.each(data, function (index, item) {
 
+                var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+                $('#dataTableBodyCANCELLED').append('<tr><td >' + (index + 1) + '</td><td class="" >' + item.version + '</td><td>' + item.statestate + '</td><td class="w-25">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+            });
+        }       
+            function alternatePartsUpdateTable(data) {
+            // Tabloyu güncelleme işlemleri burada yapılabilir
+            // Örneğin, jQuery ile:
+                $('#dataTableBodyAlternatePart').empty();
+            $.each(data, function (index, item) {
+
+                var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+                $('#dataTableBodyAlternatePart').append('<tr><td >' + (index + 1) + '</td><td class="" >' + item.id + '</td><td>' + item.state + '</td><td class="w-25">' + item.name + '</td><td class="w-25">' + item.number + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+            });
+        }
 
 
 function updateCount(count) {
@@ -1561,6 +1766,18 @@ function updateCount(count) {
     $('#dataCount').text(count);
 }
 
+        function updateCountRELEASED(count) {
+            // Toplam kayıt sayısını güncelleme işlemleri burada yapılabilir
+            $('#dataCountReleased').text(count);
+        }
+        function updateCountCANCELLED(count) {
+            // Toplam kayıt sayısını güncelleme işlemleri burada yapılabilir
+            $('#dataCountCancelled').text(count);
+        }
+        function updateCounAlternate(count) {
+            // Toplam kayıt sayısını güncelleme işlemleri burada yapılabilir
+            $('#dataCountAlternate').text(count);
+        }
 
 function updateWorkStatus(connectionType) {
     var statusElement = $("#workStatus");

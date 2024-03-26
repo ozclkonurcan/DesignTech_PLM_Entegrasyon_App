@@ -552,7 +552,7 @@
 						</div>
 						<!--end::Sidebar toggle-->
 					</div>
-					<span class="badge badge-sm badge-light-primary m-5 fs-7 d-flex justify-content-center">v1.6.0</span>
+					<span class="badge badge-sm badge-light-primary m-5 fs-7 d-flex justify-content-center">v1.7.0</span>
 
 					<!--end::Logo-->
 					<!--begin::sidebar menu-->
@@ -694,7 +694,7 @@
 															<span class="path4"></span>
 														</i>
 													</span>
-													<span class="menu-title">PTC Schema Settings</span>
+													<span class="menu-title">Rol Ayarları</span>
 												</a>
 												<!--end:Menu link-->
 											</div>
@@ -711,13 +711,13 @@
 															<span class="path4"></span>
 														</i>
 													</span>
-													<span class="menu-title">PTC Product Management Domain</span>
+													<span class="menu-title">Part Yönetimi</span>
 												</a>
 												<!--end:Menu link-->
 											</div>
 											<!--end:Menu item-->
 											<!--begin:Menu item-->
-											<div class="menu-item">
+											<div class="menu-item" hidden>
 												<!--begin:Menu link-->
 												<a class="menu-link" href="@Url.Action("CADDocumentMgmt", "WindowsFormSettings")">
 													<span class="menu-icon">
@@ -792,7 +792,7 @@
 									@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
 									{
 
-										<div class="menu-item">
+										<div class="menu-item" hidden>
 											<!--begin:Menu link-->
 											<a class="menu-link" href="@Url.Action("Index", "WindowsFormSettings")">
 												<span class="menu-icon">
