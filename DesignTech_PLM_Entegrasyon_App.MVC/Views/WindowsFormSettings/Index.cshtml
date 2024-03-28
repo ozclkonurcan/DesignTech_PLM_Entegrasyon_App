@@ -139,7 +139,7 @@
 									<!--begin::Modal - Add role-->
 									<div class="modal fade" id="kt_modal_add_role" tabindex="-1" aria-hidden="true">
 										<!--begin::Modal dialog-->
-										<div class="modal-dialog modal-dialog-centered mw-750px">
+										<div class="modal-dialog modal-dialog-centered mw-900px">
 											<!--begin::Modal content-->
 											<div class="modal-content">
 												<!--begin::Modal header-->
@@ -174,38 +174,87 @@
 																<input class="form-control form-control-solid" placeholder="Rol adının giriniz" name="role_name" />
 																<!--end::Input-->
 															</div>
-                                                            	<div class="fv-row mb-10">
-																<!--begin::Label-->
-																<label class="fs-5 fw-bold form-label mb-2">
-																	<span class="required">Kaynak api adı</span>
-																</label>
-																<!--end::Label-->
-																<!--begin::Input-->
-																<select class="form-control form-control-solid" name="source_Api">
-                                                                    <option value="">Kaynak Api Seç</option>
-                                                                    <option value="CADDocumentMgmt/CADDocuments('OR:wt.epm.EPMDocument:">PTC CAD Document Management Domain - CADDocuments</option>
-                                                                  
-                                                                    <option value="ProdMgmt/Parts('OR:wt.part.WTPart:">PTC Product Management Domain - Parts</option>
-                                                                </select>
-																<!--end::Input-->
-															</div>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                <div class="fv-row mb-10">
+                                    <!--begin::Label-->
+                                    <label class="fs-5 fw-bold form-label mb-2">
+                                        <span class="required">Kaynak api adı</span>
+                                    </label>
+                                    <!--end::Label-->
+                                    <!--begin::Input-->
+                                    <select class="form-control form-control-solid" name="source_Api">
+                                        <option value="">Kaynak Api Seç</option>
+                                        <option value="CADDocumentMgmt/CADDocuments('OR:wt.epm.EPMDocument:">PTC CAD Document Management Domain - CADDocuments</option>
 
-                                                                   	<div class="fv-row mb-10">
-																<!--begin::Label-->
-																<label class="fs-5 fw-bold form-label mb-2">
-																	<span class="required">İşlem adı</span>
-																</label>
-																<!--end::Label-->
-																<!--begin::Input-->
-																<select class="form-control form-control-solid" name="yapilacakIslem">
-                                                                    <option value="">Yapılacak işlemi seç</option>
-                                                                    <option value="RELEASED">Tamamlanmış parçaları aktar</option>
-                                                                    <option value="INWORK">Devam eden parçaları aktar</option>
-                                                                    <option value="CANCELLED">İptal edilmiş parçaları aktar</option>
-                                                                    
-                                                                </select>
-																<!--end::Input-->
-															</div>
+                                        <option value="ProdMgmt/Parts('OR:wt.part.WTPart:">PTC Product Management Domain - Parts</option>
+                                    </select>
+                                    <!--end::Input-->
+                                </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                <div class="fv-row mb-10">
+                                    <!--begin::Label-->
+                                    <label class="fs-5 fw-bold form-label mb-2">
+                                        <span class="required">İşlem adı</span>
+                                    </label>
+                                    <!--end::Label-->
+                                    <!--begin::Input-->
+                                    <select class="form-control form-control-solid" name="yapilacakIslem">
+                                        <option value="">Yapılacak işlemi seç</option>
+                                        <option value="RELEASED">Tamamlanmış parçaları aktar</option>
+                                        <option value="INWORK">Devam eden parçaları aktar</option>
+                                        <option value="CANCELLED">İptal edilmiş parçaları aktar</option>
+
+                                    </select>
+                                    <!--end::Input-->
+                                </div>
+                                                                </div>
+                                                            </div>
+
+
+
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                <div class="fv-row mb-10">
+                                    <!--begin::Label-->
+                                    <label class="fs-5 fw-bold form-label mb-2">
+                                        <span class="required">API adresi</span>
+                                    </label>
+                                    <!--end::Label-->
+                                    <!--begin::Input-->
+                                    <input class="form-control form-control-solid" placeholder="Api adresini giriniz" name="api_adres" />
+                                    <!--end::Input-->
+                                </div>
+                                                                </div>
+                            <div class="col-md-3">
+                                <div class="fv-row mb-10">
+                                    <!--begin::Label-->
+                                    <label class="fs-5 fw-bold form-label mb-2">
+                                        <span class="required">Ana kaynak</span>
+                                    </label>
+                                    <!--end::Label-->
+                                    <!--begin::Input-->
+                                    <input class="form-control form-control-solid" placeholder="Ana kaynak giriniz" name="ana_kaynak" />
+                                    <!--end::Input-->
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="fv-row mb-10">
+                                    <!--begin::Label-->
+                                    <label class="fs-5 fw-bold form-label mb-2">
+                                        <span class="required">Alt Endpoint</span>
+                                    </label>
+                                    <!--end::Label-->
+                                    <!--begin::Input-->
+                                    <input class="form-control form-control-solid" placeholder="Alt Endpoint giriniz" name="alt_endpoint" />
+                                    <!--end::Input-->
+                                </div>
+                            </div>
+                                                            </div>
+                                                         
+
+                                                     
 															<!--end::Input group-->
 															<!--begin::Permissions-->
 															<div class="fv-row">

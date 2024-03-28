@@ -653,6 +653,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 				var sablonName = jsonData.FirstOrDefault().Value.ToString();
                 var sourceApi = jsonData["source_Api"].ToString();
                 var yapilacakIslem = jsonData["yapilacakIslem"].ToString();
+                var apiadres = jsonData["api_adres"].ToString();
+                var anakaynak = jsonData["ana_kaynak"].ToString();
+                var altendpoint = jsonData["alt_endpoint"].ToString();
                 var sablonDataDurumu = "false";
 
                 // Şablon adına sahip olanları kontrol et
@@ -665,6 +668,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 					existingSablon["ID"] = Guid.NewGuid().ToString();
 					existingSablon["Source_Api"] = sourceApi;
 					existingSablon["State"] = yapilacakIslem;
+					existingSablon["Api_adres"] = apiadres;
+					existingSablon["Ana_kaynak"] = anakaynak;
+					existingSablon["Alt_endpoint"] = altendpoint;
                     existingSablon["sablonDataDurumu"] = sablonDataDurumu;
                     existingSablon["sablonData"] = JArray.FromObject(jsonData.Where(x => x.Key != jsonData.FirstOrDefault().Key && x.Key != "__RequestVerificationToken").Select(item => new
 					{
@@ -684,6 +690,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 						ID = Guid.NewGuid().ToString(),
                         Source_Api = sourceApi,
                         State = yapilacakIslem,
+                        Api_adres = apiadres,
+                        Ana_kaynak = anakaynak,
+                        Alt_endpoint = altendpoint,
                         sablonDataDurumu = sablonDataDurumu,
                         sablonName = sablonName,
 						sablonData = jsonData.Where(x => x.Key != jsonData.FirstOrDefault().Key && x.Key != "__RequestVerificationToken").Select(item => new
@@ -766,6 +775,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 
                 var state = "";
                 var source_Api = "";
+                var apiadres="";
+                var anakaynak="";
+				var altendpoint = "";
                 var sablons = jsonObj["sablons"] as JArray;
 
                 if (sablons != null)
@@ -781,6 +793,12 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                             sablon["sablonDataDurumu"] = sablonDataDurumu;
                             source_Api = sablon["Source_Api"]?.ToString();
                             state = sablon["State"]?.ToString();
+                            apiadres = sablon["Api_adres"]?.ToString();
+                            anakaynak = sablon["Ana_kaynak"]?.ToString();
+                            altendpoint = sablon["Alt_endpoint"]?.ToString();
+
+
+                          
 
                             //// If setting it to true, set other sablonDataDurumu values to false
                             //if (sablonDataDurumu.ToLower() == "true")
@@ -800,7 +818,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
                             var sablonData = sablon["sablonData"] as JArray;
 
 							// Call ApiSendDataPartsSettings to update IsActive
-							ApiSendDataPartsSettings(ID, sablonData, source_Api, state, SablonName, sablonDataDurumu);
+							ApiSendDataPartsSettings(ID, sablonData, source_Api, state, SablonName, sablonDataDurumu, apiadres,anakaynak, altendpoint);
 
 							TempData["SuccessMessage"] = SablonName + " adlı şablon aktif edildi.";
                             break; // Exit the loop once the update is done
@@ -819,7 +837,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
          
 
 
-        public IActionResult ApiSendDataPartsSettings(string ID, JArray sablonData,string source_Api,string state,string sablonName, string sablonDataDurumu)
+        public IActionResult ApiSendDataPartsSettings(string ID, JArray sablonData,string source_Api,string state,string sablonName, string sablonDataDurumu, string apiadres ,string anakaynak, string altendpoint)
         {
 
 			try
@@ -850,6 +868,9 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 
 						targetItem["source_Api"] = source_Api; // Eklenen kısım
 						targetItem["state"] = state; // Eklenen kısım
+						targetItem["api_adres"] = apiadres; // Eklenen kısım
+						targetItem["ana_kaynak"] = anakaynak; // Eklenen kısım
+						targetItem["alt_endpoint"] = altendpoint; // Eklenen kısım
 						targetItem["sablonDataDurumu"] = sablonDataDurumu; // Eklenen kısım
 
 						if (wtPartMasterArray != null)
@@ -884,7 +905,10 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 						var newTargetItem = new JObject();
 						newTargetItem["source_Api"] = source_Api; // Eklenen kısım
 						newTargetItem["state"] = state; // Eklenen kısım
-						newTargetItem["sablonDataDurumu"] = sablonDataDurumu; // Eklenen kısım
+                        newTargetItem["api_adres"] = apiadres; // Eklenen kısım
+                        newTargetItem["ana_kaynak"] = anakaynak; // Eklenen kısım
+                        newTargetItem["alt_endpoint"] = altendpoint; // Eklenen kısım
+                        newTargetItem["sablonDataDurumu"] = sablonDataDurumu; // Eklenen kısım
 
 						if (sablonDataDurumu.ToLower() == "true")
 						{
