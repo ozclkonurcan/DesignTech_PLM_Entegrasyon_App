@@ -186,9 +186,9 @@
           
             <!--begin::Card body-->
             <div class="card-body pt-5 " id="kt_contacts_list_body">
-                       <p>
+            @*            <p>
                                     Toplam kayıt sayısı : <strong id="dataCount"></strong>
-                                </p>
+                                </p> *@
                 <!--begin::List-->
                 <div hidden class="scroll-y me-n5 pe-5 h-300px h-xl-auto" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_header, #kt_toolbar, #kt_footer, #kt_contacts_list_header" data-kt-scroll-wrappers="#kt_content, #kt_contacts_list_body" data-kt-scroll-stretch="#kt_contacts_list, #kt_contacts_main" data-kt-scroll-offset="5px" style="max-height: 763px;">
              
@@ -312,10 +312,11 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Version</th>
-                                            <th>Durum</th>
-                                            <th>Adı</th>
+                                            <th>Transfer-ID</th>
                                             <th>Numarası</th>
+                                            <th>Adı</th>
+                                            <th>Durum</th>
+                                            <th>Version</th>
                                             <th>İşlem Tarihi</th>
                                         </tr>
                                     </thead>
@@ -342,10 +343,11 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Version</th>
-                                            <th>Durum</th>
-                                            <th>Adı</th>
+                                            <th>Transfer-ID</th>
                                             <th>Numarası</th>
+                                            <th>Adı</th>
+                                            <th>Durum</th>
+                                            <th>Version</th>
                                             <th>İşlem Tarihi</th>
                                         </tr>
                                     </thead>
@@ -365,10 +367,10 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Kod</th>
-                                            <th>Durum</th>
-                                            <th>Adı</th>
+                                            <th>Transfer-ID</th>
                                             <th>Numarası</th>
+                                            <th>Adı</th>
+                                            <th>Durumu</th>
                                             <th>İşlem Tarihi</th>
                                         </tr>
                                     </thead>
@@ -1734,7 +1736,8 @@ $(document).ready(() => {
 
         var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
-        $('#dataTableBodyRELEASED').append('<tr><td >' + (index + 1) + '</td><td class="" >' + item.version + '</td><td>' + item.statestate + '</td><td class="w-25">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+                $('#dataTableBodyRELEASED').append('<tr><td >' + (index + 1) + '</td><td >' + item.transferID + '</td><td class="" >' + item.wtPartNumber + '</td><td>' + item.name + '</td><td class="w-25">' + item.statestate + '</td><td class="w-25">' + item.version + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+        // console.log(data);
     });
 }
         function cancelledUpdateTable(data) {
@@ -1745,7 +1748,7 @@ $(document).ready(() => {
 
                 var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
-                $('#dataTableBodyCANCELLED').append('<tr><td >' + (index + 1) + '</td><td class="" >' + item.version + '</td><td>' + item.statestate + '</td><td class="w-25">' + item.name + '</td><td class="w-25">' + item.wtPartNumber + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+                $('#dataTableBodyCANCELLED').append('<tr><td >' + (index + 1) + '</td><td >' + item.transferID + '</td><td class="" >' + item.wtPartNumber + '</td><td>' + item.name + '</td><td class="w-25">' + item.statestate + '</td><td class="w-25">' + item.version + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
             });
         }       
             function alternatePartsUpdateTable(data) {
@@ -1756,7 +1759,9 @@ $(document).ready(() => {
 
                 var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
-                $('#dataTableBodyAlternatePart').append('<tr><td >' + (index + 1) + '</td><td class="" >' + item.id + '</td><td>' + item.state + '</td><td class="w-25">' + item.name + '</td><td class="w-25">' + item.number + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+                // $('#dataTableBodyAlternatePart').append('<tr><td >' + (index + 1) + '</td> <td>'+item.transferID+'</td> <td>' + item.state + '</td><td class="w-25">' + item.name + '</td><td class="w-25">' + item.number + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+                $('#dataTableBodyAlternatePart').append('<tr><td>' + (index + 1) + '</td><td >' + item.transferID + '</td><td  class="w-25">' + item.number + '</td><td  class="w-25">' + item.name + '</td><td>' + item.state + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+
             });
         }
 

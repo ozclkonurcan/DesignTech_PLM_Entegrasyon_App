@@ -15,14 +15,14 @@
 
 </div>
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-5 g-xl-9">
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-5 g-xl-9 g-xxl-2">
 
      @if (sablonList != null)
             {
                  foreach (var item in sablonList)
                 {
                     <!--begin::Col-->
-                    <div class="col-md-4">
+            <div class="col-md-4 col-sm-6 col-xl-3 col-xxl-2">
                         <!--begin::Card-->
                         <div class="card card-flush h-md-100">
                             <!--begin::Card header-->
@@ -32,39 +32,46 @@
                                     <h2>@item.SablonName</h2>
                                 </div>
                                 <!--end::Card title-->
-                                <form asp-action="apiSablonsRemoveSettings" asp-controller="WindowsFormSettings" method="post">
+                        <form id="formDeleteRole_@item.ID" asp-action="apiSablonsRemoveSettings" asp-controller="WindowsFormSettings" method="post">
+                            <input name="ID" value="@item.ID" hidden />
+                            @if (item.sablonDataDurumu == "false")
+                            {
+                                <div class="ribbon-label bg-danger">
+                                    <button type="button" class="bg-transparent border-0 sweetAlertDeleteRole" data-id="@item.ID">
+                                        <i class="ki-solid ki-trash text-inverse-danger fs-1"></i>
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="ribbon-label bg-secondary">
+                                    <button type="button" class="bg-transparent border-0" disabled>
+                                        <i class="ki-solid ki-trash text-inverse-secondary fs-1"></i>
+                                    </button>
+                                </div>
+                            }
+                        </form>
 
-                                    <input name="ID" value="@item.ID" hidden />
-                                @if(item.sablonDataDurumu == "false"){
-
-                                        <div class="ribbon-label bg-danger">
-                                            <button type="submit" class="bg-transparent border-0">
-                                            <i class="ki-solid ki-trash text-inverse-danger fs-1"></i>
-                                            </button>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                          <div class="ribbon-label bg-secondary">
-                                               <button type="submit" class="bg-transparent border-0" disabled>
-                                            <i class="ki-solid ki-trash text-inverse-secondary fs-1"></i>
-                                            </button>
-                                        </div>
-                                    }
-                                </form>
                          
                             </div>
                             <!--end::Card header-->
 
                             <!--begin::Card body-->
-                            <div class="card-body pt-1 scroll-y" style="height:300px">
+
+                    <div class="card-body pt-1  mx-auto" >
+                        <i class="ki-solid ki-gear text-success fs-7tx ">
+                          
+                        </i>
+                            </div>
+
+                    <div class="card-body pt-1 scroll-y" style="height:300px" hidden>
                                     
                                     <!--begin::Users-->
                                 <div class="fw-bold text-gray-600 mb-5">Aktif edilmiş Attribute sayısı: @item.SablonDataList.Count(x => x.IsActive == "true")</div>
                                 <!--end::Users-->
                                     
                                 <!--begin::Permissions-->
-                                <div class="d-flex flex-column text-gray-600">
+                                <div class="d-flex flex-column text-gray-600" >
                                     @foreach (var item2 in item.SablonDataList)
                                         {
                                              if(item2.IsActive == "true")
@@ -82,22 +89,33 @@
                             <!--begin::Card footer-->
                             <div class="card-footer flex-wrap pt-0">
 
+                        <form id="formSablons_@item.ID" asp-action="apiSablonsSendtToWindowsFormSettings" asp-controller="WindowsFormSettings" method="post">
+                            <input name="ID" value="@item.ID" hidden />
+                            <input name="SablonName" value="@item.SablonName" hidden />
+                            <input type="hidden" name="sablonDataDurumu" value="@item.sablonDataDurumu" />
 
+                            @if (item.sablonDataDurumu == "false")
+                            { 
+                            <button type="button" class="btn btn-light btn-light-success my-1 float-end startButton">Başlat</button>
+                            }else{
 
+                            <button type="button" class="btn btn-light btn-primary my-1 float-end stopButton">Durdur</button>
+                            }
+                        </form>
 
-                                <form asp-action="apiSablonsSendtToWindowsFormSettings" asp-controller="WindowsFormSettings" method="post">
+                           @*      <form asp-action="apiSablonsSendtToWindowsFormSettings" asp-controller="WindowsFormSettings" method="post">
 
                                     <input name="ID" value="@item.ID" hidden/>
                                     <input name="SablonName" value="@item.SablonName" hidden/>
 
                                 @if(item.sablonDataDurumu == "false"){
-                                <button type="submit" class="btn btn-light btn-light-success my-1 float-end" >Aktif Et</button>
+                                <button type="submit" class="btn btn-light btn-light-success my-1 float-end" >Başlat</button>
                                     <input name="sablonDataDurumu" value="true" hidden/>
                                 }else{ 
-                                <button type="submit" class="btn btn-light btn-primary my-1 float-end" >İptal Et</button>
+                                <button type="submit" class="btn btn-light btn-primary my-1 float-end" >Durdur</button>
                                     <input name="sablonDataDurumu" value="false" hidden/>
                                 }
-                                </form>
+                                </form> *@
                             </div>
                             <!--end::Card footer-->
                         </div>
@@ -109,7 +127,7 @@
 
     
     <!--begin::Add new card-->
-    <div class="ol-md-4">
+    <div class="col-md-4 col-sm-6 col-xl-3 col-xxl-2">
         <!--begin::Card-->
         <div class="card h-md-100">
             <!--begin::Card body-->
@@ -185,7 +203,7 @@
                                     <!--begin::Input-->
                                     <select class="form-control form-control-solid" name="source_Api">
                                         <option value="">Kaynak Api Seç</option>
-                                        <option value="CADDocumentMgmt/CADDocuments('OR:wt.epm.EPMDocument:">PTC CAD Document Management Domain - CADDocuments</option>
+                                        <option hidden value="CADDocumentMgmt/CADDocuments('OR:wt.epm.EPMDocument:">PTC CAD Document Management Domain - CADDocuments</option>
 
                                         <option value="ProdMgmt/Parts('OR:wt.part.WTPart:">PTC Product Management Domain - Parts</option>
                                     </select>
@@ -202,9 +220,10 @@
                                     <!--begin::Input-->
                                     <select class="form-control form-control-solid" name="yapilacakIslem">
                                         <option value="">Yapılacak işlemi seç</option>
-                                        <option value="RELEASED">Tamamlanmış parçaları aktar</option>
-                                        <option value="INWORK">Devam eden parçaları aktar</option>
-                                        <option value="CANCELLED">İptal edilmiş parçaları aktar</option>
+                                        <option value="RELEASED">RELEASED - Tamamlanmış parçaları aktar</option>
+                                        <option value="ALTERNATE_RELEASED">MUADİL - Muadil parçaları aktar</option>
+                                        <option value="INWORK">INWORK - Devam eden parçaları aktar</option>
+                                        <option value="CANCELLED">CANCELLED - İptal edilmiş parçaları aktar</option>
 
                                     </select>
                                     <!--end::Input-->
@@ -257,7 +276,7 @@
                                                      
 															<!--end::Input group-->
 															<!--begin::Permissions-->
-															<div class="fv-row">
+															<div class="fv-row" hidden>
 																<!--begin::Label-->
 																<label class="fs-5 fw-bold form-label mb-2">Api Yönetimi</label>
 																<!--end::Label-->
@@ -305,6 +324,89 @@
 
 
 	@section scripts {
+
+        <!-- #region SweetAlert area -->
+    <script>
+        const buttons = document.querySelectorAll('.sweetAlertDeleteRole');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', async (e) => {
+                e.preventDefault(); // Prevent default form submission
+                const confirmation = await Swal.fire({
+                    html: `Rolü silmek istediğinize emin misiniz? Bu işlem geri alınamaz. Silinen rol, rolün sahip olduğu tüm izinleri ve erişimleri de beraberinde silecektir.`,
+                    icon: "warning", // Use a more appropriate icon for deletion
+                    buttonsStyling: false,
+                    showCancelButton: true,
+                    confirmButtonText: "Tamam, devam et",
+                    cancelButtonText: 'Hayır, iptal et',
+                    customClass: {
+                        confirmButton: "btn btn-primary",
+                        cancelButton: 'btn btn-danger'
+                    }
+                });
+
+                if (confirmation.isConfirmed) {
+                    // Find the parent form and submit it
+                    const formId = `formDeleteRole_${button.getAttribute('data-id')}`;
+                    document.getElementById(formId).submit();
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $(".startButton").click(function () {
+                var form = $(this).closest('form');
+                var id = form.find('input[name="ID"]').val();
+                var sablonName = form.find('input[name="SablonName"]').val();
+
+                Swal.fire({
+                    text: "İşlem başlatılsın mı?",
+                    icon: "success",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Başlat",
+                    cancelButtonText: "İptal",
+                    cancelButtonColor: '#d33',
+                    reverseButtons: false,
+                    customClass: {
+                        confirmButton: 'btn btn-success', // Evet butonu rengi
+                        cancelButton: 'btn btn-danger' // İptal butonu rengi
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.find('input[name="sablonDataDurumu"]').val("true");
+                        form.submit();
+                    }
+                });
+            });
+
+            $(".stopButton").click(function () {
+                var form = $(this).closest('form');
+                var id = form.find('input[name="ID"]').val();
+                var sablonName = form.find('input[name="SablonName"]').val();
+
+                Swal.fire({
+                    text: "İşlemi durdurmak istediğinize emin misiniz?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Durdur",
+                    cancelButtonText: "İptal",
+                    cancelButtonColor: '#d33',
+                    reverseButtons: false,
+                    customClass: {
+                        confirmButton: 'btn btn-warning', // Evet butonu rengi
+                        cancelButton: 'btn btn-danger' // İptal butonu rengi
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.find('input[name="sablonDataDurumu"]').val("false");
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+<!-- #endregion -->
                                                                 <script>
 
                                                                     $(document).ready(function () { 

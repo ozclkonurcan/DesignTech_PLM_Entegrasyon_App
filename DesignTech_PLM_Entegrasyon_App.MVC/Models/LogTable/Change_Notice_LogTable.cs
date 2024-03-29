@@ -73,6 +73,7 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Models.LogTable
 
 
 		public string? idA2A2 { get; set; }
+		public string? TransferID { get; set; }
 		public string? idA3masterReference { get; set; }
 		public string? statestate { get; set; }
 		public string? name { get; set; }
