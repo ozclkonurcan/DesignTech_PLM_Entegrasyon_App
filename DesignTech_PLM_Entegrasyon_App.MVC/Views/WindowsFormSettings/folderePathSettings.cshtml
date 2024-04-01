@@ -1,0 +1,37 @@
+﻿<div class="row">
+
+    <h2 class="mb-7 text-info">Dosya Path Ayarları</h2>
+
+    <div class="col-md-12">
+        <h4 class="text-primary">appsettings.json</h4>
+        <p>Gerekli klasör üzerinden dosya ile birlikte dosya yolunun eklenmemsi lazım.</p>
+    <form asp-action="windowsFormURLSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
+        <input type="text" class="form-control" placeholder="Hedef dosya yolunu ekleyin ---> ( Configuration / appsettings.json )" alt="Dosya seçiniz" name="jsonFile" />
+
+        <button class="btn btn-info btn-sm float-end m-4">Bağla</button>
+    </form>
+    </div>
+
+
+
+    <div class="col-md-12">
+        <h4 class="text-primary">ApiSendDataSettings.json</h4>
+        <p>Gerekli klasör üzerinden dosya ile birlikte dosya yolunun eklenmemsi lazım.</p>
+        <form asp-action="ApiSendDataSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
+            <input type="text" class="form-control" placeholder="Hedef dosya yolunu ekleyin ---> ( Configuration / ApiSendDataSettings.json )" alt="Dosya seçiniz" name="jsonFile" />
+
+            <button class="btn btn-info btn-sm float-end m-4">Bağla</button>
+            </form>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <h4 class="text-primary">Entegrasyon - LOG</h4>
+            <p>Log dosyalarının görüntülenmesi için sadece log json dosyalarının tutulduğu klasörün dosya yolu yeterli.</p>
+        <form asp-action="jsonLogFileFolderPathSettings" asp-controller="WindowsFormSettings" method="post" enctype="multipart/form-data">
+            <input type="text" class="form-control" placeholder="Hedef dosya yolunu ekleyin ---> ( Configuration / Logs )" alt="Dosya seçiniz" name="jsonLogFileFolderPath" />
+
+            <button class="btn btn-info btn-sm float-end m-4">Bağla</button>
+        </form>
+
+    </div>
+</div>

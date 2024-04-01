@@ -1760,7 +1760,9 @@ $(document).ready(() => {
                 var formattedTimestamp = new Date(item.processTimestamp).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
                 // $('#dataTableBodyAlternatePart').append('<tr><td >' + (index + 1) + '</td> <td>'+item.transferID+'</td> <td>' + item.state + '</td><td class="w-25">' + item.name + '</td><td class="w-25">' + item.number + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
-                $('#dataTableBodyAlternatePart').append('<tr><td>' + (index + 1) + '</td><td >' + item.transferID + '</td><td  class="w-25">' + item.number + '</td><td  class="w-25">' + item.name + '</td><td>' + item.state + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
+                $('#dataTableBodyAlternatePart').append('<tr><td>' + (index + 1) + '</td><td>' + item.transferID + '</td><td >' + item.number + '</td><td >' + item.anaParcaNumber + ' : ' + item.anaParcaName+' > '+ item.name + '</td><td>' + item.state + '</td><td >' + formattedTimestamp + '</td></tr>');
+
+                // $('#dataTableBodyAlternatePart').append('<tr><td>' + (index + 1) + '</td><td >' + item.transferID + '</td><td  class="w-25">' + item.number + '</td><td  class="w-25">' + item.name + '</td><td>' + item.state + '</td><td class="w-25">' + formattedTimestamp + '</td></tr>');
 
             });
         }

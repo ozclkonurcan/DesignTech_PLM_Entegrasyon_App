@@ -417,70 +417,111 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
             }
         }
 
-		#region windowsFormURLSettings
-		 
-		//public IActionResult windowsFormURLSettings(IFormFile jsonFile)
-		//{
-		//    try
-		//    {
+        public IActionResult jsonLogFileFolderPathSettings(string jsonLogFileFolderPath)
+        {
+            try
+            {
+                if (jsonLogFileFolderPath != null && jsonLogFileFolderPath.Length > 0)
+                {
 
-		//        if (jsonFile != null && jsonFile.Length > 0)
-		//        {
-		//            // appsettings.json dosyasını oku
-		//            var appSettingsPath = "appsettings.json";
-		//            var json = System.IO.File.ReadAllText(appSettingsPath);
-		//            var jsonObj = JObject.Parse(json);
+                    // appsettings.json dosyasını oku
+                    var appSettingsPath = "appsettings.json";
+                    var json = System.IO.File.ReadAllText(appSettingsPath);
+                    var jsonObj = JObject.Parse(json);
 
+                    // Eğer WindowsFormFileUrl zaten varsa güncelle, yoksa ekle
+                    if (jsonObj["LogFileFolderPathSettings"] == null)
+                    {
+                        jsonObj.Add("LogFileFolderPathSettings", jsonLogFileFolderPath);
+                    }
+                    else
+                    {
+                        jsonObj["LogFileFolderPathSettings"] = jsonLogFileFolderPath;
+                    }
 
-		//            // Dosya adını almak için
-		//            var fileName = jsonFile.FileName;
+                    // Değişiklikleri kaydet
+                    System.IO.File.WriteAllText(appSettingsPath, jsonObj.ToString());
 
-		//            // Dosya yolunu belirlemek için (sunucuya kaydetmeden)
-		//            var fullFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Configuration", fileName);
-		//            //var fullFilePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", fileName);
+                    // Başarılı mesajı
+                    TempData["SuccessMessage"] = "DataSettings.json dosyası güncellendi. Dosya Yolu: " + jsonLogFileFolderPath;
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Hata! Dosya seçimi yapılmadı.";
+                }
 
-		//            // Eğer WindowsFormFileUrl zaten varsa güncelle, yoksa ekle
-		//            if (jsonObj["WindowsFormFileUrl"] == null)
-		//            {
-		//                jsonObj.Add("WindowsFormFileUrl", fullFilePath);
-		//            }
-		//            else
-		//            {
-		//                jsonObj["WindowsFormFileUrl"] = fullFilePath;
-		//            }
+                return RedirectToAction("ViewJsonFiles3", "Log");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Hata! " + ex.Message;
+                return RedirectToAction("ViewJsonFiles3", "Log");
+            }
+        }
+        #region windowsFormURLSettings
 
+        //public IActionResult windowsFormURLSettings(IFormFile jsonFile)
+        //{
+        //    try
+        //    {
 
-
-		//            // Değişiklikleri kaydet
-		//            System.IO.File.WriteAllText(appSettingsPath.ToString(), jsonObj.ToString());
-
-
-
-		//            // Başarılı mesajı
-		//            TempData["SuccessMessage"] = "appsettings.json dosyası güncellendi. Dosya Yolu: " + fullFilePath;
-		//        }
-		//        else
-		//        {
-		//            // Hata mesajı
-		//            TempData["ErrorMessage"] = "Hata! Dosya seçimi yapılmadı.";
-		//        }
-
-		//        // Index sayfasına yönlendir
-		//        return RedirectToAction("Index");
-		//    }
-		//    catch (Exception ex)
-		//    {
-		//        // Hata mesajı
-		//        TempData["ErrorMessage"] = "Hata! " + ex.Message;
-
-		//        // Index sayfasına yönlendir
-		//        return RedirectToAction("Index");
-		//    }
-		//}
+        //        if (jsonFile != null && jsonFile.Length > 0)
+        //        {
+        //            // appsettings.json dosyasını oku
+        //            var appSettingsPath = "appsettings.json";
+        //            var json = System.IO.File.ReadAllText(appSettingsPath);
+        //            var jsonObj = JObject.Parse(json);
 
 
+        //            // Dosya adını almak için
+        //            var fileName = jsonFile.FileName;
 
-		public IActionResult windowsFormURLSettings(string jsonFile)
+        //            // Dosya yolunu belirlemek için (sunucuya kaydetmeden)
+        //            var fullFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Configuration", fileName);
+        //            //var fullFilePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", fileName);
+
+        //            // Eğer WindowsFormFileUrl zaten varsa güncelle, yoksa ekle
+        //            if (jsonObj["WindowsFormFileUrl"] == null)
+        //            {
+        //                jsonObj.Add("WindowsFormFileUrl", fullFilePath);
+        //            }
+        //            else
+        //            {
+        //                jsonObj["WindowsFormFileUrl"] = fullFilePath;
+        //            }
+
+
+
+        //            // Değişiklikleri kaydet
+        //            System.IO.File.WriteAllText(appSettingsPath.ToString(), jsonObj.ToString());
+
+
+
+        //            // Başarılı mesajı
+        //            TempData["SuccessMessage"] = "appsettings.json dosyası güncellendi. Dosya Yolu: " + fullFilePath;
+        //        }
+        //        else
+        //        {
+        //            // Hata mesajı
+        //            TempData["ErrorMessage"] = "Hata! Dosya seçimi yapılmadı.";
+        //        }
+
+        //        // Index sayfasına yönlendir
+        //        return RedirectToAction("Index");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Hata mesajı
+        //        TempData["ErrorMessage"] = "Hata! " + ex.Message;
+
+        //        // Index sayfasına yönlendir
+        //        return RedirectToAction("Index");
+        //    }
+        //}
+
+
+
+        public IActionResult windowsFormURLSettings(string jsonFile)
 		{
 			try
 			{
@@ -524,7 +565,17 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers.Modules.WindowsFormSett
 
 
 		#endregion
-
+		public IActionResult folderePathSettings()
+		{
+			try
+			{
+				return View();
+			}
+			catch (Exception)
+			{
+				return View();
+			}
+		}
 
 
 		public IActionResult windowssFormSQLSettings(string Catalog, string ServerName, string KullaniciAdi,string Parola,string ConnectionStrings)

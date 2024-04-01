@@ -85,10 +85,8 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 				return View();
 			}
 		}
-
-
-
-		public ActionResult ViewJsonFiles(string dateFolder)
+		
+        public ActionResult ViewJsonFiles(string dateFolder)
         {
 
             try {
@@ -132,24 +130,24 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 
 
 		}
+     
+
+        //public ActionResult ViewLogFile(string dateFolder, string jsonFile)
+        //{
+        //    string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
+        //    string dateFolderPath = Path.Combine(logsPath, dateFolder);
+        //    string jsonFilePath = Path.Combine(dateFolderPath, jsonFile);
+
+        //    string jsonContent = System.IO.File.ReadAllText(jsonFilePath);
+
+        //    // JSON içeriği ViewBag'e aktarın
+        //    ViewBag.JsonContent = jsonContent;
+
+        //    return View();
+        //}
 
 
-		//public ActionResult ViewLogFile(string dateFolder, string jsonFile)
-		//{
-		//    string logsPath = "wwwroot\\Logs"; // Logs klasörünüzün yolu
-		//    string dateFolderPath = Path.Combine(logsPath, dateFolder);
-		//    string jsonFilePath = Path.Combine(dateFolderPath, jsonFile);
-
-		//    string jsonContent = System.IO.File.ReadAllText(jsonFilePath);
-
-		//    // JSON içeriği ViewBag'e aktarın
-		//    ViewBag.JsonContent = jsonContent;
-
-		//    return View();
-		//}
-
-
-		public class LogEntry
+        public class LogEntry
         {
             public string Timestamp { get; set; }
             public LogMessage Message { get; set; }
@@ -381,7 +379,212 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Controllers
 
 
 
-		public ActionResult UpdateLogControlJson(LogUpdateRequest logUpdateRequest)
+
+        //LOG3  
+        public IActionResult Log3()
+        {
+            try
+            {
+
+                var appSettingsPath = "appsettings.json";
+
+                // appsettings.json dosyasını oku
+                var json = System.IO.File.ReadAllText(appSettingsPath);
+                var jsonObj = JObject.Parse(json);
+
+                // Dosya yolu ve dosya adını al
+                var windowsFormFileUrl = jsonObj["LogFileFolderPathSettings"]?.ToString();
+
+                //string logsPath = "C:\\Users\\tronu\\source\\repos\\designtechkamil\\Designtech_PLM_Entegrasyon_AutoPost_V2\\Designtech_PLM_Entegrasyon_AutoPost_V2\\bin\\Debug\\net8.0-windows\\Configuration\\logs"; // Logs klasörünüzün yolu
+                //if (!Directory.Exists(logsPath))
+                //{
+                //    // Logs klasörü yoksa oluşturun
+                //    Directory.CreateDirectory(logsPath);
+                //}
+
+                //string[] dateFolders = Directory.GetDirectories(logsPath);
+
+                //// Filter folders containing "ProcessLog"
+                //var filteredFolders = dateFolders.Where(folder => folder.Contains("TakvimFile")).ToArray();
+
+                // Tarih klasörlerini ViewBag'e aktarın
+                ViewBag.DateFolders = windowsFormFileUrl;
+                return View();
+            }
+            catch (Exception)
+            {
+                return View();
+            }
+        }
+
+        public ActionResult ViewJsonFiles3(string dateFolder)
+        {
+
+            try
+            {
+                var appSettingsPath = "appsettings.json";
+
+                // appsettings.json dosyasını oku
+                var json = System.IO.File.ReadAllText(appSettingsPath);
+                var jsonObj = JObject.Parse(json);
+
+                // Dosya yolu ve dosya adını al
+                var windowsFormFileUrl = jsonObj["LogFileFolderPathSettings"]?.ToString();
+
+                //dateFolder = "TakvimFile";
+
+
+                //string logsPath = "C:\\Users\\tronu\\source\\repos\\designtechkamil\\Designtech_PLM_Entegrasyon_AutoPost_V2\\Designtech_PLM_Entegrasyon_AutoPost_V2\\bin\\Debug\\net8.0-windows\\Configuration\\logs"; // Logs klasörünüzün yolu
+                //string dateFolderPath = Path.Combine(logsPath, dateFolder);
+                string[] jsonFiles = Directory.GetFiles(windowsFormFileUrl, "*.json");
+
+                // JSON dosyalarını ViewBag'e aktarın
+                ViewBag.DateFolder = windowsFormFileUrl;
+                ViewBag.JsonFiles = jsonFiles;
+                return View();
+            }
+            catch (Exception) { return View(); }
+
+
+
+
+        }
+
+
+  
+
+   
+
+
+        public class TakvimJsonoLogClass
+        {
+            public string TransferID { get; set; } = string.Empty;
+            public string ID { get; set; } = string.Empty;
+            public string Number { get; set; } = string.Empty;
+            public string Name { get; set; } = string.Empty;
+            public string Mesaj { get; set; } = string.Empty;
+            public string Version { get; set; } = string.Empty;
+            public string? VersionID { get; set; }
+            public string? islemTarihi { get; set; }
+
+        }
+        public class TakvimJsonoLogClass2
+        {
+            public string TransferID { get; set; } = string.Empty;
+            public string ID { get; set; } = string.Empty;
+            public string Number { get; set; } = string.Empty;
+            public string Name { get; set; } = string.Empty;
+            public string Mesaj { get; set; } = string.Empty;
+            public string Version { get; set; } = string.Empty;
+            public string? VersionID { get; set; }
+            public string? islemTarihi { get; set; }
+        }
+
+
+        public ActionResult ViewLogFile3(string dateFolder, string jsonFile)
+        {
+            try
+            {
+
+                var appSettingsPath = "appsettings.json";
+
+                // appsettings.json dosyasını oku
+                var json = System.IO.File.ReadAllText(appSettingsPath);
+                var jsonObj = JObject.Parse(json);
+
+                // Dosya yolu ve dosya adını al
+                var windowsFormFileUrl = jsonObj["LogFileFolderPathSettings"]?.ToString();
+
+
+
+                if (string.IsNullOrEmpty(dateFolder) || string.IsNullOrEmpty(jsonFile))
+                {
+                    TempData["ErrorMessage"] = "Hata oluştu";
+                    return RedirectToAction("Index");
+                }
+
+                //string logsPath = "C:\\Users\\tronu\\source\\repos\\designtechkamil\\Designtech_PLM_Entegrasyon_AutoPost_V2\\Designtech_PLM_Entegrasyon_AutoPost_V2\\bin\\Debug\\net8.0-windows\\Configuration\\logs";
+                //string dateFolderPath = Path.Combine(dateFolder);
+                string jsonFilePath = Path.Combine(windowsFormFileUrl, jsonFile);
+
+                if (!System.IO.File.Exists(jsonFilePath))
+                {
+                    TempData["ErrorMessage"] = "Belirtilen JSON dosyası bulunamadı.";
+                    return RedirectToAction("Index");
+                }
+
+                var excelLogEntries = new List<TakvimJsonoLogClass2>();
+
+                // Dosyayı okuma işlemi için try-catch kullanarak hataları ele alın
+                // Dosyayı okuma işlemi için try-catch kullanarak hataları ele alın
+                try
+                {
+                    using (var fileStream = System.IO.File.Open(jsonFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    using (var streamReader = new StreamReader(fileStream))
+                    {
+                        string jsonContent = streamReader.ReadToEnd();
+
+
+                        JArray jsonArray = JArray.Parse(jsonContent);
+                        foreach (var jsonEntry in jsonArray.Children())
+                        {
+                            try
+                            {
+                                var logEntry = jsonEntry.ToObject<TakvimJsonoLogClass>();
+
+                                // LogEntry sınıfını ExcelLogEntry sınıfına dönüştür
+                                var excelLogEntry = new TakvimJsonoLogClass2
+                                {
+                                       TransferID = logEntry.TransferID,
+                                       ID = logEntry.ID,
+                                       Number = logEntry.Number,
+                                       Name = logEntry.Name,
+                                    Mesaj = logEntry.Mesaj,
+                                       Version = logEntry.Version,
+                                       VersionID = logEntry.VersionID,
+                                       islemTarihi = logEntry.islemTarihi,
+                                };
+
+                                excelLogEntries.Add(excelLogEntry);
+                            }
+                            catch (JsonReaderException ex)
+                            {
+                                TempData["ErrorMessage"] = "UYARI ! " + ex.Message;
+                                return RedirectToAction("Index");
+                            }
+                            finally
+                            {
+                                streamReader.Close();
+                                fileStream.Close();
+                            }
+                        }
+
+                    }
+                }
+                catch (System.IO.IOException ex)
+                {
+                    // Dosya erişimi hatası oluştuğunda yapılacak işlemler
+                }
+
+
+                // Verileri tazelemek için aynı sayfayı tekrar yükle
+                ViewBag.jsonFilePath = jsonFilePath;
+                ViewBag.excelLogEntries = excelLogEntries;
+                return View(excelLogEntries);
+            }
+            catch (Exception)
+            {
+                return View();
+            }
+
+        }
+
+        //LOG3  
+
+
+
+
+        public ActionResult UpdateLogControlJson(LogUpdateRequest logUpdateRequest)
         {
             try
             {

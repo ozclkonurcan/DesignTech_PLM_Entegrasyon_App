@@ -59,9 +59,17 @@
                             <!--begin::Card body-->
 
                     <div class="card-body pt-1  mx-auto" >
-                        <i class="ki-solid ki-gear text-success fs-7tx ">
-                          
-                        </i>
+                        @if (item.sablonDataDurumu == "false"){
+
+                        <i class="ki-solid ki-gear text-secondary fs-2tx "></i>
+                        <i class="ki-solid ki-gear text-secondary fs-4tx "></i>
+                        <i class="ki-solid ki-gear text-secondary fs-7tx "></i>
+                        }else{
+
+                        <i class="ki-solid ki-gear text-success fs-2tx "></i>
+                        <i class="ki-solid ki-gear text-success fs-4tx "></i>
+                        <i class="ki-solid ki-gear text-success fs-7tx "></i>
+                        }
                             </div>
 
                     <div class="card-body pt-1 scroll-y" style="height:300px" hidden>
@@ -221,9 +229,10 @@
                                     <select class="form-control form-control-solid" name="yapilacakIslem">
                                         <option value="">Yapılacak işlemi seç</option>
                                         <option value="RELEASED">RELEASED - Tamamlanmış parçaları aktar</option>
-                                        <option value="ALTERNATE_RELEASED">MUADİL - Muadil parçaları aktar</option>
                                         <option value="INWORK">INWORK - Devam eden parçaları aktar</option>
                                         <option value="CANCELLED">CANCELLED - İptal edilmiş parçaları aktar</option>
+                                        <option value="ALTERNATE_RELEASED">MUADİL - Muadil parçaları aktar</option>
+                                        <option value="REMOVED_PART">REMOVED_PART - Kaldırılmış muadil parçaları aktar</option>
 
                                     </select>
                                     <!--end::Input-->

@@ -4,6 +4,10 @@ namespace DesignTech_PLM_Entegrasyon_App.MVC.Models.LogTable
 {
     public class WTPartAlternateLink_LOG
     {
+        public string? AnaParcaTransferID { get; set; }
+        public string? AnaParcaID { get; set; }
+        public string? AnaParcaNumber { get; set; }
+        public string? AnaParcaName { get; set; }
         public string? TransferID { get; set; }
         public string? ID { get; set; }
         public string? ObjectType { get; set; }
